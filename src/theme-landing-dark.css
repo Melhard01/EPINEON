@@ -1,0 +1,467 @@
+/**
+ * Landing page dark theme — scoped to .landing-page-dark
+ * Does not alter .site-header scroll animation rules (separate selectors).
+ * Excludes: header logo img, .epineon-btn-primary, .epineon-btn-secondary (and descendants).
+ */
+
+.landing-page-dark {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Shell — sections + header stay pure black */
+.landing-page-dark > section,
+.landing-page-dark > header.site-header {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* Footer — same surface + border as premium cards (#1a1a1a / #333) */
+.landing-page-dark > footer.site-footer {
+  background-color: #1a1a1a !important;
+  background-image: none !important;
+  border: 1px solid #333333 !important;
+  border-bottom: none !important;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Header bar (animation flex rules live under .site-header .site-header-nav-shell — untouched) */
+.landing-page-dark > header.site-header {
+  border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Wordmark PNG — lift contrast on gold “Precision Life Science” line on black header (no extra DOM) */
+.landing-page-dark header.site-header .site-header-wordmark {
+  filter: brightness(1.09) contrast(1.14) saturate(1.12);
+}
+
+.landing-page-dark header.site-header .site-header-wordmark:hover {
+  filter: brightness(1.12) contrast(1.16) saturate(1.15);
+}
+
+/* Nav links: white + accent hover (indigo) — not logo, not CTA button */
+.landing-page-dark header.site-header nav a,
+.landing-page-dark header.site-header .site-header-nav-trigger,
+.landing-page-dark header.site-header .site-header-utility-link {
+  color: #ffffff !important;
+}
+
+.landing-page-dark header.site-header nav a:hover,
+.landing-page-dark header.site-header .site-header-nav-trigger:hover,
+.landing-page-dark header.site-header .site-header-utility-link:hover {
+  color: #a5b4fc !important;
+}
+
+/* CTA strip: flatten to pure black */
+.landing-page-dark section#CTA {
+  background: #000000 !important;
+}
+
+/* ---------- Typography: dark → white ---------- */
+.landing-page-dark .text-slate-600,
+.landing-page-dark .text-slate-700,
+.landing-page-dark .text-slate-800,
+.landing-page-dark .text-slate-900,
+.landing-page-dark .text-gray-800,
+.landing-page-dark .text-black {
+  color: #ffffff !important;
+}
+
+.landing-page-dark p,
+.landing-page-dark label {
+  color: #ffffff !important;
+}
+
+.landing-page-dark h1,
+.landing-page-dark h2,
+.landing-page-dark h3,
+.landing-page-dark h4 {
+  color: #ffffff !important;
+}
+
+/* Hero eyebrow — charcoal pill, gold hairline border + wide-track caps (above main headline) */
+.landing-page-dark section#home .hero-precision-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /* Nudge only the pill up; headline stays in normal flow (layout box unchanged). */
+  top: -0.875rem;
+  margin-bottom: 0;
+  padding: 0.28rem 0.95rem 0.38rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(201, 162, 39, 0.55);
+  background: linear-gradient(180deg, #2a2624 0%, #1c1a18 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  color: #d4b85c !important;
+  font-family: inherit !important;
+  font-size: 0.5625rem;
+  font-weight: 500;
+  font-style: normal !important;
+  letter-spacing: 0.24em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+@media (min-width: 640px) {
+  .landing-page-dark section#home .hero-precision-pill {
+    top: -1rem;
+    padding: 0.32rem 1.1rem 0.42rem;
+    font-size: 0.625rem;
+    letter-spacing: 0.26em;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-page-dark section#home .hero-precision-pill {
+    top: -1.125rem;
+    padding: 0.36rem 1.25rem 0.46rem;
+    font-size: 0.6875rem;
+    letter-spacing: 0.28em;
+  }
+}
+
+/* Hero editorial headline — preserve two-tone serif (overrides h1 white inheritance) */
+.landing-page-dark h1.hero-display-serif .hero-display-line1 {
+  color: #e7e5e4 !important;
+  font-style: italic !important;
+  font-weight: 700 !important;
+}
+
+.landing-page-dark h1.hero-display-serif .hero-display-line2 {
+  color: #c9a227 !important;
+  font-style: italic !important;
+  font-weight: 700 !important;
+}
+
+/* Hero intro blurb — muted neutral grey (not full white), matches reference body on charcoal */
+.landing-page-dark section#home p.hero-intro-body.epineon-body-large {
+  color: #b0b0b0 !important;
+}
+
+/* Hero steward line — stone on black; same sans/body treatment as hero .epineon-body-large */
+.landing-page-dark section#home .hero-steward-tagline {
+  color: #e7e5e4 !important;
+  font-style: normal !important;
+  font-weight: 400 !important;
+  font-family: inherit !important;
+}
+
+/* Gold headline + gradient text (do not force white) */
+.landing-page-dark .text-\[\#c9a227\] {
+  color: #c9a227 !important;
+}
+
+.landing-page-dark .epineon-gradient-text {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Status / semantic colors */
+.landing-page-dark .text-green-600 {
+  color: rgb(22 163 74) !important;
+}
+
+.landing-page-dark .text-red-600 {
+  color: rgb(220 38 38) !important;
+}
+
+/* Footer & resource links */
+.landing-page-dark footer a:hover {
+  color: #a5b4fc !important;
+}
+
+/* Muted body text that must survive the global `.landing-page-dark p { color:#fff !important }` rule */
+.landing-page-dark .product-card-desc,
+.landing-page-dark .challenge-card-text,
+.landing-page-dark .team-card-bio {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.landing-page-dark .product-detail-desc {
+  color: rgba(255, 255, 255, 0.72) !important;
+}
+
+.landing-page-dark .team-card-title {
+  color: #c9a227 !important;
+}
+
+.landing-page-dark .team-card-title--placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Mobile footer tagline — white on dark (mobile-only block in markup) */
+.landing-page-dark footer .footer-mobile-tagline {
+  color: #ffffff !important;
+}
+
+.landing-page-dark footer .footer-mobile-copyright {
+  color: rgba(255, 255, 255, 0.42) !important;
+}
+
+.landing-page-dark footer .footer-mobile-link {
+  color: #c4c0dc !important;
+}
+
+/* ---------- Buttons: do not alter primary / secondary brand buttons ---------- */
+.landing-page-dark .epineon-btn-primary,
+.landing-page-dark .epineon-btn-primary * {
+  color: #ffffff !important;
+}
+
+.landing-page-dark .epineon-btn-secondary {
+  background-color: #ffffff !important;
+  color: #0a0a0a !important;
+  border-color: #e5e5e5 !important;
+}
+
+.landing-page-dark .epineon-btn-secondary .epineon-gradient-text {
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* Hero #home — Uncover Our Story: black (overrides global .epineon-btn-primary white on outline inner text) */
+.landing-page-dark section#home .hero-cta-outline.epineon-btn-secondary .hero-cta-story-text {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background: none !important;
+  background-clip: border-box !important;
+}
+
+/* ---------- Premium cards (charcoal panel, serif titles, muted body, dark pill CTAs + gold label) ---------- */
+.landing-page-dark .epineon-card {
+  background-color: #1a1a1a !important;
+  color: #ffffff !important;
+  border: 1px solid #333333 !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35) !important;
+  transition:
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.landing-page-dark .epineon-card:hover,
+.landing-page-dark .epineon-card.hover\:transform:hover {
+  transform: translateY(-4px) !important;
+  border-color: #444444 !important;
+  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Card titles — display serif (same as section / hero titling) */
+.landing-page-dark .epineon-card .epineon-h4 {
+  font-family: var(--epineon-font-display) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.05em !important;
+  color: #ffffff !important;
+}
+
+.landing-page-dark .epineon-card .epineon-h3,
+.landing-page-dark .epineon-card .venture-studio-card-title {
+  color: #ffffff !important;
+}
+
+.landing-page-dark .epineon-card .venture-studio-card-title.text-slate-900 {
+  color: #ffffff !important;
+}
+
+/* Body copy inside cards — soft grey */
+.landing-page-dark .epineon-card .epineon-body,
+.landing-page-dark .epineon-card .epineon-body-large {
+  color: #a0a0a0 !important;
+}
+
+/* Utility text inside cards inherits hierarchy over global white slate rules */
+.landing-page-dark .epineon-card .text-slate-700,
+.landing-page-dark .epineon-card .text-slate-800,
+.landing-page-dark .epineon-card .text-slate-900 {
+  color: #a0a0a0 !important;
+}
+
+.landing-page-dark .epineon-card .epineon-h4.text-slate-900 {
+  color: #ffffff !important;
+}
+
+/* Biotech carousel — card titles in brand gold */
+.landing-page-dark .epineon-card .epineon-h4.solution-card-title--gold {
+  color: #c9a227 !important;
+}
+
+/* Meta / company line — muted gold, subtle tracking */
+.landing-page-dark .epineon-card .text-slate-600 {
+  color: #9a8359 !important;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+}
+
+@media (min-width: 640px) {
+  .landing-page-dark .epineon-card .text-slate-600 {
+    font-size: 0.75rem;
+  }
+}
+
+/* Logo wells */
+.landing-page-dark .bg-gray-50 {
+  background-color: #171717 !important;
+}
+
+.landing-page-dark .epineon-card .bg-gray-50 {
+  background-color: #141414 !important;
+}
+
+/* Primary CTAs — dark grey → black pill + gold label (in-card only; hero CTAs styled below) */
+.landing-page-dark .epineon-card .epineon-btn-primary {
+  background: linear-gradient(180deg, #3a3a3a 0%, #242424 38%, #121212 72%, #080808 100%) !important;
+  background-image: linear-gradient(180deg, #3a3a3a 0%, #242424 38%, #121212 72%, #080808 100%) !important;
+  color: #c9a227 !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 4px 14px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Hero + header (desktop + mobile drawer) — Get Started: solid gold fill, black label */
+.landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary,
+.landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary,
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary {
+  background: #c9a227 !important;
+  background-image: none !important;
+  color: #0a0a0a !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(184, 148, 42, 0.55) !important;
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.2),
+    0 4px 18px rgba(212, 175, 55, 0.35) !important;
+}
+
+.landing-page-dark .epineon-card .epineon-btn-primary * {
+  color: #c9a227 !important;
+}
+
+.landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary *,
+.landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary *,
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary * {
+  color: #0a0a0a !important;
+}
+
+.landing-page-dark .epineon-card .epineon-btn-primary:hover {
+  filter: brightness(1.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 8px 22px rgba(0, 0, 0, 0.65) !important;
+}
+
+.landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary:hover,
+.landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary:hover,
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary:hover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.28),
+    0 6px 24px rgba(212, 175, 55, 0.45) !important;
+}
+
+/* Hero — Uncover Our Story: same gold glow ring, no inner/shadow seam */
+.landing-page-dark section#home .hero-cta-outline.epineon-btn-secondary {
+  border: 2px solid rgba(201, 162, 39, 0.48) !important;
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.18),
+    0 0 26px rgba(201, 162, 39, 0.34),
+    0 0 52px rgba(201, 162, 39, 0.16) !important;
+}
+
+.landing-page-dark section#home .hero-cta-outline.epineon-btn-secondary:hover {
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.24),
+    0 0 34px rgba(201, 162, 39, 0.42),
+    0 0 64px rgba(201, 162, 39, 0.2) !important;
+}
+
+/* ---------- Carousel chrome ---------- */
+.landing-page-dark .bg-white\/90,
+.landing-page-dark .hover\:bg-white:hover {
+  background-color: rgba(23, 23, 23, 0.95) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Carousel dot row */
+.landing-page-dark .flex.space-x-2 > .rounded-full.bg-black {
+  background-color: #ffffff !important;
+}
+
+.landing-page-dark .flex.space-x-2 > .rounded-full.bg-gray-300,
+.landing-page-dark .flex.space-x-2 > .rounded-full.hover\:bg-gray-400:hover {
+  background-color: #525252 !important;
+}
+
+/* ---------- Icon chips — dark disc + gold stroke (matches gold / “shield” accent) ---------- */
+.landing-page-dark .lp-icon-chip {
+  background-image: none !important;
+  background-color: #151210 !important;
+  border: 1px solid rgba(201, 162, 39, 0.55) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 220, 0.07),
+    0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.landing-page-dark .lp-icon-chip svg {
+  color: #c9a227 !important;
+  shape-rendering: geometricPrecision;
+}
+
+/* ---------- CTA copy on black ---------- */
+.landing-page-dark section#CTA .epineon-body-large,
+.landing-page-dark section#CTA .epineon-body {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+/* ---------- Contact form (card is black; fields readable) ---------- */
+.landing-page-dark section#CTA input,
+.landing-page-dark section#CTA textarea {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.landing-page-dark section#CTA input::placeholder,
+.landing-page-dark section#CTA textarea::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.landing-page-dark section#CTA input:focus,
+.landing-page-dark section#CTA textarea:focus {
+  border-color: #a5b4fc !important;
+}
+
+.landing-page-dark section#CTA label {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* ---------- Responsive: viewports below 1024px only (lg+ matches existing Tailwind) ---------- */
+@media (max-width: 1023.98px) {
+  .landing-page-dark section#home h1.hero-display-serif .hero-display-line1,
+  .landing-page-dark section#home h1.hero-display-serif .hero-display-line2 {
+    font-size: clamp(1.3rem, 5.5vw + 0.45rem, 2.65rem) !important;
+    line-height: 1.12 !important;
+    text-wrap: balance;
+  }
+
+  .landing-page-dark section#home .hero-steward-tagline {
+    font-size: clamp(1rem, 2.75vw + 0.35rem, 1.375rem) !important;
+  }
+
+  .landing-page-dark .epineon-section-title,
+  .landing-page-dark .epineon-section-lead,
+  .landing-page-dark .epineon-section-subtitle {
+    text-wrap: balance;
+  }
+}
+
+/* Ultra-wide: comfortable horizontal padding (does not reduce content max-width below defaults) */
+@media (min-width: 1920px) {
+  .landing-page-dark .container {
+    padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
+  }
+}

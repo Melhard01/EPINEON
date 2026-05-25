@@ -1,0 +1,16 @@
+# Hashed Vite assets — safe to cache long-term (filename changes every build)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/vite.svg
+  Cache-Control: public, max-age=86400
+
+# SPA shell — always revalidate so script/css hashes stay in sync after deploy
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache

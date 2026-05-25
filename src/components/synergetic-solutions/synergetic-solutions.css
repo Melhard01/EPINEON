@@ -1,0 +1,1504 @@
+/* Synergetic Solutions — luxury editorial (scoped) */
+
+.synergetic-solutions {
+  --syn-gold: #d4af37;
+  --syn-gold-light: #e8c95a;
+  --syn-gold-dark: #8b7028;
+  --syn-ink-900: #07070a;
+  --syn-ink-800: #0d0d11;
+  --syn-border-soft: rgba(212, 175, 55, 0.08);
+  --syn-border-medium: rgba(212, 175, 55, 0.18);
+  --syn-border-strong: rgba(212, 175, 55, 0.35);
+  font-family: Manrope, ui-sans-serif, system-ui, sans-serif;
+}
+
+.synergetic-solutions--surface {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--syn-ink-900);
+  background-image:
+    radial-gradient(ellipse 85% 55% at 50% -8%, rgba(212, 175, 55, 0.12), transparent 58%),
+    radial-gradient(ellipse 50% 40% at 100% 20%, rgba(212, 175, 55, 0.06), transparent 50%);
+}
+
+.synergetic-solutions__noise {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.synergetic-solutions__inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Synergetic Solutions keeps subtle fade-up; rest of landing uses horizontal `.scroll-animate`. */
+.synergetic-solutions .scroll-animate {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.synergetic-solutions .scroll-animate.visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes syn-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.synergetic-solutions .syn-animate-in {
+  animation: syn-fade-up 0.75s cubic-bezier(0.4, 0, 0.1, 1) both;
+}
+
+@media (max-width: 1023.98px) {
+  .synergetic-solutions .syn-animate-in {
+    animation-duration: 0.5s;
+  }
+
+  .synergetic-solutions .scroll-animate {
+    transform: translate3d(0, 14px, 0);
+    transition:
+      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .synergetic-solutions .scroll-animate.visible {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.synergetic-card {
+  position: relative;
+  border: 1px solid var(--syn-border-medium);
+  background: linear-gradient(165deg, var(--syn-ink-800) 0%, var(--syn-ink-900) 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.45);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.synergetic-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 2.75rem;
+  right: 2.75rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(232, 201, 90, 0.15) 15%,
+    var(--syn-gold) 50%,
+    rgba(139, 112, 40, 0.5) 85%,
+    transparent
+  );
+  opacity: 0.55;
+  transition: opacity 0.35s ease;
+}
+
+.synergetic-card:hover {
+  border-color: var(--syn-border-strong);
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.12),
+    0 28px 56px rgba(0, 0, 0, 0.55);
+}
+
+.synergetic-card:hover::before {
+  opacity: 1;
+}
+
+.synergetic-card--compact {
+  overflow: visible;
+}
+
+.synergetic-card--compact > div {
+  overflow: visible;
+}
+
+/* Product card — responsive body copy + CTA */
+.synergetic-card-text {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.synergetic-card-text-column {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.synergetic-card-description {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 0;
+  color: rgba(245, 241, 232, 0.9);
+  font-size: clamp(0.8125rem, 2.35vw + 0.48rem, 0.9375rem);
+  line-height: 1.62;
+  letter-spacing: 0.01em;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
+}
+
+.synergetic-card--compact .synergetic-card-description {
+  font-size: clamp(0.78125rem, 2.1vw + 0.42rem, 0.875rem);
+  line-height: 1.58;
+}
+
+@media (min-width: 640px) {
+  .synergetic-card-description {
+    font-size: clamp(0.875rem, 1vw + 0.62rem, 1rem);
+    line-height: 1.6;
+  }
+
+  .synergetic-card--compact .synergetic-card-description {
+    font-size: clamp(0.8125rem, 0.85vw + 0.58rem, 0.9375rem);
+  }
+}
+
+@media (min-width: 900px) {
+  .synergetic-card-description {
+    font-size: clamp(0.875rem, 0.45vw + 0.7rem, 0.9375rem);
+    line-height: 1.58;
+  }
+
+  .synergetic-card--compact .synergetic-card-description {
+    font-size: clamp(0.8125rem, 0.4vw + 0.65rem, 0.875rem);
+    line-height: 1.55;
+  }
+}
+
+@media (min-width: 1280px) {
+  .synergetic-card-description {
+    font-size: 1rem;
+    line-height: 1.62;
+  }
+
+  .synergetic-card--compact .synergetic-card-description {
+    font-size: 0.875rem;
+    line-height: 1.56;
+  }
+}
+
+.synergetic-card-description--offset {
+  margin-top: 1.25rem;
+}
+
+.synergetic-card-cta-wrap {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  justify-content: flex-start;
+  margin-top: clamp(1rem, 2.5vw, 2rem);
+}
+
+.synergetic-card--compact .synergetic-card-cta-wrap {
+  margin-top: clamp(0.875rem, 2vw, 1.25rem);
+}
+
+.synergetic-card-cta {
+  max-width: 100%;
+  font-size: clamp(0.625rem, 1.65vw + 0.32rem, 0.75rem);
+  line-height: 1.35;
+  letter-spacing: clamp(0.14em, 0.35vw, 0.28em);
+  word-break: break-word;
+}
+
+@media (min-width: 480px) {
+  .synergetic-card-cta {
+    letter-spacing: 0.22em;
+  }
+}
+
+@media (min-width: 900px) {
+  .synergetic-card-cta {
+    font-size: 0.75rem;
+    letter-spacing: 0.26em;
+  }
+}
+
+.synergetic-card-title {
+  width: 100%;
+  max-width: 100%;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.35rem, 4vw + 0.65rem, 2.375rem);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--syn-gold);
+  text-wrap: balance;
+}
+
+.synergetic-logo-frame {
+  position: relative;
+  width: 144px;
+  height: 144px;
+  flex-shrink: 0;
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.35),
+    0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* Epi Trust / EPI LeGallet / Epi well / EPI Crypt / Epiminded / Renaissance Now — transparent PNG on card (no white fill) */
+.synergetic-logo-frame--transparent {
+  background: transparent;
+  width: min(100%, 264px);
+  height: 136px;
+  box-shadow: none;
+}
+
+@media (min-width: 900px) {
+  .synergetic-logo-frame--transparent {
+    width: 300px;
+    height: 156px;
+  }
+
+  .synergetic-logo-frame--transparent.synergetic-logo-frame--transparent-tall {
+    width: 260px;
+    height: 176px;
+  }
+
+  .synergetic-logo-frame:not(.synergetic-logo-frame--transparent) {
+    width: 192px;
+    height: 192px;
+  }
+}
+
+/* Renaissance Now — stacked wordmark needs a bit more height */
+.synergetic-logo-frame--transparent.synergetic-logo-frame--transparent-tall {
+  height: 156px;
+  width: min(100%, 240px);
+}
+
+.synergetic-logo-frame--transparent .synergetic-logo-frame__corner-tl,
+.synergetic-logo-frame--transparent .synergetic-logo-frame__corner-br {
+  opacity: 0.95;
+}
+
+.synergetic-logo-frame__corner-tl,
+.synergetic-logo-frame__corner-br {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+
+.synergetic-logo-frame__corner-tl {
+  top: 6px;
+  left: 6px;
+  border-top: 1.5px solid var(--syn-gold);
+  border-left: 1.5px solid var(--syn-gold);
+  border-top-left-radius: 4px;
+}
+
+.synergetic-logo-frame__corner-br {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 1.5px solid var(--syn-gold);
+  border-right: 1.5px solid var(--syn-gold);
+  border-bottom-right-radius: 4px;
+}
+
+.synergetic-logo-frame__img {
+  position: absolute;
+  inset: 6%;
+  width: 88%;
+  height: 88%;
+  margin: auto;
+  object-fit: contain;
+  object-position: center;
+}
+
+.synergetic-logo-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.synergetic-logo-text__mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--syn-ink-900);
+  line-height: 1.1;
+}
+
+.synergetic-logo-text__sub {
+  margin-top: 0.2rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(7, 7, 10, 0.72);
+}
+
+.synergetic-title-underline {
+  height: 1px;
+  width: 100%;
+  max-width: 14rem;
+  margin-top: 0.65rem;
+  margin-bottom: 0.25rem;
+  background: linear-gradient(90deg, var(--syn-gold-light), var(--syn-gold) 45%, var(--syn-gold-dark));
+}
+
+.synergetic-cta-arrow {
+  display: inline-block;
+  width: 24px;
+  height: 1px;
+  margin-left: 0.65rem;
+  vertical-align: middle;
+  background: linear-gradient(90deg, var(--syn-gold), rgba(212, 175, 55, 0.35));
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.1, 1);
+}
+
+.synergetic-cta:hover .synergetic-cta-arrow {
+  width: 36px;
+}
+
+.synergetic-preview-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.25rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  background: rgba(13, 13, 17, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+.synergetic-preview-toggle__btn {
+  border: none;
+  border-radius: 9999px;
+  padding: 0.45rem 0.85rem;
+  font-size: clamp(0.625rem, 1.8vw + 0.25rem, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(245, 241, 232, 0.72);
+  background: transparent;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.synergetic-preview-toggle__btn:hover {
+  color: #f5f1e8;
+}
+
+.synergetic-preview-toggle__btn[aria-pressed='true'] {
+  color: #0a0a0a;
+  background: #d4af37;
+  box-shadow: 0 2px 12px rgba(212, 175, 55, 0.35);
+}
+
+.synergetic-preview-toggle__btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #0d0d11,
+    0 0 0 4px rgba(212, 175, 55, 0.55);
+}
+
+#epi-trust .synergetic-preview-toggle--epi-trust {
+  position: relative;
+  z-index: 20;
+}
+
+@media (max-width: 899px) {
+  #epi-trust .synergetic-preview-toggle--epi-trust {
+    transform: none;
+    margin-bottom: 0.5rem;
+    width: 100%;
+    max-width: min(100%, 19rem);
+    margin-inline: auto;
+    gap: 0.2rem;
+    padding: 0.15rem;
+    justify-content: stretch;
+  }
+
+  #epi-trust .synergetic-preview-toggle--epi-trust .synergetic-preview-toggle__btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.3rem 0.4rem;
+    font-size: clamp(0.5rem, 2.4vw + 0.2rem, 0.625rem);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  #epi-trust.synergetic-card--compact > div {
+    gap: clamp(1.25rem, 5vw, 2rem);
+  }
+
+  #epi-trust.synergetic-card--compact .synergetic-card-gallery-column {
+    gap: 0.625rem;
+    width: 100%;
+    max-width: min(100%, 22.5rem);
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 900px) {
+  #epi-trust .synergetic-preview-toggle {
+    transform: translateY(-1cm);
+  }
+}
+
+#epi-trust.synergetic-card--compact .synergetic-web-gallery--epi-trust-carousel {
+  margin-inline: auto;
+  width: 100%;
+  max-width: min(100%, calc(60% + 13rem));
+}
+
+/* Epi Trust web portal — fluid widths across mobile, tablet, desktop fan */
+.synergetic-web-gallery {
+  width: 100%;
+  max-width: 100%;
+}
+
+.synergetic-web-frame {
+  width: 100%;
+}
+
+.synergetic-web-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: 1024 / 440;
+  object-fit: contain;
+  object-position: top center;
+}
+
+.synergetic-web-slot--solo {
+  width: 100%;
+  max-width: min(100%, clamp(14.5rem, 92vw, 22.5rem));
+}
+
+@media (min-width: 480px) {
+  .synergetic-web-slot--solo {
+    max-width: min(100%, clamp(16rem, 90vw, 24rem));
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1279px) {
+  .synergetic-web-slot--solo {
+    max-width: min(100%, clamp(15rem, 78vw, 20rem));
+  }
+}
+
+/* Epi Trust web portal — solo carousel: larger previews (all breakpoints) */
+.synergetic-web-gallery--epi-trust-carousel .synergetic-web-slot--solo {
+  max-width: min(100%, clamp(17rem, 96vw, 26rem));
+}
+
+@media (min-width: 480px) {
+  .synergetic-web-gallery--epi-trust-carousel .synergetic-web-slot--solo {
+    max-width: min(100%, clamp(18.5rem, 90vw, 30rem));
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1279px) {
+  .synergetic-web-gallery--epi-trust-carousel .synergetic-web-slot--solo {
+    max-width: min(100%, clamp(20rem, 78vw, 34rem));
+  }
+}
+
+@media (min-width: 1280px) {
+  .synergetic-web-gallery--epi-trust-carousel .synergetic-web-slot--solo {
+    max-width: min(100%, clamp(24rem, 52vw, 38rem));
+  }
+}
+
+.synergetic-web-gallery__carousel {
+  padding-left: clamp(0.75rem, 4vw, 2.25rem);
+  padding-right: clamp(0.75rem, 4vw, 2.25rem);
+}
+
+@media (min-width: 1280px) {
+  .synergetic-web-gallery--fan .synergetic-web-slot--desktop {
+    width: clamp(12.5rem, 17.5vw, 19.5rem) !important;
+  }
+}
+
+@media (min-width: 1440px) {
+  .synergetic-web-gallery--fan .synergetic-web-slot--desktop {
+    width: clamp(14.5rem, 19vw, 22.5rem) !important;
+  }
+}
+
+@media (min-width: 1536px) {
+  .synergetic-web-gallery--fan .synergetic-web-slot--desktop {
+    width: clamp(16rem, 21vw, 26rem) !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .synergetic-web-gallery--fan {
+    width: min(100%, 56rem);
+    min-height: clamp(280px, 32vw, 440px);
+  }
+}
+
+.synergetic-phone-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  transform: translateY(-50%);
+  border-radius: 9999px;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  background: rgba(13, 13, 17, 0.92);
+  color: #e8c95a;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.synergetic-phone-nav:hover {
+  background: #111114;
+  color: #d4af37;
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.synergetic-phone-nav:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px #0d0d11,
+    0 0 0 4px rgba(212, 175, 55, 0.65);
+}
+
+.synergetic-phone-nav--prev {
+  left: 0;
+}
+
+.synergetic-phone-nav--next {
+  right: 0;
+}
+
+@media (max-width: 899px) {
+  .synergetic-phone-nav {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .synergetic-phone-nav svg {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+  }
+}
+
+@media (max-width: 479px) {
+  .synergetic-phone-nav {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .synergetic-phone-nav svg {
+    width: 0.8rem !important;
+    height: 0.8rem !important;
+  }
+}
+
+.synergetic-phone-gallery__pair {
+  padding-left: clamp(0.75rem, 4vw, 2.25rem);
+  padding-right: clamp(0.75rem, 4vw, 2.25rem);
+}
+
+/* Mobile solo carousel — native touch scroll with snap */
+.synergetic-mobile-scroll-strip {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+  -webkit-touch-callout: none;
+  scrollbar-width: none;
+  scroll-padding-inline: 0;
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.synergetic-mobile-scroll-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.synergetic-mobile-scroll-slide {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-inline: 0.25rem;
+}
+
+.synergetic-mobile-scroll-strip .synergetic-phone-shot,
+.synergetic-mobile-scroll-strip .synergetic-web-shot {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.synergetic-carousel-stage .synergetic-mobile-scroll-strip {
+  min-height: inherit;
+  height: 100%;
+  pointer-events: auto;
+}
+
+#epi-trust .synergetic-trust-web-carousel-track .synergetic-mobile-scroll-strip {
+  min-height: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+}
+
+/* Allow touch scrolling in the scrollport (parent may use select-none). */
+.synergetic-carousel-stage .synergetic-mobile-scroll-strip,
+.synergetic-carousel-stage .synergetic-mobile-scroll-slide {
+  pointer-events: auto;
+}
+
+@media (max-width: 899px) {
+  .synergetic-mobile-scroll-slide {
+    scroll-snap-stop: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .synergetic-mobile-scroll-strip {
+    scroll-behavior: auto;
+  }
+}
+
+/* Carousel / fan — smooth crossfade and float (no slide jank on screenshots) */
+.synergetic-carousel-stage {
+  isolation: isolate;
+}
+
+/* Epi Trust — web portal solo carousel: [prev] [mockup] [next] so arrows do not cover the screenshot */
+#epi-trust .synergetic-carousel-stage--trust-web {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.15rem, 1.8vw, 0.5rem);
+}
+
+#epi-trust .synergetic-carousel-stage--trust-web .synergetic-phone-nav {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  transform: none;
+  flex-shrink: 0;
+}
+
+#epi-trust .synergetic-trust-web-carousel-track {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(200px, 58vw, 280px);
+}
+
+@media (min-width: 480px) {
+  #epi-trust .synergetic-trust-web-carousel-track {
+    min-height: clamp(220px, 52vw, 320px);
+  }
+}
+
+@media (min-width: 900px) {
+  #epi-trust .synergetic-trust-web-carousel-track {
+    min-height: clamp(240px, 38vw, 400px);
+  }
+}
+
+.synergetic-mockup-motion--carousel {
+  pointer-events: auto;
+}
+
+.synergetic-mockup-float {
+  backface-visibility: hidden;
+}
+
+.synergetic-phone-slot {
+  backface-visibility: hidden;
+}
+
+.synergetic-dot {
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid var(--syn-border-soft);
+  transition:
+    width 0.45s cubic-bezier(0.4, 0, 0.1, 1),
+    background 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.synergetic-dot--active {
+  width: 48px;
+  background: linear-gradient(90deg, var(--syn-gold-light), var(--syn-gold));
+  border-color: rgba(212, 175, 55, 0.45);
+}
+
+.synergetic-dot--inactive {
+  width: 24px;
+}
+
+.synergetic-progress {
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.synergetic-progress__fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--syn-gold-dark), var(--syn-gold), var(--syn-gold-light));
+  transition: width 0.55s cubic-bezier(0.4, 0, 0.1, 1);
+}
+
+.synergetic-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--syn-gold);
+  box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.45);
+  animation: syn-pulse 2.2s ease-out infinite;
+}
+
+@keyframes syn-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+.synergetic-category-header .synergetic-icon-ring {
+  margin-top: 0.15rem;
+}
+
+.synergetic-icon-ring {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 30% 25%, rgba(232, 201, 90, 0.18), transparent 55%),
+    linear-gradient(145deg, rgba(212, 175, 55, 0.35), rgba(139, 112, 40, 0.15));
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 175, 55, 0.35),
+    0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+@media (max-width: 899px) {
+  .synergetic-category-header {
+    gap: 0.75rem !important;
+  }
+
+  .synergetic-icon-ring {
+    width: 46px;
+    height: 46px;
+    box-shadow:
+      inset 0 0 0 1px rgba(212, 175, 55, 0.35),
+      0 4px 16px rgba(0, 0, 0, 0.32);
+  }
+
+  .synergetic-icon-ring svg {
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+  }
+}
+
+@media (max-width: 479px) {
+  .synergetic-icon-ring {
+    width: 42px;
+    height: 42px;
+  }
+
+  .synergetic-icon-ring svg {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+}
+
+/* EdTech / Cybersecurity — tabbed shell + tabs (no carousel) */
+.synergetic-tabbed-shell {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.25rem 1.5rem;
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(212, 175, 55, 0.09), transparent 55%),
+    linear-gradient(165deg, #0c0d12 0%, #07070a 48%, #0a0b10 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 0 -24px 48px rgba(0, 0, 0, 0.35),
+    0 20px 48px rgba(0, 0, 0, 0.5);
+}
+
+@media (min-width: 768px) {
+  .synergetic-tabbed-shell {
+    border-radius: 1.5rem;
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .synergetic-tabbed-shell {
+    padding: 1.75rem 2rem 2rem;
+  }
+}
+
+.synergetic-tabbed-shell::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: calc(1.25rem - 6px);
+  border: 1px solid rgba(212, 175, 55, 0.08);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@media (min-width: 768px) {
+  .synergetic-tabbed-shell::before {
+    border-radius: calc(1.5rem - 6px);
+  }
+}
+
+@media (max-width: 479px) {
+  .synergetic-tabbed-shell {
+    padding: 0.9rem 0.75rem 1.1rem;
+    border-radius: 1rem;
+  }
+
+  .synergetic-tabbed-shell::before {
+    inset: 6px;
+    border-radius: 0.65rem;
+  }
+}
+
+.synergetic-tabbed-tabs {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+}
+
+@media (min-width: 480px) {
+  .synergetic-tabbed-tabs {
+    gap: 0.5rem 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+  }
+}
+
+.synergetic-tabbed-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 0.4rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(212, 175, 55, 0.18);
+  background: rgba(7, 7, 10, 0.55);
+  color: #a8a39a;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(0.625rem, 2.2vw + 0.32rem, 0.75rem);
+  font-weight: 500;
+  letter-spacing: 0.025em;
+  line-height: 1.2;
+  text-align: center;
+  overflow-wrap: break-word;
+  cursor: pointer;
+  transition:
+    color 0.3s ease,
+    border-color 0.3s ease,
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+@media (min-width: 480px) and (max-width: 899px) {
+  .synergetic-tabbed-tab {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0.48rem 0.65rem;
+    font-size: clamp(0.6875rem, 1.1vw + 0.58rem, 0.9375rem);
+    letter-spacing: 0.03em;
+    line-height: 1.22;
+  }
+}
+
+@media (min-width: 900px) {
+  .synergetic-tabbed-tab {
+    flex: 0 1 auto;
+    min-width: 10rem;
+    padding: 0.7rem 1.35rem;
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+  }
+}
+
+.synergetic-tabbed-tab:hover {
+  color: #e8c95a;
+  border-color: rgba(212, 175, 55, 0.35);
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.synergetic-tabbed-tab--active {
+  color: #f5f1e8;
+  border-color: rgba(212, 175, 55, 0.45);
+  background: linear-gradient(165deg, rgba(212, 175, 55, 0.14), rgba(7, 7, 10, 0.4));
+  box-shadow:
+    0 0 0 1px rgba(212, 175, 55, 0.08),
+    0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.synergetic-tabbed-shell .synergetic-card {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.synergetic-tabbed-shell .synergetic-card:hover {
+  border: 0;
+  box-shadow: none;
+}
+
+.synergetic-tabbed-shell .synergetic-card::before {
+  display: none;
+}
+
+/* Phone fan stage — responsive height/width for absolute-positioned slots */
+.synergetic-phone-fan-stage {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: clamp(300px, 90vw, 460px);
+  overflow: visible;
+  padding-bottom: 0;
+}
+
+.synergetic-phone-fan-stage--compact.synergetic-phone-fan-stage--wide {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 900px) {
+  .synergetic-phone-fan-stage--compact.synergetic-phone-fan-stage--wide {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 899px) {
+  .synergetic-phone-fan-stage {
+    width: 100%;
+    max-width: 100%;
+    min-height: clamp(280px, 85vw, 420px);
+  }
+
+}
+
+/* Epi Well + Epi Minded + Epi Trust (phone) — centered copy, gallery stacked below, fan layout */
+[data-card='epi-well'] > div,
+[data-card='epi-minded'] > div,
+#epi-trust.synergetic-card--compact > div,
+.synergetic-card--stacked-text-only > div {
+  align-items: center;
+}
+
+[data-card='epi-well'] .synergetic-card-text-column,
+[data-card='epi-minded'] .synergetic-card-text-column,
+#epi-trust.synergetic-card--compact .synergetic-card-text-column,
+.synergetic-card--stacked-text-only .synergetic-card-text-column {
+  position: relative;
+  z-index: 2;
+  align-items: center;
+  text-align: center;
+}
+
+[data-card='epi-well'] .synergetic-card-text,
+[data-card='epi-minded'] .synergetic-card-text,
+#epi-trust.synergetic-card--compact .synergetic-card-text,
+.synergetic-card--stacked-text-only .synergetic-card-text {
+  align-items: center;
+  text-align: center;
+  width: 100%;
+  max-width: min(100%, calc(60% + 13rem));
+  margin-inline: auto;
+}
+
+[data-card='epi-well'] .synergetic-card-description,
+[data-card='epi-minded'] .synergetic-card-description,
+#epi-trust.synergetic-card--compact .synergetic-card-description,
+.synergetic-card--stacked-text-only .synergetic-card-description {
+  text-align: center;
+}
+
+[data-card='epi-well'] .synergetic-card-cta-wrap,
+[data-card='epi-minded'] .synergetic-card-cta-wrap,
+#epi-trust.synergetic-card--compact .synergetic-card-cta-wrap,
+.synergetic-card--stacked-text-only .synergetic-card-cta-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+[data-card='epi-well'] .synergetic-logo-frame,
+[data-card='epi-minded'] .synergetic-logo-frame,
+#epi-trust.synergetic-card--compact .synergetic-logo-frame,
+.synergetic-card--stacked-text-only .synergetic-logo-frame {
+  margin-inline: auto !important;
+}
+
+[data-card='epi-well'] .synergetic-card-gallery-column,
+[data-card='epi-minded'] .synergetic-card-gallery-column,
+#epi-trust.synergetic-card--compact .synergetic-card-gallery-column,
+.synergetic-card--stacked-text-only .synergetic-card-gallery-column {
+  align-items: center;
+  justify-content: center;
+}
+
+[data-card='epi-well'] .synergetic-card-gallery-column > div,
+[data-card='epi-minded'] .synergetic-card-gallery-column > div,
+#epi-trust.synergetic-card--compact .synergetic-card-gallery-column > div,
+.synergetic-card--stacked-text-only .synergetic-card-gallery-column > div {
+  margin-inline: auto;
+  justify-content: center !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-slot,
+[data-card='epi-minded'] .synergetic-phone-slot,
+#epi-trust.synergetic-card--compact .synergetic-phone-slot--trust {
+  width: clamp(7.5rem, 20.5%, 13rem) !important;
+}
+
+/* Six-phone fan (Epi Well) */
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+  left: 20% !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+  left: 32% !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+  left: 44% !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+  left: 56% !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(5) {
+  left: 68% !important;
+}
+
+[data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(6) {
+  left: 80% !important;
+}
+
+/* Epi Well — large viewports: keep fan bases touching (no gaps between phones) */
+@media (min-width: 2030px) and (max-width: 3016px) {
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+    left: 32.75% !important;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+    left: 39.25% !important;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+    left: 45.75% !important;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+    left: 52.25% !important;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(5) {
+    left: 58.75% !important;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(6) {
+    left: 65.25% !important;
+  }
+}
+
+/* Four-phone fan (Epi Minded) — centered on 50% */
+[data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+  left: 32% !important;
+}
+
+[data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+  left: 44% !important;
+}
+
+[data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+  left: 56% !important;
+}
+
+[data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+  left: 68% !important;
+}
+
+/* Epi Minded — large viewports: keep fan bases touching (no gaps between phones) */
+@media (min-width: 2030px) and (max-width: 3016px) {
+  [data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+    left: 40.25% !important;
+  }
+
+  [data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+    left: 46.75% !important;
+  }
+
+  [data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+    left: 53.25% !important;
+  }
+
+  [data-card='epi-minded'] .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+    left: 59.75% !important;
+  }
+}
+
+/* Product gallery hovers — shared easing (frame zoom separate from slot rotate) */
+[data-card='epi-well'] .synergetic-phone-frame,
+[data-card='epi-minded'] .synergetic-phone-frame,
+#epi-trust .synergetic-phone-frame,
+#epi-trust .synergetic-phone-frame--trust,
+#epi-trust .synergetic-web-frame {
+  transform-origin: 50% 85%;
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#epi-trust .synergetic-web-frame {
+  transform-origin: center center;
+}
+
+[data-card='epi-well'] .synergetic-phone-shot,
+[data-card='epi-minded'] .synergetic-phone-shot,
+#epi-trust .synergetic-phone-shot,
+#epi-trust .synergetic-phone-shot--trust,
+#epi-trust .synergetic-web-shot {
+  transition: filter 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Epi Well — phone hover: slight zoom + sharper preview */
+[data-card='epi-well'] .synergetic-phone-slot:hover .synergetic-phone-frame,
+[data-card='epi-well'] .synergetic-mockup-float:hover .synergetic-phone-frame {
+  transform: scale(1.12);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(212, 175, 55, 0.2) inset;
+}
+
+[data-card='epi-well'] .synergetic-phone-slot:hover .synergetic-phone-shot,
+[data-card='epi-well'] .synergetic-mockup-float:hover .synergetic-phone-shot {
+  filter: contrast(1.02) saturate(1.01) brightness(1.008);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-card='epi-well'] .synergetic-phone-frame,
+  [data-card='epi-well'] .synergetic-phone-shot {
+    transition: none;
+  }
+
+  [data-card='epi-well'] .synergetic-phone-slot:hover .synergetic-phone-frame,
+  [data-card='epi-well'] .synergetic-mockup-float:hover .synergetic-phone-frame,
+  [data-card='epi-well'] .synergetic-phone-slot:hover .synergetic-phone-shot,
+  [data-card='epi-well'] .synergetic-mockup-float:hover .synergetic-phone-shot {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Epi Minded — phone hover: slight zoom + sharper preview */
+[data-card='epi-minded'] .synergetic-phone-slot:hover .synergetic-phone-frame,
+[data-card='epi-minded'] .synergetic-mockup-float:hover .synergetic-phone-frame {
+  transform: scale(1.12);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(212, 175, 55, 0.2) inset;
+}
+
+[data-card='epi-minded'] .synergetic-phone-slot:hover .synergetic-phone-shot,
+[data-card='epi-minded'] .synergetic-mockup-float:hover .synergetic-phone-shot {
+  filter: contrast(1.02) saturate(1.01) brightness(1.008);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-card='epi-minded'] .synergetic-phone-frame,
+  [data-card='epi-minded'] .synergetic-phone-shot {
+    transition: none;
+  }
+
+  [data-card='epi-minded'] .synergetic-phone-slot:hover .synergetic-phone-frame,
+  [data-card='epi-minded'] .synergetic-mockup-float:hover .synergetic-phone-frame,
+  [data-card='epi-minded'] .synergetic-phone-slot:hover .synergetic-phone-shot,
+  [data-card='epi-minded'] .synergetic-mockup-float:hover .synergetic-phone-shot {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Epi Trust — phone hover: slight zoom + sharper preview */
+#epi-trust .synergetic-phone-slot:hover .synergetic-phone-frame,
+#epi-trust .synergetic-phone-slot--trust:hover .synergetic-phone-frame,
+#epi-trust .synergetic-mockup-float:hover .synergetic-phone-frame,
+#epi-trust .synergetic-mockup-float:hover .synergetic-phone-frame--trust {
+  transform: scale(1.12);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(212, 175, 55, 0.2) inset;
+}
+
+#epi-trust .synergetic-phone-slot:hover .synergetic-phone-shot,
+#epi-trust .synergetic-phone-slot--trust:hover .synergetic-phone-shot,
+#epi-trust .synergetic-mockup-float:hover .synergetic-phone-shot,
+#epi-trust .synergetic-mockup-float:hover .synergetic-phone-shot--trust {
+  filter: contrast(1.02) saturate(1.01) brightness(1.008);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #epi-trust .synergetic-phone-frame,
+  #epi-trust .synergetic-phone-frame--trust,
+  #epi-trust .synergetic-phone-shot,
+  #epi-trust .synergetic-phone-shot--trust {
+    transition: none;
+  }
+
+  #epi-trust .synergetic-phone-slot:hover .synergetic-phone-frame,
+  #epi-trust .synergetic-phone-slot--trust:hover .synergetic-phone-frame,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-phone-frame,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-phone-frame--trust,
+  #epi-trust .synergetic-phone-slot:hover .synergetic-phone-shot,
+  #epi-trust .synergetic-phone-slot--trust:hover .synergetic-phone-shot,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-phone-shot,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-phone-shot--trust {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Epi Trust — web portal hover: slight zoom + sharper preview */
+#epi-trust .synergetic-web-slot--solo:hover .synergetic-web-frame,
+#epi-trust .synergetic-web-slot--desktop:hover .synergetic-web-frame,
+#epi-trust .synergetic-mockup-float:hover .synergetic-web-frame {
+  transform: scale(1.06);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+}
+
+#epi-trust .synergetic-web-slot--solo:hover .synergetic-web-shot,
+#epi-trust .synergetic-web-slot--desktop:hover .synergetic-web-shot,
+#epi-trust .synergetic-mockup-float:hover .synergetic-web-shot {
+  filter: contrast(1.02) saturate(1.01) brightness(1.008);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #epi-trust .synergetic-web-frame,
+  #epi-trust .synergetic-web-shot {
+    transition: none;
+  }
+
+  #epi-trust .synergetic-web-slot--solo:hover .synergetic-web-frame,
+  #epi-trust .synergetic-web-slot--desktop:hover .synergetic-web-frame,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-web-frame,
+  #epi-trust .synergetic-web-slot--solo:hover .synergetic-web-shot,
+  #epi-trust .synergetic-web-slot--desktop:hover .synergetic-web-shot,
+  #epi-trust .synergetic-mockup-float:hover .synergetic-web-shot {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* Five-phone fan (Epi Trust mobile) — centered on 50% */
+#epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+  left: 26% !important;
+}
+
+#epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+  left: 38% !important;
+}
+
+#epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+  left: 50% !important;
+}
+
+#epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+  left: 62% !important;
+}
+
+#epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(5) {
+  left: 74% !important;
+}
+
+/* Epi Trust — large viewports: keep fan bases touching (no gaps between phones) */
+@media (min-width: 2030px) and (max-width: 3016px) {
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(1) {
+    left: 37% !important;
+  }
+
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(2) {
+    left: 43.5% !important;
+  }
+
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(3) {
+    left: 50% !important;
+  }
+
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(4) {
+    left: 56.5% !important;
+  }
+
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage .synergetic-phone-slot:nth-child(5) {
+    left: 63% !important;
+  }
+}
+
+@media (min-width: 900px) {
+  [data-card='epi-well'] .synergetic-phone-fan-stage,
+  [data-card='epi-minded'] .synergetic-phone-fan-stage,
+  #epi-trust.synergetic-card--compact .synergetic-phone-fan-stage {
+    min-height: clamp(300px, 55vw, 480px);
+  }
+}
+
+@media (max-width: 480px) {
+  #epi-trust.synergetic-card--compact .synergetic-phone-slot--trust {
+    width: clamp(7rem, 28vw, 11.85rem) !important;
+  }
+}
+
+/* Phone fan — static desktop stack, lighter shadow, crisp bitmap scaling */
+.synergetic-phone-frame {
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(212, 175, 55, 0.12) inset;
+}
+
+.synergetic-phone-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+}
+
+/* Epi Trust — masked screen area: exact phone aspect, crisp retina, no bezel overflow */
+.synergetic-phone-frame--trust {
+  overflow: hidden;
+  contain: layout;
+}
+
+.synergetic-phone-screen-viewport--trust {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 473 / 1024;
+  overflow: hidden;
+  isolation: isolate;
+  background: #ffffff;
+  line-height: 0;
+}
+
+.synergetic-phone-shot--trust {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: fill;
+  object-position: top center;
+}
+
+.synergetic-phone-slot--trust {
+  transform-style: flat;
+}
+
+@media (min-width: 1280px) {
+  .synergetic-phone-slot--trust {
+    overflow: visible;
+  }
+}
+
+
+.synergetic-logo-frame__img {
+  image-rendering: auto;
+}
+
+.synergetic-phone-slot {
+  -webkit-font-smoothing: subpixel-antialiased;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .synergetic-mockup-float,
+  .synergetic-phone-slot {
+    animation: none !important;
+    transition: none !important;
+  }
+}

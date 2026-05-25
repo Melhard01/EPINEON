@@ -1,0 +1,236 @@
+/* —— Legal pages (Privacy / Terms): grid bg + prose + tables —— */
+
+.legal-page-root {
+  position: relative;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+/* Grid lines + “+” at tile origin (repeats at intersections) */
+.legal-page-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #000000;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.14)' stroke-width='1'%3E%3Cpath d='M0 28h8M28 0v8'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 56px 56px, 56px 56px, 56px 56px;
+  opacity: 1;
+}
+
+/* Main column: force dark readable body without editing every child class */
+.legal-doc-main {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Legal policy page title — same display serif as landing hero / section titles */
+.epineon-legal-doc-title {
+  font-family: var(--epineon-font-display);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+}
+
+.legal-doc-main section {
+  scroll-margin-top: 6.5rem;
+}
+
+.legal-doc-main div[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+.legal-doc-main h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-family: var(--epineon-font-display);
+  font-size: 1.25rem;
+  line-height: 1.35;
+  font-weight: 600;
+  color: #ffffff !important;
+  letter-spacing: 0.05em;
+}
+
+@media (min-width: 1024px) {
+  .legal-doc-main h2 {
+    font-size: 1.375rem;
+  }
+}
+
+.legal-doc-main h3 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: #ffffff !important;
+}
+
+.legal-doc-main p,
+.legal-doc-main li,
+.legal-doc-main td,
+.legal-doc-main th {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.legal-doc-main .text-slate-600,
+.legal-doc-main .text-slate-700,
+.legal-doc-main .text-slate-800,
+.legal-doc-main .text-slate-900 {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.legal-doc-main strong {
+  color: #ffffff !important;
+}
+
+.legal-doc-main a {
+  color: #a5b4fc !important;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.legal-doc-main a:hover {
+  color: #c7d2fe !important;
+}
+
+/* Premium panel — same surface as TOC / landing cards (#1a1a1a, #333, 2rem radius) */
+.legal-doc-main .legal-doc-card-panel {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333333 !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35) !important;
+}
+
+.legal-doc-main .legal-doc-card-panel p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+.legal-doc-main .legal-doc-card-panel .font-semibold {
+  color: #ffffff !important;
+}
+
+.legal-doc-main .legal-doc-card-panel strong {
+  color: #ffffff !important;
+}
+
+.legal-doc-main .legal-doc-card-panel ol,
+.legal-doc-main .legal-doc-card-panel ul {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Address / info panels */
+.legal-doc-main .legal-doc-callout,
+.legal-doc-main .bg-slate-50 {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 0.75rem;
+}
+
+.legal-doc-main .legal-doc-callout p,
+.legal-doc-main .bg-slate-50 p {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Tables */
+.legal-doc-main table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.legal-doc-main thead tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.legal-doc-main th {
+  padding: 0.75rem 0.875rem;
+  text-align: left;
+  font-weight: 600;
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Light header row (e.g. Privacy Policy slate-100 row inside dark card panel) */
+.legal-doc-main .legal-doc-card-panel table thead th,
+.legal-doc-main .legal-doc-card-panel table thead .font-semibold {
+  color: #0f172a !important;
+  background-color: #f1f5f9 !important;
+  border-color: rgb(203 213 225) !important;
+}
+
+.legal-doc-main td {
+  padding: 0.75rem 0.875rem;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  vertical-align: top;
+}
+
+.legal-doc-main tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.legal-doc-main tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.legal-doc-main .legal-doc-card-panel.overflow-x-auto {
+  border: none !important;
+}
+
+.legal-doc-main .overflow-x-auto {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Sticky TOC column: stretches with main (flex track) so sticky stops before footer */
+.legal-doc-sidebar-track {
+  min-height: 0;
+}
+
+/* TOC panel — same surface as premium cards (#1a1a1a / #333) */
+.legal-doc-toc-nav {
+  background-color: #1a1a1a !important;
+  border: 1px solid #333333 !important;
+  border-radius: 2rem !important;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.35) !important;
+}
+
+.legal-doc-toc-list {
+  border-top: 1px solid #333333;
+}
+
+.legal-doc-toc-link {
+  text-decoration: none !important;
+  color: #a0a0a0 !important;
+  border-radius: 0.75rem;
+  border-left: 2px solid transparent;
+}
+
+.legal-doc-toc-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.legal-doc-toc-link--active {
+  color: #ffffff !important;
+  background-color: #262626 !important;
+  border-left-color: #c9a227 !important;
+}
+
+.legal-doc-toc-link:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.65);
+  outline-offset: 2px;
+}
+
+/* Scrollbar in sticky TOC */
+.legal-doc-toc-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.legal-doc-toc-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+}

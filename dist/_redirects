@@ -1,0 +1,20 @@
+# Legacy slug → canonical (301). Must come BEFORE the /industries/* and /solutions/* SPA fallbacks (first match wins).
+/industries/financial-services                  /industries/finance-banking         301
+/industries/government                          /industries/government-defence      301
+/industries/wellness                            /industries/wellness-coaching       301
+/industries/influencers                         /industries/influencers-educators   301
+/solutions/trusted-ai-for-regulated-industries  /solutions/trusted-ai               301
+/solutions/precision-health-intelligence        /solutions/precision-health         301
+/solutions/future-of-work-and-learning          /solutions/future-of-work           301
+
+# React Router client routes only — do NOT add a /* catch-all (that makes missing /assets/*.js return index.html).
+/privacy        /index.html  200
+/terms          /index.html  200
+/cookie-policy  /index.html  200
+/solutions/*    /index.html  200
+/industries/*   /index.html  200
+/company/*      /index.html  200
+/products       /index.html  200
+/customers      /index.html  200
+/trust          /index.html  200
+/contact        /index.html  200

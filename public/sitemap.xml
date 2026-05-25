@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Indexable routes only. /company/team and /company/press are intentionally excluded (noindex / hidden). -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://epineon.ai/</loc><priority>1.0</priority></url>
+  <url><loc>https://epineon.ai/products</loc><priority>0.9</priority></url>
+  <url><loc>https://epineon.ai/solutions/trusted-ai</loc><priority>0.8</priority></url>
+  <url><loc>https://epineon.ai/solutions/precision-health</loc><priority>0.8</priority></url>
+  <url><loc>https://epineon.ai/solutions/future-of-work</loc><priority>0.8</priority></url>
+  <url><loc>https://epineon.ai/industries/finance-banking</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/healthcare</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/government-defence</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/wellness-coaching</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/longevity</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/clinics-organisations</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/enterprise-workforce</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/influencers-educators</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/industries/universities-academics</loc><priority>0.7</priority></url>
+  <url><loc>https://epineon.ai/customers</loc><priority>0.6</priority></url>
+  <url><loc>https://epineon.ai/customers/chargea</loc><priority>0.5</priority></url>
+  <url><loc>https://epineon.ai/customers/avenis</loc><priority>0.5</priority></url>
+  <url><loc>https://epineon.ai/company/about</loc><priority>0.6</priority></url>
+  <url><loc>https://epineon.ai/company/venture-studio</loc><priority>0.5</priority></url>
+  <url><loc>https://epineon.ai/company/careers</loc><priority>0.4</priority></url>
+  <url><loc>https://epineon.ai/trust</loc><priority>0.6</priority></url>
+  <url><loc>https://epineon.ai/contact</loc><priority>0.6</priority></url>
+  <url><loc>https://epineon.ai/privacy</loc><priority>0.3</priority></url>
+  <url><loc>https://epineon.ai/terms</loc><priority>0.3</priority></url>
+  <url><loc>https://epineon.ai/cookie-policy</loc><priority>0.3</priority></url>
+</urlset>

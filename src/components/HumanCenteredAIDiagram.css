@@ -1,0 +1,79 @@
+/* Human Centered AI diagram — floats + reduced motion */
+.hcai-diagram {
+  font-family: "EB Garamond", Garamond, "Palatino Linotype", Palatino, "Times New Roman", serif;
+}
+
+.hcai-diagram svg {
+  display: block;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+.hcai-diagram .hcai-float {
+  transform-box: fill-box;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.hcai-diagram .hcai-float--ethics {
+  animation: hcai-drift-a 6.8s ease-in-out infinite;
+}
+
+.hcai-diagram .hcai-float--humans {
+  animation: hcai-drift-b 7.4s ease-in-out infinite 0.4s;
+}
+
+.hcai-diagram .hcai-float--tech {
+  animation: hcai-drift-c 6.2s ease-in-out infinite 0.2s;
+}
+
+.hcai-diagram .hcai-float--center {
+  animation: hcai-drift-d 7.1s ease-in-out infinite 0.6s;
+}
+
+@keyframes hcai-drift-a {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes hcai-drift-b {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes hcai-drift-c {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes hcai-drift-d {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hcai-diagram .hcai-float {
+    animation: none !important;
+  }
+}
