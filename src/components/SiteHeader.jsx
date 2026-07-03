@@ -6,7 +6,6 @@ import epineonWordmarkLogo from '../assets/epineon_logo_wordmark.png'
 import { ECOSYSTEMS } from '../data/ecosystem.js'
 import {
   SOLUTIONS_LINKS,
-  INDUSTRIES_LINKS,
   COMPANY_LINKS,
   UTILITY_LINKS,
   PRIMARY_CTA,
@@ -65,7 +64,7 @@ function NavDropdown({ id, label, items, openMenu, onOpen, onScheduleClose, onNa
   const isOpen = openMenu === id
   return (
     <div
-      className="site-header-dropdown"
+      className="site-header-dropdown site-header-dropdown--nav-type"
       onMouseEnter={() => onOpen(id)}
       onMouseLeave={onScheduleClose}
     >
@@ -103,7 +102,7 @@ export function SiteHeader() {
   const navScrollSentinelRef = useRef(null)
   const [headerScrolled, setHeaderScrolled] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [openMenu, setOpenMenu] = useState(null) // 'solutions'|'products'|'industries'|'company'|null
+  const [openMenu, setOpenMenu] = useState(null) // 'solutions'|'products'|'company'|null
   const [mobileSection, setMobileSection] = useState(null)
   const closeTimer = useRef(null)
 
@@ -181,7 +180,7 @@ export function SiteHeader() {
       />
       <header
         ref={headerRef}
-        className={`site-header fixed top-0 w-full bg-black border-b border-white/10 backdrop-blur-md z-50 lg:bg-[#ffffff] lg:border-black/10 lg:backdrop-blur-sm${headerScrolled ? ' scrolled' : ''}${mobileNavOpen ? ' site-header--menu-open' : ''}${openMenu ? ' site-header--mega-open' : ''}`}
+        className={`site-header fixed top-0 w-full z-50${headerScrolled ? ' scrolled' : ''}${mobileNavOpen ? ' site-header--menu-open' : ''}${openMenu ? ' site-header--mega-open' : ''}`}
       >
         <div className="site-header__content site-content w-full min-w-0">
           <div className="site-header-inner relative flex min-w-0 items-center gap-3 lg:gap-5">
@@ -238,20 +237,6 @@ export function SiteHeader() {
                   />
                 </button>
               </div>
-
-              <NavDropdown
-                id="industries"
-                label="INDUSTRIES"
-                items={INDUSTRIES_LINKS}
-                openMenu={openMenu}
-                onOpen={openMenuFn}
-                onScheduleClose={scheduleClose}
-                onNavigate={closeAll}
-              />
-
-              <Link to="/customers" className="site-header-nav-link" onClick={closeAll}>
-                CUSTOMERS
-              </Link>
 
               <NavDropdown
                 id="company"
@@ -328,7 +313,7 @@ export function SiteHeader() {
               onToggle={() => setMobileSection((s) => (s === 'solutions' ? null : 'solutions'))}
             >
               {SOLUTIONS_LINKS.map((l) => (
-                <Link key={l.href} to={l.href} className="mobile-sub-link" onClick={closeAll}>
+                <Link key={l.href} to={l.href} className="mobile-sub-link mobile-sub-link--nav-type" onClick={closeAll}>
                   {l.label}
                 </Link>
               ))}
@@ -376,28 +361,12 @@ export function SiteHeader() {
             </MobileAccordion>
 
             <MobileAccordion
-              label="Industries"
-              open={mobileSection === 'industries'}
-              onToggle={() => setMobileSection((s) => (s === 'industries' ? null : 'industries'))}
-            >
-              {INDUSTRIES_LINKS.map((l) => (
-                <Link key={l.href} to={l.href} className="mobile-sub-link" onClick={closeAll}>
-                  {l.label}
-                </Link>
-              ))}
-            </MobileAccordion>
-
-            <Link to="/customers" className="mobile-top-link" onClick={closeAll}>
-              Customers
-            </Link>
-
-            <MobileAccordion
               label="Company"
               open={mobileSection === 'company'}
               onToggle={() => setMobileSection((s) => (s === 'company' ? null : 'company'))}
             >
               {COMPANY_LINKS.map((l) => (
-                <Link key={l.href} to={l.href} className="mobile-sub-link" onClick={closeAll}>
+                <Link key={l.href} to={l.href} className="mobile-sub-link mobile-sub-link--nav-type" onClick={closeAll}>
                   {l.label}
                 </Link>
               ))}

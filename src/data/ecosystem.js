@@ -18,12 +18,13 @@
  *               precedence over href/status for the card + menu CTA
  *   note        optional sub-note (e.g. hardware/software pairing)
  */
-import epicryptLogo from '../assets/logos/Epi Crypt/Epi-Crypt-logo-transparent.png'
-import epiquantumLogo from '../assets/logos/Epi Quantum/Epi-Quantum-logo.png'
-import epiwellLogo from '../assets/logos/Epi Nutrition/Epi-Well-logo-transparent.png'
-import epilegalletLogo from '../assets/logos/Epi le Galet/Epi-LeGallet-logo-transparent.png'
-import epitrustLogo from '../assets/logos/Epi Trust/Epi-Trust-logo-transparent.png'
-import epimindedLogo from '../assets/logos/Epiminded/Epiminded-logo-transparent.png'
+import qaegisLogo from '../assets/logos/Qaegis/qaegis-wordmark.png'
+import epicryptLogo from '../assets/logos/Epi Crypt/epicrypt-wordmark.png'
+import epiquantumLogo from '../assets/logos/Epi Quantum/epiquantum-wordmark.png'
+import epiwellLogo from '../assets/logos/Epi Nutrition/epiwell-wordmark.png'
+import epilegalletLogo from '../assets/logos/Epi le Galet/epilegallet-wordmark.png'
+import epitrustLogo from '../assets/logos/Epi Trust/epitrust-wordmark.png'
+import epimindedLogo from '../assets/logos/Epiminded/epiminded-wordmark.png'
 
 /** Corporate inquiries / coming-soon products route here (stays on the hub). */
 export const CORPORATE_CONTACT_HREF = '/#CTA'
@@ -49,6 +50,7 @@ export const ECOSYSTEMS = [
           'Qaegis gives enterprises a private, sovereign environment to put large language models to work without sensitive data ever leaving their control. Models run inside isolated sandboxes governed by your own access, residency and audit policies, so teams gain the productivity of modern AI while meeting the standards banks, regulators and security functions operate under — adopting AI on their own terms, without trading away confidentiality or compliance.',
         audience: 'Enterprises · Banks · CISOs',
         accent: '#22d3ee',
+        logo: qaegisLogo,
         href: 'https://quantumaegis.ai/',
         status: 'live',
         external: true,

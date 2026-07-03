@@ -1,0 +1,47 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/industries/financial-services",
+      "destination": "/industries/finance-banking",
+      "permanent": true
+    },
+    {
+      "source": "/industries/government",
+      "destination": "/industries/government-defence",
+      "permanent": true
+    },
+    {
+      "source": "/industries/wellness",
+      "destination": "/industries/wellness-coaching",
+      "permanent": true
+    },
+    {
+      "source": "/industries/influencers",
+      "destination": "/industries/influencers-educators",
+      "permanent": true
+    },
+    {
+      "source": "/solutions/trusted-ai-for-regulated-industries",
+      "destination": "/solutions/trusted-ai",
+      "permanent": true
+    },
+    {
+      "source": "/solutions/precision-health-intelligence",
+      "destination": "/solutions/precision-health",
+      "permanent": true
+    },
+    {
+      "source": "/solutions/future-of-work-and-learning",
+      "destination": "/solutions/future-of-work",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

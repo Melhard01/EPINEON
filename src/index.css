@@ -2,6 +2,10 @@
 html {
   overflow-x: clip;
   max-width: 100%;
+  /* Stable rem baseline + disable browser text auto-scaling (avoids “zoomed” look across devices) */
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {

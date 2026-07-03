@@ -9,10 +9,15 @@
   color: #ffffff;
 }
 
-/* Shell — sections + header stay pure black */
-.landing-page-dark > section,
-.landing-page-dark > header.site-header {
+/* Shell — sections stay pure black */
+.landing-page-dark > section {
   background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* Solution hero with photographic background (inside <main>) */
+.landing-page-dark .solution-hero-section--has-bg {
+  background-color: #06080e !important;
   background-image: none !important;
 }
 
@@ -25,9 +30,27 @@
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Header bar (animation flex rules live under .site-header .site-header-nav-shell — untouched) */
+/* Header bar — transparent at top of hero; solid when scrolled or menu open */
 .landing-page-dark > header.site-header {
+  background-color: transparent !important;
+  background-image: none !important;
+  border-bottom: 1px solid transparent !important;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease,
+    backdrop-filter 0.3s ease,
+    -webkit-backdrop-filter 0.3s ease;
+}
+
+.landing-page-dark > header.site-header.scrolled,
+.landing-page-dark > header.site-header.site-header--menu-open,
+.landing-page-dark > header.site-header.site-header--mega-open {
+  background-color: #000000 !important;
   border-bottom-color: rgba(255, 255, 255, 0.12) !important;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
 }
 
 /* Wordmark PNG — lift contrast on gold “Precision Life Science” line on black header (no extra DOM) */
@@ -52,9 +75,151 @@
   color: #a5b4fc !important;
 }
 
-/* CTA strip: flatten to pure black */
-.landing-page-dark section#CTA {
-  background: #000000 !important;
+/* ---------- Landing sections — black grid + amber/gold mesh orbs ---------- */
+.landing-page-dark .landing-section {
+  background-color: #000000;
+  isolation: isolate;
+}
+
+.landing-page-dark .landing-section__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-page-dark .landing-section__grid {
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 52px 52px;
+}
+
+.landing-page-dark .landing-section__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(52px);
+  opacity: 0.92;
+}
+
+.landing-page-dark .landing-section__orb--amber {
+  left: -12%;
+  top: 38%;
+  width: min(72vw, 34rem);
+  height: min(72vw, 34rem);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 118, 48, 0.58) 0%,
+    rgba(232, 92, 28, 0.34) 32%,
+    rgba(140, 48, 8, 0.1) 58%,
+    transparent 72%
+  );
+}
+
+.landing-page-dark .landing-section__orb--gold {
+  right: -12%;
+  top: 34%;
+  width: min(68vw, 32rem);
+  height: min(68vw, 32rem);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(255, 224, 96, 0.62) 0%,
+    rgba(255, 196, 48, 0.38) 30%,
+    rgba(201, 162, 39, 0.14) 56%,
+    transparent 74%
+  );
+}
+
+/* Hero — original black grid + bottom gold glow (unchanged by mesh sections) */
+.landing-page-dark .landing-hero-section {
+  background-color: #000000;
+  isolation: isolate;
+}
+
+.landing-page-dark .landing-hero-section__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-page-dark .landing-hero-section__grid {
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.85) 35%,
+    #000 68%,
+    #000 100%
+  );
+}
+
+.landing-page-dark .landing-hero-section__glow {
+  position: absolute;
+  left: 50%;
+  bottom: -28%;
+  width: min(185%, 110rem);
+  height: 95%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      ellipse 78% 72% at 50% 92%,
+      rgba(255, 176, 56, 0.72) 0%,
+      rgba(232, 145, 32, 0.52) 22%,
+      rgba(201, 162, 39, 0.32) 42%,
+      rgba(90, 52, 8, 0.12) 62%,
+      transparent 88%
+    ),
+    radial-gradient(
+      ellipse 120% 55% at 50% 100%,
+      rgba(255, 210, 120, 0.28) 0%,
+      rgba(201, 162, 39, 0.1) 40%,
+      transparent 72%
+    );
+  filter: blur(2px);
+}
+
+@media (min-width: 1024px) {
+  .landing-page-dark .landing-section__grid {
+    background-size: 56px 56px;
+  }
+
+  .landing-page-dark .landing-section__orb {
+    filter: blur(64px);
+  }
+
+  .landing-page-dark .landing-section__orb--amber {
+    left: -6%;
+    width: min(42vw, 38rem);
+    height: min(42vw, 38rem);
+  }
+
+  .landing-page-dark .landing-section__orb--gold {
+    right: -6%;
+    width: min(40vw, 36rem);
+    height: min(40vw, 36rem);
+  }
+
+  .landing-page-dark .landing-hero-section__grid {
+    background-size: 56px 56px;
+  }
+
+  .landing-page-dark .landing-hero-section__glow {
+    bottom: -24%;
+    width: min(200%, 120rem);
+    height: 105%;
+  }
 }
 
 /* ---------- Typography: dark → white ---------- */
@@ -79,23 +244,20 @@
   color: #ffffff !important;
 }
 
-/* Hero eyebrow — charcoal pill, gold hairline border + wide-track caps (above main headline) */
-.landing-page-dark section#home .hero-precision-pill {
+.landing-page-dark .epineon-eyebrow-pill {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  /* Nudge only the pill up; headline stays in normal flow (layout box unchanged). */
-  top: -0.875rem;
   margin-bottom: 0;
-  padding: 0.28rem 0.95rem 0.38rem;
+  padding: 0.24rem 0.85rem 0.34rem;
   border-radius: 9999px;
   border: 1px solid rgba(201, 162, 39, 0.55);
   background: linear-gradient(180deg, #2a2624 0%, #1c1a18 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   color: #d4b85c !important;
   font-family: inherit !important;
-  font-size: 0.5625rem;
+  font-size: 0.5rem;
   font-weight: 500;
   font-style: normal !important;
   letter-spacing: 0.24em;
@@ -103,21 +265,32 @@
   text-transform: uppercase;
 }
 
+.landing-page-dark section#home .epineon-eyebrow-pill {
+  /* Nudge only the pill up; headline stays in normal flow (layout box unchanged). */
+  top: -0.875rem;
+}
+
 @media (min-width: 640px) {
-  .landing-page-dark section#home .hero-precision-pill {
-    top: -1rem;
-    padding: 0.32rem 1.1rem 0.42rem;
-    font-size: 0.625rem;
+  .landing-page-dark .epineon-eyebrow-pill {
+    padding: 0.28rem 1rem 0.38rem;
+    font-size: 0.5625rem;
     letter-spacing: 0.26em;
+  }
+
+  .landing-page-dark section#home .epineon-eyebrow-pill {
+    top: -1rem;
   }
 }
 
 @media (min-width: 1024px) {
-  .landing-page-dark section#home .hero-precision-pill {
-    top: -1.125rem;
-    padding: 0.36rem 1.25rem 0.46rem;
-    font-size: 0.6875rem;
+  .landing-page-dark .epineon-eyebrow-pill {
+    padding: 0.31rem 1.1rem 0.42rem;
+    font-size: 0.625rem;
     letter-spacing: 0.28em;
+  }
+
+  .landing-page-dark section#home .epineon-eyebrow-pill {
+    top: -1.125rem;
   }
 }
 
@@ -178,7 +351,8 @@
   color: rgba(255, 255, 255, 0.62) !important;
 }
 
-.landing-page-dark .product-detail-desc {
+.landing-page-dark .product-detail-desc,
+.landing-page-dark .solution-challenge-card__text {
   color: rgba(255, 255, 255, 0.72) !important;
 }
 
@@ -247,6 +421,30 @@
   box-shadow: 0 28px 56px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* Ecosystem portfolio — metric-panel cards (reference: dark panel, icon + tag, serif headline, progress, divider, info row) */
+.landing-page-dark .ecosystem-card.epineon-card {
+  background: linear-gradient(165deg, #161616 0%, #121212 100%) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 20px 40px rgba(0, 0, 0, 0.42) !important;
+}
+
+.landing-page-dark .ecosystem-card.epineon-card:hover {
+  border-color: color-mix(in srgb, var(--eco-accent, #c9a227) 32%, #333333) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--eco-accent, #c9a227) 14%, transparent),
+    0 28px 52px rgba(0, 0, 0, 0.55) !important;
+}
+
+.landing-page-dark .ecosystem-card .ecosystem-card-headline {
+  color: #ffffff !important;
+}
+
+.landing-page-dark .ecosystem-card .ecosystem-card-label {
+  color: #c9a227 !important;
+}
+
 /* Card titles — display serif (same as section / hero titling) */
 .landing-page-dark .epineon-card .epineon-h4 {
   font-family: var(--epineon-font-display) !important;
@@ -256,7 +454,15 @@
 }
 
 .landing-page-dark .epineon-card .epineon-h3,
-.landing-page-dark .epineon-card .venture-studio-card-title {
+.landing-page-dark .epineon-card .venture-studio-card-title,
+.landing-page-dark .why-apart-card .why-apart-card__title,
+.landing-page-dark .why-apart-card .why-apart-card__title-line,
+.landing-page-dark .why-apart-card .why-item-label {
+  color: #ffffff !important;
+}
+
+.landing-page-dark .why-apart-card .why-apart-card__title.text-slate-900,
+.landing-page-dark .why-apart-card .why-item-label.text-slate-900 {
   color: #ffffff !important;
 }
 
@@ -266,14 +472,27 @@
 
 /* Body copy inside cards — soft grey */
 .landing-page-dark .epineon-card .epineon-body,
-.landing-page-dark .epineon-card .epineon-body-large {
-  color: #a0a0a0 !important;
+.landing-page-dark .epineon-card .epineon-body-large,
+.landing-page-dark .why-apart-card .why-apart-card__body {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
+
+.landing-page-dark .why-apart-grid .why-apart-card {
+  background: transparent !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.landing-page-dark .why-apart-grid .why-apart-card:hover {
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 /* Utility text inside cards inherits hierarchy over global white slate rules */
 .landing-page-dark .epineon-card .text-slate-700,
 .landing-page-dark .epineon-card .text-slate-800,
-.landing-page-dark .epineon-card .text-slate-900 {
+.landing-page-dark .epineon-card .text-slate-900:not(.why-apart-card__title):not(.why-item-label):not(.industry-challenges-split__heading) {
   color: #a0a0a0 !important;
 }
 
@@ -321,10 +540,12 @@
     0 4px 14px rgba(0, 0, 0, 0.55) !important;
 }
 
-/* Hero + header (desktop + mobile drawer) — Get Started: solid gold fill, black label */
+/* Hero + header + final CTA “Book a demo” — solid gold fill, black label */
 .landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary,
 .landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary,
-.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary {
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary,
+.landing-page-dark section#CTA .final-cta-path .epineon-btn-primary,
+.landing-page-dark .solution-final-cta__btn--gold {
   background: #c9a227 !important;
   background-image: none !important;
   color: #0a0a0a !important;
@@ -341,7 +562,9 @@
 
 .landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary *,
 .landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary *,
-.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary * {
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary *,
+.landing-page-dark section#CTA .final-cta-path .epineon-btn-primary *,
+.landing-page-dark .solution-final-cta__btn--gold * {
   color: #0a0a0a !important;
 }
 
@@ -354,11 +577,32 @@
 
 .landing-page-dark section#home .hero-cta-learn-more.epineon-btn-primary:hover,
 .landing-page-dark .site-header .header-cta-get-started.epineon-btn-primary:hover,
-.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary:hover {
+.landing-page-dark .site-header-mobile-panel .header-cta-get-started.epineon-btn-primary:hover,
+.landing-page-dark section#CTA .final-cta-path .epineon-btn-primary:hover,
+.landing-page-dark .solution-final-cta__btn--gold:hover {
   filter: brightness(1.06);
   box-shadow:
     0 0 0 1px rgba(212, 175, 55, 0.28),
     0 6px 24px rgba(212, 175, 55, 0.45) !important;
+}
+
+/* White pill CTA (solution pages + selected industry pages) */
+.landing-page-dark .solution-final-cta__btn--white {
+  background: #ffffff !important;
+  background-image: none !important;
+  color: #0a0a0a !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+}
+
+.landing-page-dark .solution-final-cta__btn--white * {
+  color: #0a0a0a !important;
+}
+
+.landing-page-dark .solution-final-cta__btn--white:hover {
+  filter: brightness(0.96);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Hero — Uncover Our Story: same gold glow ring, no inner/shadow seam */
@@ -416,7 +660,80 @@
   color: rgba(255, 255, 255, 0.92) !important;
 }
 
-/* ---------- Contact form (card is black; fields readable) ---------- */
+/* ---------- Talk to Us /contact form fields ---------- */
+.landing-page-dark .epineon-card .contact-form-field,
+.landing-page-dark .contact-form-field {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: none;
+}
+
+.landing-page-dark .contact-form-field::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.landing-page-dark .contact-form-field:focus {
+  border-color: rgba(201, 162, 39, 0.5) !important;
+  outline: none;
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
+}
+
+.landing-page-dark .contact-form-field:-webkit-autofill,
+.landing-page-dark .contact-form-field:-webkit-autofill:hover,
+.landing-page-dark .contact-form-field:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-out 0s;
+  box-shadow: 0 0 0 1000px #0a0a0a inset !important;
+}
+
+.landing-page-dark select.contact-form-field {
+  appearance: none;
+  background-color: #0a0a0a !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.55)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  padding-right: 2.5rem;
+}
+
+.landing-page-dark select.contact-form-field option {
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+/* Radix contact dropdowns (Product of interest, Use case) */
+.landing-page-dark .contact-form-select-trigger {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+.landing-page-dark .contact-form-select-trigger[data-state='open'],
+.landing-page-dark .contact-form-select-trigger:focus-visible {
+  border-color: rgba(201, 162, 39, 0.5) !important;
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.25);
+}
+
+.landing-page-dark .contact-form-select-trigger svg {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.landing-page-dark .contact-form-select-content {
+  background-color: #0a0a0a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.landing-page-dark .contact-form-select-content [data-slot='select-item'] {
+  color: #ffffff;
+}
+
+.landing-page-dark .contact-form-select-content [data-slot='select-item'][data-highlighted] {
+  background-color: rgba(201, 162, 39, 0.15) !important;
+  color: #ffffff !important;
+}
+
+/* ---------- Homepage CTA form (card is black; fields readable) ---------- */
 .landing-page-dark section#CTA input,
 .landing-page-dark section#CTA textarea {
   background-color: #0a0a0a !important;
@@ -442,13 +759,14 @@
 @media (max-width: 1023.98px) {
   .landing-page-dark section#home h1.hero-display-serif .hero-display-line1,
   .landing-page-dark section#home h1.hero-display-serif .hero-display-line2 {
-    font-size: clamp(1.3rem, 5.5vw + 0.45rem, 2.65rem) !important;
-    line-height: 1.12 !important;
+    font-size: clamp(1.75rem, 2.75vw + 0.9rem, 2.75rem) !important;
+    line-height: 1.14 !important;
     text-wrap: balance;
   }
 
   .landing-page-dark section#home .hero-steward-tagline {
-    font-size: clamp(1rem, 2.75vw + 0.35rem, 1.375rem) !important;
+    font-size: clamp(0.875rem, 3.6vw + 0.45rem, 1.0625rem) !important;
+    line-height: 1.55 !important;
   }
 
   .landing-page-dark .epineon-section-title,
@@ -464,4 +782,56 @@
     padding-left: max(1.5rem, env(safe-area-inset-left, 0px));
     padding-right: max(1.5rem, env(safe-area-inset-right, 0px));
   }
+}
+
+/* Homepage — snap between sections; next block lands at the top when scrolling */
+html.landing-scroll-snap {
+  scroll-snap-type: y proximity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.landing-scroll-snap {
+    scroll-snap-type: none;
+  }
+}
+
+.landing-page-dark .page-sections--snap > section {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  scroll-margin-top: calc(var(--site-header-height, 5rem) + 0.5rem);
+}
+
+/* Snappier section reveal when a block scrolls into view */
+.landing-page-dark .page-sections--snap section:not(.page-section--active) > .site-content,
+.landing-page-dark .page-sections--snap section:not(.page-section--active) > .landing-section__content {
+  transition-duration: 0.5s;
+}
+
+.landing-page-dark .page-sections--snap section.page-section--active > .site-content,
+.landing-page-dark .page-sections--snap section.page-section--active > .landing-section__content {
+  transition-duration: 0.5s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate {
+  transition-duration: 0.5s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate-delay-1 {
+  transition-delay: 0.04s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate-delay-2 {
+  transition-delay: 0.08s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate-delay-3 {
+  transition-delay: 0.12s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate-delay-4 {
+  transition-delay: 0.16s;
+}
+
+.landing-page-dark .page-sections--snap .scroll-animate-delay-5 {
+  transition-delay: 0.2s;
 }

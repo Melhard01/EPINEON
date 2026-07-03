@@ -4,6 +4,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import { PageShell } from '../components/PageShell'
+import { ContactFormSelect } from '../components/contact/ContactFormSelect'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 
 const CONTACT_SUBMIT_URL = (() => {
@@ -56,7 +57,15 @@ const INQUIRE_TABS = [
       { name: 'email', label: 'Work email', type: 'email', required: true },
       { name: 'company', label: 'Company', type: 'text', required: true },
       { name: 'role', label: 'Role', type: 'text', required: false },
-      { name: 'useCase', label: 'Use case', type: 'select', required: true, options: USE_CASES },
+      {
+        name: 'product',
+        label: 'Product of interest',
+        type: 'select',
+        required: true,
+        options: PRODUCT_OPTIONS,
+        placeholder: 'Select a product',
+      },
+      { name: 'useCase', label: 'Use case', type: 'select', required: true, options: USE_CASES, placeholder: 'Select…' },
       { name: 'message', label: 'Message', type: 'textarea', required: true },
     ],
   },
@@ -80,7 +89,7 @@ function resolveFromHash(hash) {
 }
 
 const inputClass =
-  'w-full px-3 lg:px-4 py-3.5 lg:py-4 min-h-[3rem] bg-slate-100 border border-neutral-300 rounded-lg text-slate-800 focus:border-black focus:outline-none text-sm lg:text-base'
+  'contact-form-field w-full px-3 lg:px-4 py-3.5 lg:py-4 min-h-[3rem] rounded-lg border border-white/20 bg-[#0a0a0a] text-white text-sm lg:text-base placeholder:text-white/40 focus:border-[#c9a227]/50 focus:outline-none focus:ring-1 focus:ring-[#c9a227]/25'
 
 export default function Contact() {
   const { hash, search } = useLocation()
@@ -101,13 +110,15 @@ export default function Contact() {
   }, [hash])
 
   useEffect(() => {
-    if (productParam) {
+    if (!productParam || !PRODUCT_OPTIONS.includes(productParam)) return
+    setValues((v) => ({ ...v, product: productParam }))
+    if (hash === '#sales') {
+      setMode('inquire')
+      setInquireId('sales')
+    } else {
       setMode('demo')
-      if (PRODUCT_OPTIONS.includes(productParam)) {
-        setValues((v) => ({ ...v, product: productParam }))
-      }
     }
-  }, [productParam])
+  }, [productParam, hash])
 
   const tab = mode === 'demo' ? DEMO_FORM : INQUIRE_TABS.find((t) => t.id === inquireId)
 
@@ -130,10 +141,23 @@ export default function Contact() {
   }
 
   const onChange = (e) => setValues((v) => ({ ...v, [e.target.name]: e.target.value }))
+  const onSelectChange = (name, value) => setValues((v) => ({ ...v, [name]: value }))
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (status.submitting) return
+
+    const missingRequired = tab.fields.some(
+      (f) => f.required && !String(values[f.name] ?? '').trim(),
+    )
+    if (missingRequired) {
+      setStatus({
+        submitting: false,
+        submitted: false,
+        error: 'Please complete all required fields.',
+      })
+      return
+    }
 
     const url = CONTACT_SUBMIT_URL
     if (typeof window !== 'undefined' && window.location.protocol === 'https:' && url.startsWith('http://')) {
@@ -184,12 +208,16 @@ export default function Contact() {
 
   return (
     <PageShell title="Contact Epineon" description="Talk to our sales or partnerships teams." path="/contact">
-      <section className="pt-32 pb-20 lg:pt-40 lg:pb-28">
-        <div className="site-content min-w-0">
+      <section className="careers-section relative overflow-x-clip pt-32 pb-20 lg:pt-40 lg:pb-28">
+        <div className="careers-section__bg" aria-hidden>
+          <div className="careers-section__glow careers-section__glow--left" />
+          <div className="careers-section__glow careers-section__glow--right" />
+        </div>
+        <div className="site-content relative z-10 min-w-0">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c9a227]">Contact</p>
             <h1 className="epineon-h2 epineon-section-title mt-3 text-slate-900">Talk to Us</h1>
-            <p className="epineon-body-large mt-5 text-white/75 text-base leading-relaxed lg:text-lg">
+            <p className="epineon-body-large mx-auto mt-5 max-w-2xl text-balance text-center text-white/75 text-base leading-relaxed lg:text-lg">
               Choose the path that fits, and the right team will get back within 24 hours.
             </p>
           </div>
@@ -236,7 +264,7 @@ export default function Contact() {
 
           <div className="mt-6 mx-auto max-w-2xl">
             <p className="text-sm text-white/55 text-center">{tab.blurb}</p>
-            <Card className="epineon-card mt-4 bg-[#fefefe] text-slate-800 shadow-lg border border-black/10">
+            <Card className="epineon-card mt-4 border-0 bg-transparent shadow-lg">
               <CardContent className="p-6 sm:p-7 lg:p-9">
                 {status.submitted ? (
                   <div className="text-center">
@@ -263,9 +291,9 @@ export default function Contact() {
 
                     {tab.fields.map((f) => (
                       <div key={f.name}>
-                        <label htmlFor={`f-${f.name}`} className="block text-slate-700 mb-2 text-sm lg:text-base">
+                        <label htmlFor={`f-${f.name}`} className="block text-[#8e8e8e] mb-2 text-sm lg:text-base">
                           {f.label}
-                          {!f.required ? <span className="text-slate-400"> (optional)</span> : null}
+                          {!f.required ? <span className="text-white/35"> (optional)</span> : null}
                         </label>
                         {f.type === 'textarea' ? (
                           <textarea
@@ -280,20 +308,16 @@ export default function Contact() {
                             className={`${inputClass} min-h-[8rem] resize-none leading-relaxed`}
                           />
                         ) : f.type === 'select' ? (
-                          <select
+                          <ContactFormSelect
                             id={`f-${f.name}`}
                             name={f.name}
                             value={values[f.name] || ''}
-                            onChange={onChange}
+                            options={f.options}
+                            placeholder={f.placeholder || 'Select…'}
                             required={f.required}
                             disabled={status.submitting}
-                            className={inputClass}
-                          >
-                            <option value="" disabled>{f.placeholder || 'Select…'}</option>
-                            {f.options.map((o) => (
-                              <option key={o} value={o}>{o}</option>
-                            ))}
-                          </select>
+                            onChange={onSelectChange}
+                          />
                         ) : (
                           <input
                             id={`f-${f.name}`}
@@ -307,7 +331,7 @@ export default function Contact() {
                             className={inputClass}
                           />
                         )}
-                        {f.help ? <p className="mt-1.5 text-xs text-slate-500">{f.help}</p> : null}
+                        {f.help ? <p className="mt-1.5 text-xs text-white/40">{f.help}</p> : null}
                       </div>
                     ))}
 

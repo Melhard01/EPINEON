@@ -2,5 +2,5 @@
   "version": 1,
   "description": "Do not run Pages Functions for static build assets.",
   "include": ["/*"],
-  "exclude": ["/assets/*", "/vite.svg"]
+  "exclude": ["/assets/*", "/favicon/*", "/favicon.ico", "/favicon.svg", "/site.webmanifest"]
 }

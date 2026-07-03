@@ -8,6 +8,7 @@ export const SOLUTIONS = {
     path: '/solutions/trusted-ai',
     eyebrow: 'Use cases',
     title: 'Trusted AI for Regulated Industries',
+    heroTitleLines: ['Trusted AI for', 'Regulated Industries'],
     lede: 'The leverage of modern AI, inside a perimeter you control — built for organisations that can’t afford to be wrong.',
     seoDescription:
       'Private, sovereign AI for finance, government, and critical infrastructure — built around the standards you operate under.',
@@ -19,11 +20,10 @@ export const SOLUTIONS = {
     solutionHeading: 'How Epineon addresses it',
     solutionIntro:
       'Epineon brings AI inside your environment, on infrastructure you govern — paired with quantum-aware cryptography and compliance-grade workflows.',
+    solutionIntroNavWidth: true,
     credibilityLine:
       'Designed for environments governed by GDPR, HIPAA and national-security frameworks.',
     productIds: ['qaegis', 'epicrypt', 'epiquantum'],
-    audienceHeading: 'Built for',
-    industries: ['finance-banking', 'government-defence', 'healthcare'],
     caseStudy: null,
     ctaHeading: 'Bring trusted AI inside your perimeter.',
     ctaLabel: 'Request a Demo',
@@ -45,9 +45,12 @@ export const SOLUTIONS = {
     solutionHeading: 'How Epineon addresses it',
     solutionIntro:
       'A connected stack that captures real-world signals, turns them into clear guidance, and keeps ownership of the data with the person — not the platform.',
+    solutionIntroNavWidth: true,
+    solutionIntroLines: [
+      'A connected stack that captures real-world signals, turns them into clear guidance,',
+      'and keeps ownership of the data with the person — not the platform.',
+    ],
     productIds: ['epiwell', 'epi-legallet', 'epitrust'],
-    audienceHeading: 'Who it’s for',
-    industries: ['healthcare', 'wellness-coaching'],
     caseStudy: null,
     proofNote: 'Healthcare pilots are underway; we publish results once partners are ready to be named.',
     ctaHeading: 'Make health preventive and personal.',
@@ -70,19 +73,16 @@ export const SOLUTIONS = {
     solutionHeading: 'How Epineon addresses it',
     solutionIntro:
       'Epiminded turns trend intelligence and behavioural science into personalised foresight and micro-learning that sharpen decision-making and strategic thinking.',
+    solutionIntroLines: [
+      'Epiminded turns trend intelligence and behavioural science into personalised foresight and micro-learning',
+      'that sharpen decision-making and strategic thinking.',
+    ],
     productIds: ['epiminded'],
     manifestoNote: {
       text: 'Renaissance Now is Epineon’s manifesto: our thesis on living and working well across body, mind, people and contribution, and the role technology should play in service of a whole life. It is the foundation everything in Future Intelligence is built on.',
       label: 'Read Renaissance Now',
       href: 'https://renaissancenow.org/',
     },
-    audienceHeading: 'Use cases',
-    useCases: [
-      'Foresight for leadership teams facing AI disruption',
-      'Personalised micro-learning that adapts to each person',
-      'Communities that learn and trade insight together',
-    ],
-    industries: ['enterprise-workforce', 'universities-academics', 'influencers-educators'],
     ctaHeading: 'Prepare your organisation for what’s next.',
     ctaLabel: 'Start a Conversation',
     ctaHref: '/contact#sales',

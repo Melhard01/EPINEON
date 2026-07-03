@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
-import { Button } from './components/ui/button'
-import { useScrollAnimation } from './hooks/useScrollAnimation'
+import React, { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import { usePageSectionAnimations } from './hooks/usePageSectionAnimations'
 import CookieConsent from './components/CookieConsent'
 import './App.css'
 import './theme-landing-dark.css'
@@ -10,17 +10,25 @@ import { SiteFooter } from './components/SiteFooter'
 import { Seo } from './components/Seo'
 import { EcosystemPortfolio } from './components/home/EcosystemPortfolio'
 import { IndustryStrip } from './components/home/IndustryStrip'
-import { SocialProof } from './components/home/SocialProof'
 import { WhyEpineon } from './components/home/WhyEpineon'
 import { FinalCTA } from './components/home/FinalCTA'
+import { HeroSectionBlock } from './components/home/HeroSection'
 
 const STORY_VIDEO_URL =
   'https://pub-aac5b9c26dbb46c394af3e5472d9429d.r2.dev/Synergeon-presentation.mp4'
 
 function App() {
+  const mainRef = useRef(null)
+  const { pathname } = useLocation()
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false)
   const [showCookieConsent, setShowCookieConsent] = useState(false)
-  const [heroRef, heroVisible] = useScrollAnimation({ initialVisible: true })
+
+  usePageSectionAnimations(mainRef, [pathname], { sectionSnap: true })
+
+  useEffect(() => {
+    document.documentElement.classList.add('landing-scroll-snap')
+    return () => document.documentElement.classList.remove('landing-scroll-snap')
+  }, [])
 
   return (
     <>
@@ -29,73 +37,13 @@ function App() {
       <div className="landing-page-dark relative min-h-screen min-w-0 overflow-x-clip bg-black font-inter">
         <SiteHeader />
 
-        {/* Section 1 — Hero */}
-        <section id="home" className="relative overflow-x-clip pb-16 pt-28">
-          <div className="site-content min-w-0">
-            <div className="flex min-h-[calc(100svh-12rem)] flex-col items-center justify-center">
-              <div ref={heroRef} className={`w-full min-w-0 max-w-3xl scroll-animate text-center sm:max-w-4xl ${heroVisible ? 'visible' : ''}`}>
-                <div className="space-y-5 lg:space-y-7">
-                  <div className="flex flex-col items-center gap-3 sm:gap-4">
-                    <p className={`hero-precision-pill scroll-animate text-reveal text-center ${heroVisible ? 'visible' : ''}`}>
-                      PRECISION LIFE SCIENCE, POWERED BY AI
-                    </p>
-                    <h1 className={`hero-display-serif text-reveal text-center leading-snug text-balance text-4xl sm:text-5xl md:text-[2.875rem] lg:text-6xl xl:text-7xl ${heroVisible ? 'visible' : ''}`}>
-                      <span className="hero-display-line1 mb-2 block text-4xl sm:mb-3 sm:text-5xl md:text-[2.875rem] lg:text-6xl xl:text-7xl">
-                        Human-centred AI for high-stakes work,
-                      </span>
-                      <span className="hero-display-line2 block text-4xl sm:text-5xl md:text-[2.875rem] lg:text-6xl xl:text-7xl">
-                        built on trust.
-                      </span>
-                    </h1>
-                  </div>
-                  <p className={`hero-steward-tagline scroll-animate scroll-animate-delay-2 mx-auto max-w-3xl text-pretty text-lg font-normal sm:text-xl lg:text-2xl ${heroVisible ? 'visible' : ''}`}>
-                    Epineon builds private, human-centred AI for organisations and people operating where trust, privacy and foresight are non-negotiable.
-                  </p>
-                </div>
-                <div className={`mx-auto mt-8 flex scroll-animate scroll-animate-delay-4 w-full max-w-[16.5rem] flex-col items-center justify-center gap-2.5 md:max-w-none md:flex-row md:justify-center md:gap-3 ${heroVisible ? 'visible' : ''}`}>
-                  <Button
-                    asChild
-                    className="epineon-btn-primary hero-cta-learn-more shadow-none w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 md:w-auto md:text-lg md:px-8 md:py-4 lg:text-xl lg:px-11 lg:py-5"
-                  >
-                    <a href="#ecosystems">Explore Ecosystems</a>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="epineon-btn-secondary hero-cta-outline shadow-none !bg-white !text w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 md:w-auto md:text-lg md:px-8 md:py-4 lg:text-xl lg:px-11 lg:py-5"
-                  >
-                    <a href="#industries"><span className="hero-cta-story-text">Find your path</span></a>
-                  </Button>
-                </div>
-                <div className={`mt-5 flex flex-wrap scroll-animate scroll-animate-delay-4 items-center justify-center gap-x-6 gap-y-2 ${heroVisible ? 'visible' : ''}`}>
-                  <button
-                    type="button"
-                    onClick={() => setIsVideoModalOpen(true)}
-                    className="hero-story-link -mx-2 inline-flex min-h-[44px] items-center gap-2 rounded-md px-2 py-2 text-sm font-medium tracking-wide text-[#c9a227] underline-offset-4 transition-colors hover:text-[#e8c95a] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a227]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
-                  >
-                    <span aria-hidden>▶</span>
-                    <span>Watch our story</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 2 — Ecosystem Portfolio */}
-        <EcosystemPortfolio />
-
-        {/* Section 3 — Industry Entry Strip */}
-        <IndustryStrip />
-
-        {/* Section 4 — Social Proof */}
-        <SocialProof />
-
-        {/* Section 5 — Why Epineon */}
-        <WhyEpineon />
-
-        {/* Section 6 — Final CTA */}
-        <FinalCTA />
+        <main ref={mainRef} className="page-sections page-sections--snap relative z-10">
+          <HeroSectionBlock onWatchStory={() => setIsVideoModalOpen(true)} />
+          <EcosystemPortfolio />
+          <IndustryStrip />
+          <WhyEpineon />
+          <FinalCTA />
+        </main>
 
         <SiteFooter />
       </div>

@@ -16,8 +16,6 @@ import Team from './pages/company/Team.jsx'
 import VentureStudio from './pages/company/VentureStudio.jsx'
 import Careers from './pages/company/Careers.jsx'
 import Press from './pages/company/Press.jsx'
-import Customers from './pages/Customers.jsx'
-import CustomerStory from './pages/CustomerStory.jsx'
 import Trust from './pages/Trust.jsx'
 import NotFound from './pages/NotFound.jsx'
 
@@ -39,8 +37,6 @@ createRoot(document.getElementById('root')).render(
         <Route path="/company/venture-studio" element={<VentureStudio />} />
         <Route path="/company/careers" element={<Careers />} />
         <Route path="/company/press" element={<Press />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/customers/:slug" element={<CustomerStory />} />
         <Route path="/trust" element={<Trust />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

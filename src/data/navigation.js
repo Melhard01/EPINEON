@@ -62,5 +62,4 @@ export const NAV_ROUTES = [
   ...COMPANY_LINKS.map((l) => l.href.replace(/#.*$/, '')),
   ...UTILITY_LINKS.map((l) => l.href),
   '/products',
-  '/customers',
 ].filter((href, i, arr) => arr.indexOf(href) === i)

@@ -14,8 +14,11 @@ export const INDUSTRIES = {
       'Quantum computing threatens the cryptography protecting today’s transactions.',
       'Audit and explainability requirements that generic AI tools can’t meet.',
     ],
-    approach:
-      'Banks and insurers can’t send regulated data to a public model. Qaegis lets your teams use modern AI inside a perimeter you control; EPICRYPT protects transactions in motion at line speed; and EPIQUANTUM future-proofs your keys against quantum attacks — all while meeting audit and explainability demands.',
+    approach: [
+      'Banks and insurers can’t send regulated data to a public model.',
+      'Qaegis puts modern AI inside a perimeter you control; EPICRYPT protects transactions in motion; EPIQUANTUM future-proofs keys against quantum attacks.',
+      'All while meeting audit and explainability demands your regulators expect.',
+    ],
     productIds: ['qaegis', 'epiquantum', 'epicrypt'],
     relatedSolution: '/solutions/trusted-ai',
     caseStudy: {
@@ -24,7 +27,6 @@ export const INDUSTRIES = {
       quote:
         'We have a continuous business and partnership together with Epineon because our interests are now merged for the better. Their cutting-edge technology and forward-thinking strategies have been pivotal in our journey towards sustainable growth.',
       attribution: 'William Beny · Chargea',
-      href: '/customers/chargea',
     },
   },
 
@@ -39,8 +41,11 @@ export const INDUSTRIES = {
       'Clinicians lose time to documentation and data overload.',
       'Fragmented records make personalised, preventive care hard to deliver.',
     ],
-    approach:
-      'Clinical trust starts with protecting patient data. EpiTrust acts as a co-pilot through the consultation, turning scattered medical and behavioural data into clear, shareable guidance; EPIWELL converts continuous signals into preventive, personalised care plans — all without sending records to a public model.',
+    approach: [
+      'Clinical trust starts with protecting patient data.',
+      'EpiTrust co-pilots the consultation, turning scattered medical and behavioural data into clear, shareable guidance.',
+      'EPIWELL converts continuous signals into preventive, personalised care plans — without sending records to a public model.',
+    ],
     productIds: ['epitrust', 'epiwell'],
     relatedSolution: '/solutions/precision-health',
     caseStudy: null, // TODO: add a real clinic/provider story
@@ -57,8 +62,11 @@ export const INDUSTRIES = {
       'Post-quantum threats put long-lived classified data at risk.',
       'Legacy infrastructure must adopt AI without adding attack surface.',
     ],
-    approach:
-      'Sovereignty is non-negotiable. Qaegis keeps sensitive workloads under your direct control; EPICRYPT secures communications in transit; and EPIQUANTUM protects long-lived classified data against the day quantum computers break today’s encryption — letting legacy infrastructure adopt AI without widening the attack surface.',
+    approach: [
+      'Sovereignty is non-negotiable.',
+      'Qaegis keeps sensitive workloads under your control; EPICRYPT secures communications in transit; EPIQUANTUM protects long-lived data against post-quantum threats.',
+      'Legacy infrastructure can adopt AI without widening the attack surface.',
+    ],
     productIds: ['qaegis', 'epiquantum', 'epicrypt'],
     relatedSolution: '/solutions/trusted-ai',
     caseStudy: {
@@ -67,7 +75,6 @@ export const INDUSTRIES = {
       quote:
         'We worked hand in hand with Epineon to revolutionize our digital infrastructure. Their innovative approach and attention to detail were instrumental in streamlining our processes.',
       attribution: 'Peter Craft · Avenis',
-      href: '/customers/avenis',
     },
   },
 
@@ -82,8 +89,11 @@ export const INDUSTRIES = {
       'Generic plans don’t reflect each client’s biology.',
       'Scaling personalised guidance is manual and time-consuming.',
     ],
-    approach:
-      'Stop stitching together a dozen disconnected apps. EPIWELL unifies each client’s signals into one adaptive view, while the EPI LeGallet biosensor streams real-time glucose and metabolic data — so you can give biology-specific guidance and scale a personalised practice without scaling your hours.',
+    approach: [
+      'Stop stitching together a dozen disconnected apps.',
+      'EPIWELL unifies each client’s signals; EPI LeGallet streams real-time glucose and metabolic data.',
+      'Give biology-specific guidance and scale a personalised practice without scaling your hours.',
+    ],
     productIds: ['epiwell', 'epi-legallet'],
     relatedSolution: '/solutions/precision-health',
     caseStudy: null, // TODO: add a real coach/practitioner story
@@ -100,8 +110,11 @@ export const INDUSTRIES = {
       'No honest answer to the only question that matters: am I getting healthier?',
       'Compliance dies after the second sensor — the habit never sticks.',
     ],
-    approach:
-      'EPIWELL pulls glucose, sleep, activity and nutrition into one dashboard and turns your own data — not generic protocols — into personal recommendations. The EPI LeGallet biosensor keeps tracking non-invasive (no patch, no prescription, no skin irritation), so the habit actually sticks past sensor number two.',
+    approach: [
+      'EPIWELL pulls glucose, sleep, activity and nutrition into one dashboard.',
+      'Your own data — not generic protocols — drives personal recommendations.',
+      'EPI LeGallet keeps tracking non-invasive, so the habit sticks past sensor number two.',
+    ],
     productIds: ['epiwell', 'epi-legallet'],
     relatedSolution: '/solutions/precision-health',
     ctaHeadline: 'Ready to understand your own biology?',
@@ -121,8 +134,11 @@ export const INDUSTRIES = {
       'Client compliance collapses around week 4 as patch friction sets in.',
       'Patch friction quietly kills your 12-week programmes.',
     ],
-    approach:
-      'EPIWELL gives your clinical team a cohort dashboard to manage 20–200 clients in one view, a white-label experience under your own brand, and outcome reporting (PDF, CSV) ready for client reviews and case studies. The EPI LeGallet biosensor removes the patch friction that breaks 12-week programmes, while EpiTrust adds a clinician co-pilot across the consultation.',
+    approach: [
+      'EPIWELL gives your team a cohort dashboard, white-label experience, and outcome reporting (PDF, CSV).',
+      'EPI LeGallet removes the patch friction that breaks 12-week programmes.',
+      'EpiTrust adds a clinician co-pilot across the consultation.',
+    ],
     productIds: ['epiwell', 'epi-legallet', 'epitrust'],
     relatedSolution: '/solutions/precision-health',
     ctaHeadline: 'Bring a branded metabolic programme to your clients.',
@@ -142,8 +158,11 @@ export const INDUSTRIES = {
       'Reskilling the workforce is urgent, but it’s unclear which skills will still matter.',
       'Bet-the-company decisions demand foresight, not guesswork, about what’s coming next.',
     ],
-    approach:
-      'Leadership decisions can’t run on guesswork. Epiminded combines trend intelligence with behavioural science to show how AI is reshaping your market and which skills your workforce will need next — turning foresight into a planning input, so your strategy keeps pace with the disruption around it.',
+    approach: [
+      'Leadership decisions can’t run on guesswork.',
+      'Epiminded combines trend intelligence and behavioural science to show how AI is reshaping your market.',
+      'Turn foresight into a planning input so strategy keeps pace with disruption.',
+    ],
     productIds: ['epiminded'],
     relatedSolution: '/solutions/future-of-work',
     ctaHeadline: 'Ready to lead through AI disruption?',
@@ -161,8 +180,11 @@ export const INDUSTRIES = {
       'Turning complex AI and future-of-work trends into clear content eats your time.',
       'Standing out means foresight your followers can’t find anywhere else.',
     ],
-    approach:
-      'Your audience follows you to understand what’s next. Epiminded distils complex AI and future-of-work signals into clear, credible foresight you can turn into content — so you spend less time tracking the noise and more time publishing the insight that keeps you ahead of the curve.',
+    approach: [
+      'Your audience follows you to understand what’s next.',
+      'Epiminded distils complex AI and future-of-work signals into clear, credible foresight.',
+      'Spend less time tracking noise and more time publishing insight that keeps you ahead.',
+    ],
     productIds: ['epiminded'],
     relatedSolution: '/solutions/future-of-work',
     ctaHeadline: 'Give your audience the signal, not the noise.',
@@ -181,8 +203,11 @@ export const INDUSTRIES = {
       'Faculty and students lack a clear view of the careers that will actually exist.',
       'Teaching and research demand trustworthy, future-focused intelligence.',
     ],
-    approach:
-      'Curricula struggle to keep pace with AI. Epiminded gives faculty and students a structured, evidence-based view of where skills and careers are heading — so programmes, research and teaching stay aligned with the roles that will actually exist when today’s students graduate.',
+    approach: [
+      'Curricula struggle to keep pace with AI.',
+      'Epiminded gives faculty and students a structured view of where skills and careers are heading.',
+      'Programmes, research and teaching stay aligned with the roles graduates will actually need.',
+    ],
     productIds: ['epiminded'],
     relatedSolution: '/solutions/future-of-work',
     ctaHeadline: 'Let’s prepare your students for what’s actually next.',

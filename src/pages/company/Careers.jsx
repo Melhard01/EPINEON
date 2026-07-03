@@ -1,72 +1,81 @@
-import React, { useState } from 'react'
+import React from 'react'
+import { ShieldCheck, Users, HeartHandshake, Layers, Sparkles } from 'lucide-react'
 import { PageShell } from '../../components/PageShell'
+import { FinalCTA } from '../../components/home/FinalCTA'
 
-const BELIEFS = [
-  'We build for environments where being wrong isn’t an option — and we hold ourselves to that standard.',
-  'Senior people, small teams, real ownership. No layers between you and the work.',
-  'Human agency is the point. We build AI that extends judgement, never replaces it.',
-  'Three frontiers, one company. Work across security, health and foresight without changing employers.',
+const BELIEF_ITEMS = [
+  {
+    icon: ShieldCheck,
+    lead: 'We build for environments where being wrong isn’t an option',
+    body: '— and we hold ourselves to that standard.',
+  },
+  {
+    icon: Users,
+    lead: 'Senior people, small teams, real ownership.',
+    body: 'No layers between you and the work.',
+  },
+  {
+    icon: HeartHandshake,
+    lead: 'Human agency is the point.',
+    body: 'We build AI that extends judgement, never replaces it.',
+  },
+  {
+    icon: Layers,
+    lead: 'Three frontiers, one company.',
+    body: 'Work across security, health and foresight without changing employers.',
+  },
 ]
 
 export default function Careers() {
-  const [email, setEmail] = useState('')
-  const [done, setDone] = useState(false)
-
-  const onSubmit = (e) => {
-    e.preventDefault()
-    if (!email.trim()) return
-    setDone(true) // TODO: wire to a real openings-alert list
-  }
-
   return (
     <PageShell
       title="Careers"
       description="Work on problems that actually matter — private AI, post-quantum security, precision health and foresight."
       path="/company/careers"
     >
-      <section className="pt-32 pb-24 lg:pt-40 lg:pb-32">
-        <div className="site-content min-w-0">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c9a227]">Careers</p>
-            <h1 className="epineon-h2 epineon-section-title mt-3 text-slate-900">
-              Work on problems that actually matter.
+      <section className="careers-section relative overflow-x-clip pt-32 pb-24 lg:pt-40 lg:pb-32">
+        <div className="careers-section__bg" aria-hidden>
+          <div className="careers-section__glow careers-section__glow--left" />
+          <div className="careers-section__glow careers-section__glow--right" />
+        </div>
+
+        <div className="site-content relative z-10 min-w-0">
+          <header className="careers-hero mx-auto max-w-3xl scroll-animate text-center">
+            <span className="careers-hero__mark" aria-hidden>
+              <Sparkles className="h-5 w-5" strokeWidth={1.75} />
+            </span>
+            <p className="careers-hero__eyebrow text-sm font-semibold uppercase tracking-[0.22em] text-[#c9a227]">Careers</p>
+            <h1 className="careers-hero__title epineon-section-lead mt-3 text-balance">
+              <span className="careers-hero__emph">Work on problems</span>{' '}
+              <span className="careers-hero__muted">that actually matter.</span>
             </h1>
-            <p className="epineon-body-large mt-5 text-white/80 text-lg leading-relaxed">
+            <p className="careers-hero__lead epineon-body-large text-center">
               We hire deliberately, and rarely. We&apos;re looking for builders who want to work on private AI,
               post-quantum security, precision health and foresight — where the stakes are real and the bar is high.
-              Leave your email and we&apos;ll reach out when a role fits.
             </p>
+          </header>
 
-            {done ? (
-              <p className="mt-8 text-base text-[#c9a227]">Thanks — we&apos;ll be in touch when something opens.</p>
-            ) : (
-              <form onSubmit={onSubmit} className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
-                <label htmlFor="careers-email" className="sr-only">Email address</label>
-                <input
-                  id="careers-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@email.com"
-                  className="newsletter-input min-w-0 flex-1 rounded-full px-5 py-3.5 text-sm"
-                />
-                <button type="submit" className="epineon-btn-primary rounded-full px-7 py-3.5 text-sm font-semibold">
-                  Keep me posted
-                </button>
-              </form>
-            )}
+          <div className="careers-beliefs-grid mx-auto mt-16 grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-x-10 sm:gap-y-12 lg:mt-24 lg:gap-x-14 lg:gap-y-16">
+            {BELIEF_ITEMS.map((item, i) => {
+              const Icon = item.icon
+              return (
+                <article
+                  key={item.lead}
+                  className={`careers-belief-item scroll-animate scroll-animate-delay-${i + 1}`}
+                >
+                  <span className="careers-belief-item__icon" aria-hidden>
+                    <Icon className="h-5 w-5" strokeWidth={1.75} />
+                  </span>
+                  <h2 className="careers-belief-item__lead">{item.lead}</h2>
+                  <p className="careers-belief-item__body">{item.body}</p>
+                </article>
+              )
+            })}
           </div>
-
-          <ul className="mx-auto mt-16 grid max-w-3xl grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
-            {BELIEFS.map((b) => (
-              <li key={b} className="epineon-card p-6 text-left">
-                <p className="epineon-body text-white/75 text-sm leading-relaxed lg:text-base">{b}</p>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
+
+      <FinalCTA />
     </PageShell>
   )
 }
