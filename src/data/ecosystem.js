@@ -24,7 +24,7 @@ import epiquantumLogo from '../assets/logos/Epi Quantum/epiquantum-wordmark.png'
 import epiwellLogo from '../assets/logos/Epi Nutrition/epiwell-wordmark.png'
 import epilegalletLogo from '../assets/logos/Epi le Galet/epilegallet-wordmark.png'
 import epitrustLogo from '../assets/logos/Epi Trust/epitrust-wordmark.png'
-import epimindedLogo from '../assets/logos/Epiminded/epiminded-wordmark.png'
+import soulchainLogo from '../assets/logos/SoulChain/soulchain-wordmark.png'
 
 /** Corporate inquiries / coming-soon products route here (stays on the hub). */
 export const CORPORATE_CONTACT_HREF = '/#CTA'
@@ -143,12 +143,12 @@ export const ECOSYSTEMS = [
     products: [
       {
         id: 'epiminded',
-        name: 'Epiminded',
+        name: 'SoulChain',
         positioning: 'Foresight and AI upskilling for leaders navigating constant change.',
         audience: 'Organizations · Creators',
         accent: '#a78bfa',
-        logo: epimindedLogo,
-        href: 'https://epiminded.com/',
+        logo: soulchainLogo,
+        href: 'https://soulchain.net/',
         status: 'live',
         external: true,
       },

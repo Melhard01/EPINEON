@@ -160,7 +160,7 @@ export const INDUSTRIES = {
     ],
     approach: [
       'Leadership decisions can’t run on guesswork.',
-      'Epiminded combines trend intelligence and behavioural science to show how AI is reshaping your market.',
+      'SoulChain combines trend intelligence and behavioural science to show how AI is reshaping your market.',
       'Turn foresight into a planning input so strategy keeps pace with disruption.',
     ],
     productIds: ['epiminded'],
@@ -182,13 +182,13 @@ export const INDUSTRIES = {
     ],
     approach: [
       'Your audience follows you to understand what’s next.',
-      'Epiminded distils complex AI and future-of-work signals into clear, credible foresight.',
+      'SoulChain distils complex AI and future-of-work signals into clear, credible foresight.',
       'Spend less time tracking noise and more time publishing insight that keeps you ahead.',
     ],
     productIds: ['epiminded'],
     relatedSolution: '/solutions/future-of-work',
     ctaHeadline: 'Give your audience the signal, not the noise.',
-    ctaButton: 'Explore Epiminded',
+    ctaButton: 'Explore SoulChain',
     caseStudy: null, // TODO: add a real creator/influencer story
   },
 
@@ -205,7 +205,7 @@ export const INDUSTRIES = {
     ],
     approach: [
       'Curricula struggle to keep pace with AI.',
-      'Epiminded gives faculty and students a structured view of where skills and careers are heading.',
+      'SoulChain gives faculty and students a structured view of where skills and careers are heading.',
       'Programmes, research and teaching stay aligned with the roles graduates will actually need.',
     ],
     productIds: ['epiminded'],

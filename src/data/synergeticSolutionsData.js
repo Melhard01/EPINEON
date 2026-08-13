@@ -145,7 +145,7 @@ export const synergeticCategories = [
       {
         id: 'epi-minded',
         slug: 'epi-minded',
-        name: 'Epiminded',
+        name: 'SoulChain',
         logo: epimindedlogo,
         screenshots: [
           phoneShot(epimindedScreen1, epimindedScreen1_2x),
@@ -154,9 +154,9 @@ export const synergeticCategories = [
           phoneShot(epimindedScreen4, epimindedScreen4_2x),
         ],
         description:
-          `Epiminded is a foresight and upskilling companion for founders, strategists and leadership teams operating under uncertainty. It combines curated trend intelligence with behavioural science to deliver personalised insight that sharpens decision-making, supports strategic thinking and surfaces the signals that matter, when they matter. Whether shaping a venture, redefining a mission or weighing a critical decision, Epiminded helps leaders anticipate change rather than react to it.`,
-        ctaLabel: 'Discover Epiminded',
-        ctaHref: 'https://epiminded.com/',
+          `SoulChain is a foresight and upskilling companion for founders, strategists and leadership teams operating under uncertainty. It combines curated trend intelligence with behavioural science to deliver personalised insight that sharpens decision-making, supports strategic thinking and surfaces the signals that matter, when they matter. Whether shaping a venture, redefining a mission or weighing a critical decision, SoulChain helps leaders anticipate change rather than react to it.`,
+        ctaLabel: 'Discover SoulChain',
+        ctaHref: 'https://soulchain.net/',
       },
     ],
   },

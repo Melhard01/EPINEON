@@ -86,7 +86,7 @@ export default function Trust() {
                 keep it encrypted, and give users clear control over it. Each product documents how it handles data
                 within its own privacy notice.
               </p>
-              {/* TODO: add per-product data-handling summaries (Qaegis, EPIWELL, Epitrust, Epiminded). */}
+              {/* TODO: add per-product data-handling summaries (Qaegis, EPIWELL, Epitrust, SoulChain). */}
             </div>
           </div>
         </div>

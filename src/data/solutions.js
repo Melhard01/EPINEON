@@ -72,9 +72,9 @@ export const SOLUTIONS = {
     ],
     solutionHeading: 'How Epineon addresses it',
     solutionIntro:
-      'Epiminded turns trend intelligence and behavioural science into personalised foresight and micro-learning that sharpen decision-making and strategic thinking.',
+      'SoulChain turns trend intelligence and behavioural science into personalised foresight and micro-learning that sharpen decision-making and strategic thinking.',
     solutionIntroLines: [
-      'Epiminded turns trend intelligence and behavioural science into personalised foresight and micro-learning',
+      'SoulChain turns trend intelligence and behavioural science into personalised foresight and micro-learning',
       'that sharpen decision-making and strategic thinking.',
     ],
     productIds: ['epiminded'],

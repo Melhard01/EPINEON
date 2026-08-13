@@ -8,7 +8,7 @@ import { scrollPageToTop } from '../lib/scrollPageToTop.js'
 const FOOTER_SOLUTIONS = [
   { label: 'Qaegis', href: 'https://quantumaegis.ai/', external: true },
   { label: 'EPIWELL', href: 'https://epiwell.tech/', external: true },
-  { label: 'Epiminded', href: 'https://epiminded.com/', external: true },
+  { label: 'SoulChain', href: 'https://soulchain.net/', external: true },
   { label: 'Epitrust', href: '/products#epitrust' },
   { label: 'EPIQUANTUM', href: '/products#epiquantum' },
   { label: 'EPICRYPT', href: '/products#epicrypt' },

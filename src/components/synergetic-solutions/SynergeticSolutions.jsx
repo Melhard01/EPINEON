@@ -1299,7 +1299,7 @@ function EdTechTabbedPanel({ products, isActive }) {
           className={`synergetic-tabbed-tab ${active === 'epiminded' ? 'synergetic-tabbed-tab--active' : ''}`}
           onClick={() => handleTab('epiminded')}
         >
-          Epiminded
+          SoulChain
         </button>
         <button
           type="button"

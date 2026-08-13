@@ -70,9 +70,9 @@ export const CUSTOMERS = [
     outcomeStat: 'Sharper decisions under pressure',
     context: 'Meridian Academic Center runs executive leadership and workforce-development programs.',
     challenge: 'Sought an AI-powered foresight tool for their executive leadership development program.',
-    outcome: 'Epiminded deployed as a core resource, improving strategic decision-making across cohorts.',
+    outcome: 'SoulChain deployed as a core resource, improving strategic decision-making across cohorts.',
     quote:
-      "Epiminded has become a core resource for our leadership development program. It's the only AI tool we've seen that genuinely improves strategic thinking under pressure.",
+      "SoulChain has become a core resource for our leadership development program. It's the only AI tool we've seen that genuinely improves strategic thinking under pressure.",
     attribution: 'Dr. Leila Okonkwo',
     role: 'Program Director, Meridian Academic Center',
   },
