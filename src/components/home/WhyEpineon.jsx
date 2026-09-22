@@ -2,14 +2,11 @@ import React from 'react'
 import { HeartHandshake, Network, ShieldCheck, Rocket, Users } from 'lucide-react'
 import { LandingSection } from './LandingSection'
 
-// Partner/client wordmarks. TODO: replace text wordmarks with real logo assets (grayscale).
-const CLIENTS = ['Chargea', 'Avenis', 'NeuroLab Institute', 'BioSync Research', 'Meridian Academic Center']
-
 // Static, source-anchored metrics. TODO: verify each figure with a real source before launch.
 const METRICS = [
   { value: '30+', label: 'Years of combined R&D', footnote: 'across our founding teams' },
   { value: '100+', label: 'Research partnerships', footnote: 'with universities and institutes' },
-  { value: '7', label: 'Products shipping', footnote: 'across three ecosystems' },
+  { value: '6', label: 'Products shipping', footnote: 'across three ecosystems' },
 ]
 
 // Corporate-level differentiators only — no product features (Principle 1).
@@ -80,17 +77,6 @@ export function WhyEpineon() {
               </article>
             )
           })}
-        </div>
-
-        <p className="mt-24 text-center text-sm uppercase tracking-[0.18em] text-white/55 scroll-animate lg:mt-32">
-          Trusted by organizations building what comes next.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 scroll-animate scroll-animate-delay-1 lg:mt-12">
-          {CLIENTS.map((name) => (
-            <span key={name} className="social-logo">
-              {name}
-            </span>
-          ))}
         </div>
 
         <div className="mt-24 grid grid-cols-1 gap-10 text-center sm:grid-cols-3 scroll-animate scroll-animate-delay-2 lg:mt-32 lg:gap-12">

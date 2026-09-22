@@ -1,7 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
-import qaegisWordmark from '../assets/logos/Qaegis/qaegis-wordmark.png'
 
 /**
  * Reusable product card for /products and the solution pages.
@@ -9,7 +8,6 @@ import qaegisWordmark from '../assets/logos/Qaegis/qaegis-wordmark.png'
  * Keeps descriptions short (hub-level, ≤ ~20 words) — deep detail lives on the product site.
  */
 const WORDMARK_LOGO_CLASS = {
-  qaegis: 'product-card-logo--wordmark',
   epicrypt: 'product-card-logo--wordmark',
   epiquantum: 'product-card-logo--wordmark',
   epiwell: 'product-card-logo--wordmark',
@@ -20,8 +18,7 @@ const WORDMARK_LOGO_CLASS = {
 
 export function ProductCard({ product }) {
   const isLive = product.status === 'live'
-  const isQaegis = product.id === 'qaegis'
-  const logoSrc = isQaegis ? qaegisWordmark : product.logo
+  const logoSrc = product.logo
   const logoClass = WORDMARK_LOGO_CLASS[product.id] ?? ''
   const audienceTags = (product.audience || '').split('·').map((t) => t.trim()).filter(Boolean)
 

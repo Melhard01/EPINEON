@@ -3714,9 +3714,8 @@
   object-position: left center;
 }
 
-/* Horizontal product wordmarks (Qaegis, EPICRYPT, EPIQUANTUM) */
-.product-card-logo--wordmark,
-.product-card-logo--qaegis {
+/* Horizontal product wordmarks (EPICRYPT, EPIQUANTUM, …) */
+.product-card-logo--wordmark {
   display: block;
   height: clamp(1.65rem, 2.8vw, 2.1rem);
   width: auto;

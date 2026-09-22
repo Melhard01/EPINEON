@@ -23,7 +23,7 @@ export const SOLUTIONS = {
     solutionIntroNavWidth: true,
     credibilityLine:
       'Designed for environments governed by GDPR, HIPAA and national-security frameworks.',
-    productIds: ['qaegis', 'epicrypt', 'epiquantum'],
+    productIds: ['epicrypt', 'epiquantum'],
     caseStudy: null,
     ctaHeading: 'Bring trusted AI inside your perimeter.',
     ctaLabel: 'Request a Demo',

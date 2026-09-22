@@ -16,10 +16,10 @@ export const INDUSTRIES = {
     ],
     approach: [
       'Banks and insurers can’t send regulated data to a public model.',
-      'Qaegis puts modern AI inside a perimeter you control; EPICRYPT protects transactions in motion; EPIQUANTUM future-proofs keys against quantum attacks.',
+      'EPICRYPT protects transactions in motion; EPIQUANTUM future-proofs keys against quantum attacks.',
       'All while meeting audit and explainability demands your regulators expect.',
     ],
-    productIds: ['qaegis', 'epiquantum', 'epicrypt'],
+    productIds: ['epiquantum', 'epicrypt'],
     relatedSolution: '/solutions/trusted-ai',
     caseStudy: {
       company: 'Chargea',
@@ -64,10 +64,10 @@ export const INDUSTRIES = {
     ],
     approach: [
       'Sovereignty is non-negotiable.',
-      'Qaegis keeps sensitive workloads under your control; EPICRYPT secures communications in transit; EPIQUANTUM protects long-lived data against post-quantum threats.',
+      'EPICRYPT secures communications in transit; EPIQUANTUM protects long-lived data against post-quantum threats.',
       'Legacy infrastructure can adopt AI without widening the attack surface.',
     ],
-    productIds: ['qaegis', 'epiquantum', 'epicrypt'],
+    productIds: ['epiquantum', 'epicrypt'],
     relatedSolution: '/solutions/trusted-ai',
     caseStudy: {
       company: 'Avenis',

@@ -28,7 +28,7 @@ remote API instead — see [.env.example](.env.example).
 ## Architecture
 
 A React 19 + Vite SPA: the Epineon corporate **hub**. Its job is to explain the company and
-route visitors outbound to individual product sites (Qaegis, EPICRYPT, EpiTrust, …) — the
+route visitors outbound to individual product sites (EPICRYPT, EpiTrust, …) — the
 products themselves are not hosted here.
 
 ### Routing and page shells

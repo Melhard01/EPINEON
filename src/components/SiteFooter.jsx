@@ -6,7 +6,6 @@ import { scrollPageToTop } from '../lib/scrollPageToTop.js'
 // Live products link to their own domains (new tab); under-development products route
 // to the portfolio page until they have a site. (No more broken /#epi-* anchors.)
 const FOOTER_SOLUTIONS = [
-  { label: 'Qaegis', href: 'https://quantumaegis.ai/', external: true },
   { label: 'EPIWELL', href: 'https://epiwell.tech/', external: true },
   { label: 'SoulChain', href: 'https://soulchain.net/', external: true },
   { label: 'Epitrust', href: '/products#epitrust' },
