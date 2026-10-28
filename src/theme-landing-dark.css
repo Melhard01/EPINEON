@@ -111,11 +111,12 @@
   top: 38%;
   width: min(72vw, 34rem);
   height: min(72vw, 34rem);
+  /* Deeper gold than the right-hand orb, so the mesh keeps depth without going orange. */
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(255, 118, 48, 0.58) 0%,
-    rgba(232, 92, 28, 0.34) 32%,
-    rgba(140, 48, 8, 0.1) 58%,
+    rgba(255, 206, 84, 0.54) 0%,
+    rgba(212, 175, 55, 0.34) 32%,
+    rgba(146, 112, 24, 0.1) 58%,
     transparent 72%
   );
 }
@@ -492,7 +493,7 @@
 /* Utility text inside cards inherits hierarchy over global white slate rules */
 .landing-page-dark .epineon-card .text-slate-700,
 .landing-page-dark .epineon-card .text-slate-800,
-.landing-page-dark .epineon-card .text-slate-900:not(.why-apart-card__title):not(.why-item-label):not(.industry-challenges-split__heading) {
+.landing-page-dark .epineon-card .text-slate-900:not(.why-apart-card__title):not(.why-item-label) {
   color: #a0a0a0 !important;
 }
 

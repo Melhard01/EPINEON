@@ -22,7 +22,7 @@ export default function Team() {
         </div>
       </section>
 
-      <section className="border-t border-white/5 pb-24 pt-12 lg:pb-32">
+      <section className="pb-24 pt-12 lg:pb-32">
         <div className="site-content min-w-0">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
             {TEAM.map((member) => (

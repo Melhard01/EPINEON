@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { HeartHandshake, Network, ShieldCheck, Rocket, Users } from 'lucide-react'
 import { LandingSection } from './LandingSection'
+import { CountUpValue } from './CountUpValue'
 
 // Static, source-anchored metrics. TODO: verify each figure with a real source before launch.
 const METRICS = [
@@ -43,10 +44,33 @@ const ITEMS = [
   },
 ]
 
+/**
+ * Tracks visibility both ways — unlike a one-shot reveal, this keeps reporting
+ * false once the element leaves, so the counters can replay on re-entry.
+ */
+function useInView(ref, threshold = 0.35) {
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof IntersectionObserver === 'undefined') return undefined
+    const observer = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), {
+      threshold,
+    })
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [ref, threshold])
+
+  return inView
+}
+
 /** Section 5 — Why Epineon. */
 export function WhyEpineon() {
+  const metricsRef = useRef(null)
+  const metricsInView = useInView(metricsRef)
+
   return (
-    <LandingSection className="border-t border-white/5 py-16 lg:py-24" aria-labelledby="why-epineon">
+    <LandingSection className="why-epineon-section py-16 lg:py-24" aria-labelledby="why-epineon">
       <div className="site-content min-w-0">
         <h2 id="why-epineon" className="epineon-h2 epineon-section-title text-slate-900 scroll-animate">
           What sets Epineon apart
@@ -79,10 +103,15 @@ export function WhyEpineon() {
           })}
         </div>
 
-        <div className="mt-24 grid grid-cols-1 gap-10 text-center sm:grid-cols-3 scroll-animate scroll-animate-delay-2 lg:mt-32 lg:gap-12">
+        <div
+          ref={metricsRef}
+          className="epineon-metrics mt-24 grid grid-cols-1 gap-10 text-center sm:grid-cols-3 scroll-animate scroll-animate-delay-2 lg:mt-32 lg:gap-12"
+        >
           {METRICS.map((m, i) => (
             <div key={m.label} className={`min-w-0 scroll-animate scroll-animate-delay-${i + 2}`}>
-              <div className="epineon-stat-number text-slate-900 text-3xl sm:text-4xl lg:text-5xl">{m.value}</div>
+              <div className="epineon-stat-number text-slate-900 text-3xl sm:text-4xl lg:text-5xl">
+                <CountUpValue value={m.value} active={metricsInView} />
+              </div>
               <div className="epineon-stat-label mt-1 text-white/75 text-sm sm:text-base">{m.label}</div>
               <div className="mt-1 text-xs text-white/40">{m.footnote}</div>
             </div>

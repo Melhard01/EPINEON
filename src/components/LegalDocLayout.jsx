@@ -16,6 +16,7 @@ import { LegalDocTocSidebar } from './LegalDocTocSidebar'
  */
 export function LegalDocLayout({
   title,
+  description,
   path,
   lastUpdated,
   effectiveDate,
@@ -35,7 +36,7 @@ export function LegalDocLayout({
     <div
       className="landing-page-dark relative min-h-screen overflow-x-clip bg-black font-inter"
     >
-      <Seo title={title} description={`${title} for Epineon.`} path={path} />
+      <Seo title={title} description={description || `${title} for Epineon.`} path={path} />
       <SiteHeader />
 
       <div className="legal-page-root relative min-h-screen bg-black text-white pt-24 lg:pt-28">

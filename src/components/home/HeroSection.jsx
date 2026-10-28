@@ -7,7 +7,7 @@ export function HeroSection({ onWatchStory }) {
     <div className="site-content min-w-0">
       <div className="flex flex-col items-center justify-start pt-16 sm:pt-20 lg:pt-24">
         <div className="w-full min-w-0 max-w-3xl scroll-animate text-center sm:max-w-4xl">
-          <div className="space-y-5 lg:space-y-7">
+          <div className="space-y-8 lg:space-y-10">
             <div className="flex flex-col items-center gap-3 sm:gap-4">
               <p className="epineon-eyebrow-pill scroll-animate text-reveal text-center">
                 PRECISION LIFE SCIENCE, POWERED BY AI
@@ -26,17 +26,17 @@ export function HeroSection({ onWatchStory }) {
               and foresight are non-negotiable.
             </p>
           </div>
-          <div className="mx-auto mt-8 flex scroll-animate scroll-animate-delay-4 w-full max-w-[16.5rem] flex-col items-center justify-center gap-2.5 md:max-w-none md:flex-row md:justify-center md:gap-3">
+          <div className="mx-auto mt-8 flex scroll-animate scroll-animate-delay-4 w-full max-w-[16.5rem] flex-col items-center justify-center gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-3">
             <Button
               asChild
-              className="epineon-btn-primary hero-cta-learn-more shadow-none w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 md:w-auto md:text-lg md:px-8 md:py-4 lg:text-xl lg:px-11 lg:py-5"
+              className="epineon-btn-primary hero-cta-learn-more shadow-none w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 sm:w-auto sm:whitespace-nowrap sm:px-6 md:text-base md:px-7 md:py-3 lg:text-lg lg:px-8 lg:py-3.5"
             >
               <a href="#ecosystems">Explore Ecosystems</a>
             </Button>
             <Button
               asChild
               variant="outline"
-              className="epineon-btn-secondary hero-cta-outline shadow-none !bg-white !text w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 md:w-auto md:text-lg md:px-8 md:py-4 lg:text-xl lg:px-11 lg:py-5"
+              className="epineon-btn-secondary hero-cta-outline shadow-none !bg-white !text w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 sm:w-auto sm:whitespace-nowrap sm:px-6 md:text-base md:px-7 md:py-3 lg:text-lg lg:px-8 lg:py-3.5"
             >
               <a href="#industries">
                 <span className="hero-cta-story-text">Find your path</span>

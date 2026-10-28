@@ -1,23 +1,14 @@
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
+import { SeoCollectorContext, resolveSeo } from '../seo/seoMeta.js'
 
 /**
- * Per-page document metadata — a tiny imperative head manager (no dependency).
+ * Per-page document metadata — a tiny head manager (no dependency).
  *
- * It UPDATES the existing tags from index.html in place (title, description, canonical,
- * Open Graph, Twitter) rather than appending, so sub-pages never produce duplicate
- * <title>/<meta>/<canonical> tags. index.html holds the home-page + non-JS-scraper
- * fallback values; each route overwrites them on mount.
- *
- * NOTE: this is a client-rendered SPA. These tags are correct for browsers and JS-capable
- * SEO crawlers, but social scrapers (LinkedIn/Twitter) that do NOT run JS read only the
- * static index.html tags. True per-page social cards require prerendering (follow-up).
+ * Prerendering: every route's tags are baked into its static HTML by scripts/prerender.mjs,
+ * which reads the values this component publishes through SeoCollectorContext.
+ * Browser: the effect UPDATES those same tags in place on client-side navigation, so a page
+ * never accumulates duplicate title/description/canonical tags.
  */
-export const SITE_URL = 'https://epineon.ai'
-export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.png` // TODO: add a 1200x630 image at client/public/og-image.png
-const DEFAULT_TITLE = 'Epineon — One AI Ecosystem, Built on Trust | Precision Life Science'
-const DEFAULT_DESCRIPTION =
-  'Epineon builds trusted, human-centered AI across enterprise security, health & wellness, and future intelligence. Explore our ecosystem.'
-
 function upsertMeta(attr, key, content) {
   if (content == null) return
   let el = document.head.querySelector(`meta[${attr}="${key}"]`)
@@ -39,37 +30,31 @@ function upsertLink(rel, href) {
   el.setAttribute('href', href)
 }
 
-export function Seo({
-  title,
-  description,
-  path = '/',
-  image = DEFAULT_OG_IMAGE,
-  type = 'website',
-  noindex = false,
-}) {
+export function Seo({ title, description, path = '/', image, type, noindex = false }) {
+  const collector = useContext(SeoCollectorContext)
+  if (collector) Object.assign(collector, resolveSeo({ title, description, path, image, type, noindex }))
+
   useEffect(() => {
-    const fullTitle = title ? `${title} | Epineon` : DEFAULT_TITLE
-    const desc = description || DEFAULT_DESCRIPTION
-    const url = `${SITE_URL}${path}`
+    const seo = resolveSeo({ title, description, path, image, type, noindex })
 
-    document.title = fullTitle
-    upsertMeta('name', 'description', desc)
-    upsertLink('canonical', url)
+    document.title = seo.title
+    upsertMeta('name', 'description', seo.description)
+    upsertLink('canonical', seo.url)
 
-    upsertMeta('property', 'og:type', type)
+    upsertMeta('property', 'og:type', seo.type)
     upsertMeta('property', 'og:site_name', 'Epineon')
-    upsertMeta('property', 'og:title', fullTitle)
-    upsertMeta('property', 'og:description', desc)
-    upsertMeta('property', 'og:url', url)
-    upsertMeta('property', 'og:image', image)
+    upsertMeta('property', 'og:title', seo.title)
+    upsertMeta('property', 'og:description', seo.description)
+    upsertMeta('property', 'og:url', seo.url)
+    upsertMeta('property', 'og:image', seo.image)
 
     upsertMeta('name', 'twitter:card', 'summary_large_image')
-    upsertMeta('name', 'twitter:title', fullTitle)
-    upsertMeta('name', 'twitter:description', desc)
-    upsertMeta('name', 'twitter:image', image)
+    upsertMeta('name', 'twitter:title', seo.title)
+    upsertMeta('name', 'twitter:description', seo.description)
+    upsertMeta('name', 'twitter:image', seo.image)
 
     let robots = document.head.querySelector('meta[name="robots"]')
-    if (noindex) {
+    if (seo.noindex) {
       if (!robots) {
         robots = document.createElement('meta')
         robots.setAttribute('name', 'robots')

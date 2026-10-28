@@ -184,7 +184,7 @@ export default function Products() {
       {ECOSYSTEMS.map((eco) => (
         <LandingSection
           key={eco.id}
-          className="products-ecosystem-section border-t border-white/5 py-12 lg:py-16"
+          className="products-ecosystem-section py-12 lg:py-16"
           style={{ '--eco-accent': eco.accent }}
         >
           <div className="site-content min-w-0">

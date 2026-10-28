@@ -32,7 +32,7 @@ function AboutStripRow({
 
   if (visualUnderText) {
     return (
-      <LandingSection className="about-strip-landing border-b border-white/5">
+      <LandingSection className="about-strip-landing">
         <article id={id} className={`about-strip-row${rowModifier ? ` ${rowModifier}` : ''}`}>
           <div className="about-strip-row__inner about-strip-row__inner--stacked">
             <div className="about-strip-row__content">
@@ -49,7 +49,7 @@ function AboutStripRow({
   }
 
   return (
-    <LandingSection className="about-strip-landing border-b border-white/5">
+    <LandingSection className="about-strip-landing">
       <article id={id} className={`about-strip-row${rowModifier ? ` ${rowModifier}` : ''}`}>
         <div className="about-strip-row__inner">
           <div className="about-strip-row__content">
@@ -70,7 +70,7 @@ function AboutStripRow({
 
 function ManifestoStripRow({ children }) {
   return (
-    <LandingSection className="about-strip-landing border-b border-white/5">
+    <LandingSection className="about-strip-landing">
       <article className="about-strip-row about-strip-row--manifesto">
         <div className="about-manifesto-inner">
           <figure className="about-manifesto-figure">
@@ -98,7 +98,7 @@ export default function About() {
   return (
     <PageShell
       title="About Epineon"
-      description="Our origin story, mission, vision, and the four-dimension model behind everything we build."
+      description="Epineon's purpose, manifesto, vision and mission — and the four-dimension model behind everything we build."
       path="/company/about"
     >
       <LandingSection

@@ -1,7 +1,15 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.epineon.ai" }],
+      "destination": "https://epineon.ai/:path*",
+      "permanent": true
+    },
     {
       "source": "/industries/financial-services",
       "destination": "/industries/finance-banking",
@@ -36,12 +44,6 @@
       "source": "/solutions/future-of-work-and-learning",
       "destination": "/solutions/future-of-work",
       "permanent": true
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }

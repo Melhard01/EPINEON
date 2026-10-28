@@ -8,13 +8,13 @@ import {
 } from '../ui/select'
 
 const triggerClass =
-  'contact-form-field contact-form-select-trigger w-full min-h-[3rem] h-auto rounded-lg border border-white/20 bg-[#0a0a0a] px-3 py-3.5 text-sm text-white lg:px-4 lg:py-4 lg:text-base data-[placeholder]:text-white/40 focus:border-[#c9a227]/50 focus:ring-1 focus:ring-[#c9a227]/25'
+  'contact-form-field contact-form-select-trigger contact-input contact-input--select h-auto'
 
 const contentClass =
-  'contact-form-select-content z-[200] max-h-72 border border-white/20 bg-[#0a0a0a] text-white shadow-lg'
+  'contact-form-select-content z-[200] max-h-72 rounded-xl border border-white/15 bg-[#121212]/85 text-white backdrop-blur-xl backdrop-saturate-150 shadow-[0_24px_56px_-18px_rgba(0,0,0,0.9)]'
 
 const itemClass =
-  'text-white focus:bg-[#c9a227]/15 focus:text-white data-[highlighted]:bg-[#c9a227]/15 data-[highlighted]:text-white'
+  'rounded-lg text-white focus:bg-[#c9a227]/15 focus:text-white data-[highlighted]:bg-[#c9a227]/15 data-[highlighted]:text-white'
 
 /**
  * Dark-themed dropdown for Talk to Us contact forms (Radix Select).

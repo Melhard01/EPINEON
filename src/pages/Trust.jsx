@@ -41,7 +41,7 @@ export default function Trust() {
       </section>
 
       {/* Security posture */}
-      <section className="border-t border-white/5 py-14 lg:py-20">
+      <section className="py-14 lg:py-20">
         <div className="site-content min-w-0">
           <div className="flex flex-col gap-8 lg:flex-row lg:gap-14">
             <h2 className="epineon-h2 epineon-section-title shrink-0 text-slate-900 lg:w-72">Security posture</h2>
@@ -61,7 +61,7 @@ export default function Trust() {
       </section>
 
       {/* Compliance frameworks */}
-      <section className="border-t border-white/5 py-14 lg:py-20">
+      <section className="py-14 lg:py-20">
         <div className="site-content min-w-0">
           <h2 className="epineon-h2 epineon-section-title text-slate-900">Compliance frameworks</h2>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:gap-6">
@@ -76,7 +76,7 @@ export default function Trust() {
       </section>
 
       {/* Data privacy architecture */}
-      <section className="border-t border-white/5 py-14 lg:py-20">
+      <section className="py-14 lg:py-20">
         <div className="site-content min-w-0">
           <div className="flex flex-col gap-8 lg:flex-row lg:gap-14">
             <h2 className="epineon-h2 epineon-section-title shrink-0 text-slate-900 lg:w-72">Data privacy</h2>
@@ -93,7 +93,7 @@ export default function Trust() {
       </section>
 
       {/* AI ethics principles */}
-      <section className="border-t border-white/5 py-14 lg:py-20">
+      <section className="py-14 lg:py-20">
         <div className="site-content min-w-0">
           <h2 className="epineon-h2 epineon-section-title text-slate-900">AI ethics principles</h2>
           <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-7">

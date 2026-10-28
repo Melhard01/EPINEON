@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import { PageShell } from '../components/PageShell'
 import { ContactFormSelect } from '../components/contact/ContactFormSelect'
+import CursorGrid from '../components/visuals/CursorGrid'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 
 const CONTACT_SUBMIT_URL = (() => {
@@ -88,8 +89,27 @@ function resolveFromHash(hash) {
   return { mode: 'demo', inquireId: 'sales' }
 }
 
-const inputClass =
-  'contact-form-field w-full px-3 lg:px-4 py-3.5 lg:py-4 min-h-[3rem] rounded-lg border border-white/20 bg-[#0a0a0a] text-white text-sm lg:text-base placeholder:text-white/40 focus:border-[#c9a227]/50 focus:outline-none focus:ring-1 focus:ring-[#c9a227]/25'
+const inputClass = 'contact-form-field contact-input'
+
+// The cursor grid only has meaning with a pointer, and it only has room inside
+// the split card, so it is not mounted at all below the two-column breakpoint.
+const CURSOR_GRID_MIN = 1024
+
+function useMinWidth(px) {
+  const [matches, setMatches] = useState(
+    () => (typeof window !== 'undefined' ? window.matchMedia(`(min-width: ${px}px)`).matches : false),
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${px}px)`)
+    const onChange = () => setMatches(mq.matches)
+    onChange()
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [px])
+
+  return matches
+}
 
 export default function Contact() {
   const { hash, search } = useLocation()
@@ -102,6 +122,7 @@ export default function Contact() {
     productParam && PRODUCT_OPTIONS.includes(productParam) ? { product: productParam } : {},
   )
   const [status, setStatus] = useState({ submitting: false, submitted: false, error: null })
+  const showCursorGrid = useMinWidth(CURSOR_GRID_MIN)
 
   useEffect(() => {
     const next = resolveFromHash(hash)
@@ -207,105 +228,131 @@ export default function Contact() {
   }
 
   return (
-    <PageShell title="Contact Epineon" description="Talk to our sales or partnerships teams." path="/contact">
-      <section className="careers-section relative overflow-x-clip pt-32 pb-20 lg:pt-40 lg:pb-28">
+    <PageShell
+      title="Contact Epineon"
+      description="Request a product demo, or talk to Epineon's sales and partnerships teams."
+      path="/contact"
+    >
+      <section className="careers-section contact-page--refined relative overflow-x-clip pt-32 pb-20 lg:pt-40 lg:pb-28">
         <div className="careers-section__bg" aria-hidden>
           <div className="careers-section__glow careers-section__glow--left" />
           <div className="careers-section__glow careers-section__glow--right" />
         </div>
         <div className="site-content relative z-10 min-w-0">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[#c9a227]">Contact</p>
-            <h1 className="epineon-h2 epineon-section-title mt-3 text-slate-900">Talk to Us</h1>
-            <p className="epineon-body-large mx-auto mt-5 max-w-2xl text-balance text-center text-white/75 text-base leading-relaxed lg:text-lg">
-              Choose the path that fits, and the right team will get back within 24 hours.
-            </p>
-          </div>
+          {/* Form on the left, narrative on the right (lg+). DOM order stays
+              heading → path → form so reading and tab order follow the task. */}
+          <div className="contact-layout">
+            <div className="contact-intro">
+              {showCursorGrid ? (
+                <div className="contact-intro__grid" aria-hidden>
+                  <CursorGrid
+                    cellSize={58}
+                    color="#c9a227"
+                    gridColor="#ffffff"
+                    gridStyle="lines"
+                    radius={150}
+                    falloff="smooth"
+                    holdTime={380}
+                    fadeDuration={900}
+                    maxOpacity={0.55}
+                    fillOpacity={0.05}
+                    gridOpacity={0.055}
+                    spotlight={0.5}
+                    edgeFade={0.28}
+                  />
+                </div>
+              ) : null}
+              <p className="contact-intro__eyebrow">Contact</p>
+              <h1 className="epineon-h2 epineon-section-title contact-intro__title text-slate-900">Talk to Us</h1>
+              <p className="epineon-body-large contact-intro__lead">
+                Choose the path that fits, and the right team will get back within 24 hours.
+              </p>
 
-          {/* Primary CTAs: Demo vs Inquire */}
-          <div className="mt-8 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Contact paths">
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'demo'}
-              onClick={() => switchMode('demo')}
-              className={`customers-filter${mode === 'demo' ? ' is-active' : ''}`}
-            >
-              Demo
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mode === 'inquire'}
-              onClick={() => switchMode('inquire')}
-              className={`customers-filter${mode === 'inquire' ? ' is-active' : ''}`}
-            >
-              Inquire
-            </button>
-          </div>
-
-          {/* Secondary tabs under Inquire */}
-          {mode === 'inquire' ? (
-            <div className="mt-3 flex flex-wrap justify-center gap-2" role="tablist" aria-label="Inquiry type">
-              {INQUIRE_TABS.map((t) => (
+              {/* Primary CTAs: Demo vs Inquire */}
+              <div className="contact-tabs" role="tablist" aria-label="Contact paths">
                 <button
-                  key={t.id}
                   type="button"
                   role="tab"
-                  aria-selected={t.id === inquireId}
-                  onClick={() => switchInquire(t.id)}
-                  className={`customers-filter${t.id === inquireId ? ' is-active' : ''}`}
+                  aria-selected={mode === 'demo'}
+                  onClick={() => switchMode('demo')}
+                  className={`contact-tab${mode === 'demo' ? ' is-active' : ''}`}
                 >
-                  {t.label}
+                  Demo
                 </button>
-              ))}
-            </div>
-          ) : null}
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === 'inquire'}
+                  onClick={() => switchMode('inquire')}
+                  className={`contact-tab${mode === 'inquire' ? ' is-active' : ''}`}
+                >
+                  Inquire
+                </button>
+              </div>
 
-          <div className="mt-6 mx-auto max-w-2xl">
-            <p className="text-sm text-white/55 text-center">{tab.blurb}</p>
-            <Card className="epineon-card mt-4 border-0 bg-transparent shadow-lg">
-              <CardContent className="p-6 sm:p-7 lg:p-9">
+              {/* Secondary tabs under Inquire */}
+              {mode === 'inquire' ? (
+                <div className="contact-tabs contact-tabs--sub" role="tablist" aria-label="Inquiry type">
+                  {INQUIRE_TABS.map((t) => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={t.id === inquireId}
+                      onClick={() => switchInquire(t.id)}
+                      className={`contact-tab contact-tab--sub${t.id === inquireId ? ' is-active' : ''}`}
+                    >
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              <p className="contact-intro__blurb">{tab.blurb}</p>
+            </div>
+
+            <div className="contact-formcol">
+              <div className="contact-panel">
                 {status.submitted ? (
-                  <div className="text-center">
-                    <CheckCircle className="w-12 h-12 lg:w-16 lg:h-16 text-green-600 mx-auto mb-3 lg:mb-4" />
-                    <h3 className="epineon-h3 text-green-600 mb-3 text-lg lg:text-xl">Sent.</h3>
-                    <p className="epineon-body text-slate-700 text-sm lg:text-base leading-relaxed">
+                  <div className="contact-success">
+                    <CheckCircle className="contact-success__icon" aria-hidden />
+                    <h3 className="epineon-h3 contact-success__title">Sent.</h3>
+                    <p className="contact-success__body">
                       The right team will be in touch within 24 hours.
                     </p>
                     <Button
                       onClick={() => setStatus({ submitting: false, submitted: false, error: null })}
-                      className="epineon-btn-primary mt-4 lg:mt-6 w-full sm:w-auto"
+                      className="contact-submit contact-submit--quiet"
                     >
                       Send Another Message
                     </Button>
                   </div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-5" noValidate={false}>
+                  <form onSubmit={handleSubmit} className="contact-form" noValidate={false}>
                     {status.error && (
-                      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 lg:p-4 flex items-center">
-                        <AlertCircle className="w-4 h-4 lg:w-5 lg:h-5 text-red-600 mr-2 flex-shrink-0" />
-                        <p className="text-red-600 text-sm lg:text-base">{status.error}</p>
+                      <div className="contact-alert" role="alert">
+                        <AlertCircle className="contact-alert__icon" aria-hidden />
+                        <p className="contact-alert__text">{status.error}</p>
                       </div>
                     )}
 
                     {tab.fields.map((f) => (
-                      <div key={f.name}>
-                        <label htmlFor={`f-${f.name}`} className="block text-[#8e8e8e] mb-2 text-sm lg:text-base">
+                      <div key={f.name} className="contact-field">
+                        <label htmlFor={`f-${f.name}`} className="contact-field__label">
                           {f.label}
-                          {!f.required ? <span className="text-white/35"> (optional)</span> : null}
+                          {!f.required ? <span className="contact-field__optional"> (optional)</span> : null}
                         </label>
                         {f.type === 'textarea' ? (
                           <textarea
                             id={`f-${f.name}`}
                             name={f.name}
-                            rows={5}
+                            rows={4}
                             value={values[f.name] || ''}
                             onChange={onChange}
                             required={f.required}
                             disabled={status.submitting}
                             placeholder={f.placeholder || ''}
-                            className={`${inputClass} min-h-[8rem] resize-none leading-relaxed`}
+                            className={`${inputClass} contact-input--area`}
                           />
                         ) : f.type === 'select' ? (
                           <ContactFormSelect
@@ -331,25 +378,17 @@ export default function Contact() {
                             className={inputClass}
                           />
                         )}
-                        {f.help ? <p className="mt-1.5 text-xs text-white/40">{f.help}</p> : null}
+                        {f.help ? <p className="contact-field__help">{f.help}</p> : null}
                       </div>
                     ))}
 
-                    <Button
-                      type="submit"
-                      className="epineon-btn-primary w-full text-base lg:text-lg py-4 min-h-[3.25rem]"
-                      disabled={status.submitting}
-                    >
+                    <Button type="submit" className="contact-submit" disabled={status.submitting}>
                       {status.submitting ? 'Sending…' : mode === 'demo' ? 'Request my demo' : 'Send enquiry'}
                     </Button>
                   </form>
                 )}
-              </CardContent>
-            </Card>
-
-            <p className="mt-8 text-sm text-white/45">
-              We work across time zones — wherever you are, the right team will reply within one business day.
-            </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

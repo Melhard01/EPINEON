@@ -289,7 +289,7 @@ export function IndustryStrip() {
   return (
     <LandingSection
       id="industries"
-      className="border-t border-white/5 py-16 lg:py-20"
+      className="py-16 lg:py-20"
       aria-labelledby="find-your-path"
     >
       <IndustryStripContent />

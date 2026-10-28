@@ -53,9 +53,9 @@ export default function VentureStudio() {
         </div>
       </LandingSection>
 
-      <LandingSection className="venture-studio-cards-section border-t border-white/5 py-14 lg:py-20">
+      <LandingSection className="venture-studio-cards-section py-14 lg:py-20">
         <div className="site-content min-w-0">
-          <div className="venture-studio-cards mx-auto grid max-w-5xl grid-cols-1 gap-6 lg:max-w-6xl lg:gap-8">
+          <div className="venture-studio-cards mx-auto grid max-w-5xl grid-cols-1 gap-6 md:grid-cols-2 lg:max-w-6xl lg:gap-8">
             {PILLARS.map((pillar) => {
               const Icon = pillar.icon
               return (
@@ -91,7 +91,7 @@ export default function VentureStudio() {
       </LandingSection>
 
       {/* Portfolio + partners + engage — TODO: list real portfolio companies + academic partners by name */}
-      <LandingSection className="venture-studio-outro border-t border-white/5">
+      <LandingSection className="venture-studio-outro">
         <div className="site-content min-w-0">
           <h2 className="epineon-h2 epineon-section-title text-slate-900">Portfolio &amp; partners</h2>
           <p className="epineon-body-large text-white/75 text-base leading-relaxed lg:text-lg">

@@ -5,11 +5,15 @@ import { PageShell } from '../components/PageShell'
 import { LandingSection } from '../components/home/LandingSection'
 import { Button } from '../components/ui/button'
 import { ProductCard } from '../components/ProductCard'
-import { IndustryChallengesSplit } from '../components/industry/IndustryChallengesSplit.jsx'
+import { IndustryChallenges } from '../components/industry/IndustryChallenges.jsx'
+import { INDUSTRY_FALLBACK_IMAGE } from '../data/industryMedia.js'
 import { INDUSTRIES } from '../data/industries.js'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 
 const PRODUCT_BY_ID = Object.fromEntries(ALL_PRODUCTS.map((p) => [p.id, p]))
+
+/** Industry pages carrying the refined layout (see `.industry-page--refined` in App.css). */
+const REFINED_INDUSTRY_SLUGS = new Set(['finance-banking', 'healthcare', 'enterprise-workforce'])
 
 const WHITE_CTA_INDUSTRY_SLUGS = new Set([
   'finance-banking',
@@ -41,6 +45,8 @@ export default function IndustryPage() {
   }
 
   const products = ind.productIds.map((id) => PRODUCT_BY_ID[id]).filter(Boolean)
+  // Opt-in visual treatment: pages outside REFINED_INDUSTRY_SLUGS render as before.
+  const pageClass = REFINED_INDUSTRY_SLUGS.has(slug) ? 'industry-page--refined' : ''
   const whiteCta = WHITE_CTA_INDUSTRY_SLUGS.has(slug)
   const ctaButtonClass = whiteCta
     ? 'epineon-btn-secondary solution-final-cta__btn--white rounded-full px-9 py-4 text-base'
@@ -51,7 +57,7 @@ export default function IndustryPage() {
       {/* Hero */}
       <LandingSection
         withMeshBackground={false}
-        className="industry-page-hero landing-hero-section pt-32 pb-12 lg:pt-40 lg:pb-16"
+        className={`industry-page-hero landing-hero-section pt-32 pb-12 lg:pt-40 lg:pb-16 ${pageClass}`}
       >
         <div className="landing-hero-section__bg" aria-hidden>
           <div className="landing-hero-section__grid" />
@@ -71,14 +77,17 @@ export default function IndustryPage() {
       </LandingSection>
 
       {/* Challenges */}
-      <LandingSection className="industry-challenges-section border-t border-white/5">
+      <LandingSection className={`industry-challenges-section ${pageClass}`}>
         <div className="site-content min-w-0">
-          <IndustryChallengesSplit challenges={ind.challenges} />
+          <IndustryChallenges
+            challenges={ind.challenges}
+            fallbackImage={INDUSTRY_FALLBACK_IMAGE[slug]}
+          />
         </div>
       </LandingSection>
 
       {/* Relevant products + solution */}
-      <LandingSection className="industry-what-we-bring-section border-t border-white/5">
+      <LandingSection className={`industry-what-we-bring-section ${pageClass}`}>
         <div className="site-content min-w-0">
           <h2 className="industry-what-we-bring__heading scroll-animate epineon-h2 epineon-section-title text-slate-900">What we bring</h2>
           {ind.approach?.length > 0 ? (
@@ -108,7 +117,7 @@ export default function IndustryPage() {
       </LandingSection>
 
       {/* CTA */}
-      <LandingSection className="solution-cta-section">
+      <LandingSection className={`solution-cta-section ${pageClass}`}>
         <div className="site-content min-w-0">
           <div className="final-cta-panel scroll-animate text-center">
             <h2 className="epineon-h2 epineon-section-title text-slate-900">

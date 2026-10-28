@@ -13,6 +13,7 @@ export const SOLUTIONS = {
     seoDescription:
       'Private, sovereign AI for finance, government, and critical infrastructure — built around the standards you operate under.',
     problemHeading: 'The challenge',
+    challengeKeywords: ['Post-quantum', 'Security', 'Data-sovereignty', 'AI-adoption', 'Compliance'],
     problem: [
       'Regulated organisations want the advantage of modern AI, but they operate under rules that make sending sensitive data to a third-party model a non-starter. Compliance teams need provable control over where data lives and how it is used.',
       'Meanwhile, security teams are already preparing for a post-quantum world, where today’s encryption no longer holds. Adopting AI without addressing both at once doesn’t remove the risk — it just relocates it.',
@@ -38,6 +39,7 @@ export const SOLUTIONS = {
     seoDescription:
       'Preventive, data-owned health intelligence for clinicians and the people they care for.',
     problemHeading: 'The challenge',
+    challengeKeywords: ['Fragmented data', 'Data ownership', 'Reactive care', 'Preventive care', 'Compliance'],
     problem: [
       'Health data is fragmented across devices, labs, and apps — and rarely owned by the person it describes. Care stays reactive when it could be preventive.',
       'Clinicians are stretched thin, drowning in data without the time to turn it into clear, personalised guidance.',
@@ -66,6 +68,13 @@ export const SOLUTIONS = {
     seoDescription:
       'Foresight and AI-augmented upskilling for organisations navigating disruption.',
     problemHeading: 'The challenge',
+    challengeKeywords: [
+      'Organisational adaptation',
+      'Generic training',
+      'Skills gap',
+      'Foresight',
+      'Personalised learning',
+    ],
     problem: [
       'AI is rewriting how work gets done faster than most organisations can adapt. Leaders struggle to anticipate what’s coming, and teams fall behind on the skills that suddenly matter.',
       'Generic training doesn’t fix this. People need foresight and learning that meet them where they are.',

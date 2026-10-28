@@ -25,6 +25,7 @@ const PrivacyPolicy = () => {
   return (
     <LegalDocLayout
       title="Privacy Policy"
+      description="How Epineon collects, uses, shares and protects personal information, and how to exercise your privacy rights."
       path="/privacy"
       lastUpdated="February 10, 2025"
       effectiveDate="February 10, 2025"

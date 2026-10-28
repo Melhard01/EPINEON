@@ -5,6 +5,7 @@ import { PageShell } from '../components/PageShell'
 import { LandingSection } from '../components/home/LandingSection'
 import { Button } from '../components/ui/button'
 import { ProductCard } from '../components/ProductCard'
+import { ChallengePanel } from '../components/solutions/ChallengePanel'
 import { SOLUTIONS } from '../data/solutions.js'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 import { INDUSTRIES_LINKS } from '../data/navigation.js'
@@ -52,13 +53,16 @@ export default function SolutionPage() {
   const products = sol.productIds.map((id) => PRODUCT_BY_ID[id]).filter(Boolean)
   const industries = (sol.industries || []).map((s) => INDUSTRY_BY_SLUG[s]).filter(Boolean)
   const challengeLeftImage = CHALLENGE_LEFT_IMAGE_BY_SLUG[slug]
+  const challengePanel = sol.challengeKeywords?.length ? sol.challengeKeywords : null
+  // Scope hook for the refined Use Cases styling (see .solution-page--refined in App.css).
+  const pageClass = 'solution-page--refined'
 
   return (
     <PageShell title={sol.title} description={sol.seoDescription} path={sol.path}>
       {/* Hero */}
       <LandingSection
         withMeshBackground={false}
-        className={`solution-hero-section landing-hero-section${sol.heroBackground ? ' solution-hero-section--has-bg' : ' solution-hero-section--top-glow'}`}
+        className={`solution-hero-section landing-hero-section ${pageClass}${sol.heroBackground ? ' solution-hero-section--has-bg' : ' solution-hero-section--top-glow'}`}
       >
         {sol.heroBackground ? (
           <img
@@ -98,9 +102,16 @@ export default function SolutionPage() {
 
       {/* Problem — "The challenge" */}
       <LandingSection
-        className={`solution-challenge-section border-t border-white/5${challengeLeftImage ? ' solution-challenge-section--challenge-image' : ''}`}
+        className={`solution-challenge-section ${pageClass}${challengeLeftImage && !challengePanel ? ' solution-challenge-section--challenge-image' : ''}`}
       >
         <div className="site-content min-w-0">
+          {challengePanel ? (
+            <ChallengePanel
+              heading={sol.problemHeading}
+              keywords={challengePanel}
+              paragraphs={sol.problem}
+            />
+          ) : (
           <div className="solution-challenge-section__inner">
             <div className="solution-challenge-section__title-frame scroll-animate-slide-left">
               {challengeLeftImage ? (
@@ -126,11 +137,12 @@ export default function SolutionPage() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </LandingSection>
 
       {/* Solution overview + products */}
-      <LandingSection className="solution-addresses-section border-t border-white/5">
+      <LandingSection className={`solution-addresses-section ${pageClass}`}>
         <div className="site-content min-w-0">
           <h2 className="solution-section__heading scroll-animate">{sol.solutionHeading}</h2>
           {sol.solutionIntroNavWidth && sol.solutionIntroLines ? (
@@ -196,7 +208,7 @@ export default function SolutionPage() {
 
       {/* Audience / industries / use cases */}
       {(industries.length > 0 || sol.useCases) && (
-        <LandingSection className="solution-audience-section border-t border-white/5 py-14 lg:py-20">
+        <LandingSection className={`solution-audience-section py-14 lg:py-20 ${pageClass}`}>
           <div className="site-content min-w-0">
             <h2 className="epineon-h2 epineon-section-title scroll-animate text-slate-900">{sol.audienceHeading}</h2>
             {industries.length > 0 && (
@@ -224,7 +236,7 @@ export default function SolutionPage() {
       )}
 
       {/* CTA */}
-      <LandingSection className="solution-cta-section">
+      <LandingSection className={`solution-cta-section ${pageClass}`}>
         <div className="site-content min-w-0">
           <div className="final-cta-panel scroll-animate text-center">
             <h2 className="epineon-h2 epineon-section-title text-slate-900">{sol.ctaHeading}</h2>

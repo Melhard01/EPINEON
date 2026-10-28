@@ -18,6 +18,7 @@ const CookiePolicy = () => {
   return (
     <LegalDocLayout
       title="Cookie Policy"
+      description="How Epineon uses cookies and similar technologies, and how to manage your preferences."
       path="/cookie-policy"
       lastUpdated="February 10, 2025"
       effectiveDate="February 10, 2025"

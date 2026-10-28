@@ -31,6 +31,7 @@ const TermsAndConditions = () => {
   return (
     <LegalDocLayout
       title="Terms and Conditions"
+      description="The legal terms governing use of the Epineon website and services."
       path="/terms"
       lastUpdated="February 10, 2025"
       effectiveDate="February 10, 2025"

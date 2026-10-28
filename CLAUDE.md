@@ -12,10 +12,14 @@ usual working directory of the same name. Run every command from that inner dire
 ```bash
 npm install          # package-lock.json is the checked-in lockfile (package.json also names pnpm)
 npm run dev          # Vite dev server
-npm run build        # production build → dist/ (Vercel's buildCommand)
-npm run preview      # serve the built dist/
-npm run lint         # eslint over the repo (dist/ ignored)
+npm run build        # 3 steps: client build → SSR build → prerender (see below)
+npm run preview      # serve the built dist/ (no clean-URL rewriting — see Prerendering)
+npm run lint         # eslint over the repo (dist/ ignored); 16 pre-existing problems
 ```
+
+`npm run build` runs `vite build` (client → `dist/`), then `vite build --ssr src/entry-server.jsx`
+(→ `.ssr-build/`, gitignored), then [scripts/prerender.mjs](scripts/prerender.mjs), which writes
+one static `.html` per route plus `dist/sitemap.xml` and deletes `.ssr-build/`.
 
 There is no test framework, no TypeScript, and no formatter config — the codebase is plain
 JSX + ESLint only. Don't add test commands to docs unless a suite is actually introduced.
@@ -47,14 +51,41 @@ no nested layout routes). Three shells exist, all rendering the same chrome
   `src/legal-doc.css`. It does *not* take `PageShell`'s props — SEO description is derived from
   `title`.
 
-New page → add a route in `main.jsx`, wrap the page in `PageShell`, and add the URL to
-[public/sitemap.xml](public/sitemap.xml) (or pass `noindex` to `PageShell`, as
-`/company/team` and `/company/press` do — they exist but are unlisted).
+Routes are declared once in [src/routes.js](src/routes.js) (`STATIC_PAGES`, plus the derived
+`PRERENDER_PATHS`) and rendered by [src/AppRoutes.jsx](src/AppRoutes.jsx), which both
+`main.jsx` (browser, `BrowserRouter`) and `entry-server.jsx` (build, `StaticRouter`) use.
 
-Deployment is Vercel: [vercel.json](vercel.json) rewrites everything to `/index.html` and holds
-the permanent redirects for renamed slugs. Renaming a solution/industry slug means updating the
-data file, the sitemap, **and** adding a redirect there. `public/_headers` and `public/_routes.json`
-are Cloudflare Pages artifacts from an earlier host.
+New page → add it to `STATIC_PAGES`, wrap the page in `PageShell` (pass `noindex` for unlisted
+pages, as `/company/team` and `/company/press` do). The sitemap needs no edit — it is generated
+from the routes that render as indexable. **A route missing from `STATIC_PAGES` is a hard 404 in
+production**: there is no SPA fallback any more.
+
+### Prerendering (do not break these invariants)
+
+Every route ships as real HTML so crawlers and AI bots that don't run JavaScript get full
+content. Consequences:
+
+- Page components must render on the server: no `window`/`document`/`localStorage` **during
+  render**. Effects are fine (they don't run in SSR); guard lazy initial state with
+  `typeof window !== 'undefined'`, as `useMinWidth` does.
+- `dist/index.html` is the prerendered **home page**, not a shell. `index.html` at the repo root
+  is the template, and prerender replaces its `<!--seo:start--> … <!--seo:end-->` block per route.
+- Output is `<route>.html` (e.g. `dist/solutions/trusted-ai.html`), served at the extensionless
+  URL by Vercel (`cleanUrls`) and Cloudflare Pages alike. `dist/404.html` makes unknown URLs
+  return a real 404 on both hosts.
+- The build fails loudly if a page renders no `<Seo>`, has no `<h1>`, or has a canonical that
+  disagrees with its own URL.
+- `npm run preview` serves raw files, so extensionless URLs 404 there; that is a preview-only
+  artifact, not a production bug.
+
+Deployment is Vercel ([vercel.json](vercel.json): `cleanUrls`, `trailingSlash: false`, the
+`www` → apex redirect and the permanent redirects for renamed slugs). Renaming a
+solution/industry slug means updating the data file **and** adding a redirect in both
+`vercel.json` and [public/_redirects](public/_redirects) (Cloudflare Pages format).
+`public/_headers` and `public/_routes.json` are Cloudflare Pages artifacts.
+
+**The epineon.ai domain does not serve this repo** (as of 2026-09) — it points at an older
+Cloudflare-hosted Epineon site. This repo deploys to `epineon-website-corporate-version.vercel.app`.
 
 ### Content lives in data modules, not in JSX
 
@@ -85,11 +116,20 @@ bios or metrics for real people or companies to fill them in.
 
 ### SEO
 
-[src/components/Seo.jsx](src/components/Seo.jsx) is a dependency-free head manager that
-**updates the tags already present in `index.html` in place** (title, description, canonical, OG,
-Twitter, robots) instead of appending, so sub-pages never emit duplicates. `index.html` holds the
-home-page values and doubles as the fallback for non-JS scrapers — per-page social cards would
-need prerendering, which does not exist yet.
+Metadata has two rendering paths that share [src/seo/seoMeta.js](src/seo/seoMeta.js)
+(`resolveSeo`, the defaults, and `SeoCollectorContext`):
+
+- **Build**: `<Seo>` publishes each page's resolved values through `SeoCollectorContext`;
+  `scripts/prerender.mjs` bakes them — plus JSON-LD from
+  [src/seo/structuredData.js](src/seo/structuredData.js) — into that route's static HTML.
+- **Browser**: [src/components/Seo.jsx](src/components/Seo.jsx) updates those same tags in place
+  on client-side navigation, so a page never accumulates duplicates.
+
+`structuredData.js` encodes the brand architecture (Epineon `Organization` → ecosystems →
+product `Brand`s → solution `Service`s → industry audiences) strictly from `src/data/`. Products
+are `Brand`, not `Product`: the site publishes no prices, offers or ratings, and `Product`
+without them is invalid for Google's product results. Never add ratings, reviews, prices or
+`sameAs` entries that the site itself does not state.
 
 ### Styling
 

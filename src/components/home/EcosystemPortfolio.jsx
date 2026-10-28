@@ -15,7 +15,7 @@ export function EcosystemPortfolio() {
   return (
     <LandingSection
       id="ecosystems"
-      className="border-t border-white/5 py-36 lg:py-52"
+      className="py-36 lg:py-52"
       aria-labelledby="ecosystems-heading"
     >
       <div className="site-content min-w-0">

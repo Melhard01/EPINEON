@@ -358,9 +358,11 @@
 
   .venture-studio-card__visual {
     flex-shrink: 0;
+    /* Ratio alone, so the crop is identical at every width. The previous
+       viewport-based min/max heights overrode it and stretched the image to
+       2:1 on desktop and squashed it to 1.1:1 on phones. */
+    position: relative;
     aspect-ratio: 6 / 5;
-    min-height: clamp(16rem, 50vw, 26rem);
-    max-height: clamp(21rem, 58vw, 36rem);
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background-color: #0a0a0a;
@@ -368,8 +370,6 @@
 
   .venture-studio-card__image {
     display: block;
-    width: 100%;
-    height: 100%;
     object-fit: cover;
     object-position: center;
   }
@@ -378,7 +378,9 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    min-height: clamp(8.5rem, 24vw, 12rem);
+    /* Grid already stretches cards in a row to equal height, so the body only
+       needs a floor for the single-column case. */
+    min-height: 8.5rem;
   }
 
   .venture-studio-card-heading {
@@ -493,13 +495,6 @@
   }
 
   /* About — stacked strip rows (text left, visual right) */
-  .about-strip {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .about-strip-row {
-    border-bottom: none;
-  }
 
   .about-strip-landing.landing-section {
     background-color: #000000;
@@ -6130,166 +6125,239 @@
 }
 
 /* —— Industry “Where it gets hard” — title + switchable content cards —— */
-.industry-challenges-split {
+/* —— Industry "Where it gets hard" — stepped list + media panel —— */
+.challenges-panel {
   display: grid;
   grid-template-columns: 1fr;
-  gap: clamp(1rem, 3vw, 1.25rem);
-  align-items: stretch;
+  margin-top: clamp(1.75rem, 4vw, 2.5rem);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 1rem;
+  background: #0b0b0b;
+  overflow: hidden;
 }
 
-.industry-challenges-split__title-card,
-.industry-challenges-split__content-card {
+/* —— Left: the stepped list —— */
+.challenges-panel__list {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  padding: clamp(1.25rem, 3vw, 1.75rem);
-  border-radius: 1.25rem;
-  background: #141414;
-  border: 1px solid #2a2a2a;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
 }
 
-.industry-challenges-split__title-card {
-  justify-content: center;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.industry-challenges-split__heading {
-  margin: 0;
-  max-width: 14ch;
-  line-height: 1.12;
-}
-
-.landing-page-dark .industry-challenges-split__heading {
-  color: #ffffff !important;
-}
-
-.industry-challenges-split__content-card {
+.challenges-row {
   position: relative;
-  flex: 1 1 auto;
-  min-height: clamp(10rem, 28vw, 14rem);
-}
-
-.industry-challenges-split__nav {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  margin-bottom: clamp(0.75rem, 2vw, 1rem);
-  flex-shrink: 0;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 260ms ease;
 }
 
-.industry-challenges-split__counter {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.5);
-  order: 0;
+.challenges-row:last-child {
+  border-bottom: none;
 }
 
-.industry-challenges-split__arrows {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.challenges-row:hover {
+  background: rgba(255, 255, 255, 0.025);
 }
 
-.industry-challenges-split__arrow:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.industry-challenges-split__stage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  flex: 1 1 auto;
-  align-items: center;
-  min-height: 0;
-}
-
-.industry-challenges-split__slide {
-  grid-area: 1 / 1;
-  opacity: 0;
-  visibility: hidden;
-  transform: translate3d(0, 10px, 0);
-  transition:
-    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0s linear 0.4s;
-  pointer-events: none;
-}
-
-.industry-challenges-split__slide.is-active {
-  opacity: 1;
-  visibility: visible;
-  transform: translate3d(0, 0, 0);
-  transition:
-    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    visibility 0s;
-  pointer-events: auto;
-}
-
-.industry-challenges-split__num {
-  display: block;
-  margin-bottom: 0.65rem;
-}
-
-.industry-challenges-split__text {
-  margin: 0;
-  font-size: clamp(0.9375rem, 1.35vw, 1.0625rem);
-  line-height: 1.55;
-  max-width: 62ch;
+.challenges-row.is-active {
+  background: rgba(255, 255, 255, 0.035);
 }
 
 @media (min-width: 768px) {
-  .industry-challenges-split {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.35fr);
-    gap: clamp(1rem, 2vw, 1.5rem);
+  .challenges-row.is-active {
+    flex: 1 1 auto;
+  }
+}
+
+.challenges-row__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  min-width: 0;
+  padding: clamp(1rem, 2.2vw, 1.35rem) clamp(1.1rem, 2.4vw, 1.6rem);
+}
+
+/* Number chip — stands in for the reference's icon tile. */
+.challenges-row__num {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--epineon-font-display);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.45);
+  transition: color 260ms ease, border-color 260ms ease, background 260ms ease;
+}
+
+.challenges-row.is-active .challenges-row__num {
+  color: #c9a227;
+  border-color: rgba(201, 162, 39, 0.5);
+  background: rgba(201, 162, 39, 0.12);
+}
+
+/* Collapsed rows hold one line; the active row opens to its full text. */
+.challenges-row__text {
+  min-width: 0;
+  flex: 1 1 auto;
+  max-height: 1.6em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: clamp(0.9375rem, 1.1vw, 1.0625rem);
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.5);
+  transition: max-height 420ms cubic-bezier(0.22, 0.61, 0.36, 1), color 260ms ease;
+}
+
+.landing-page-dark .challenges-row__text {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.challenges-row.is-active .challenges-row__text,
+.landing-page-dark .challenges-row.is-active .challenges-row__text {
+  max-height: 9em;
+  white-space: normal;
+  color: #ffffff !important;
+}
+
+/* Small accent glyph on the right of each row, as in the reference. */
+.challenges-row__mark {
+  flex: 0 0 auto;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 260ms ease, box-shadow 260ms ease;
+}
+
+.challenges-row.is-active .challenges-row__mark {
+  background: #c9a227;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+
+/* Progress bar sits on the row's bottom edge and times the step. */
+.challenges-row__bar {
+  display: block;
+  height: 2px;
+  width: 100%;
+  /* Sits on the row's bottom edge even when the open row absorbs extra height. */
+  margin-top: auto;
+  background: transparent;
+  overflow: hidden;
+}
+
+.challenges-row__fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: #c9a227;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.challenges-row.is-active .challenges-row__fill {
+  animation: challenges-step-fill linear both;
+}
+
+@keyframes challenges-step-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* —— Right: media panel —— */
+.challenges-panel__media {
+  position: relative;
+  min-height: clamp(17rem, 64vw, 23rem);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: #060606;
+}
+
+.challenges-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.challenges-media__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 900ms cubic-bezier(0.33, 0, 0.2, 1),
+    transform 900ms cubic-bezier(0.33, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.challenges-media__layer.is-active {
+  opacity: 1;
+  animation: challenges-drift 18s linear forwards;
+}
+
+@keyframes challenges-drift {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1.13); }
+}
+
+@media (min-width: 768px) {
+  .challenges-panel {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
   }
 
-  .industry-challenges-split__title-card {
-    min-height: clamp(12rem, 32vw, 16rem);
-  }
-
-  .industry-challenges-split__content-card {
-    min-height: clamp(12rem, 32vw, 16rem);
+  .challenges-panel__media {
+    min-height: clamp(20rem, 38vw, 26rem);
+    border-top: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
 
 @media (min-width: 1024px) {
-  .industry-challenges-split {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
-    gap: clamp(1.25rem, 2.5vw, 2rem);
+  .challenges-panel {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.55fr);
   }
 
-  .industry-challenges-split__title-card,
-  .industry-challenges-split__content-card {
-    padding: clamp(1.5rem, 2.5vw, 2.25rem);
-    min-height: clamp(14rem, 22vw, 18rem);
-  }
-
-  .industry-challenges-split__heading {
-    font-size: clamp(1.75rem, 2vw + 0.85rem, 2.5rem);
+  .challenges-panel__media {
+    min-height: clamp(21rem, 32vw, 29rem);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .industry-challenges-split__slide,
-  .industry-challenges-split__slide.is-active {
+  .challenges-row__text {
+    transition: none;
+  }
+
+  .challenges-media__layer,
+  .challenges-media__layer.is-active {
     transition-duration: 0.01ms;
+    animation: none;
     transform: none;
+  }
+
+  /* The list holds on the active step; the bar reads as a position marker. */
+  .challenges-row.is-active .challenges-row__fill {
+    animation: none;
+    transform: scaleX(1);
   }
 }
 
-/* —— Industry page challenge cards (legacy grid) —— */
-.challenge-card {
-  padding: 1.5rem;
-  border-radius: 1.25rem;
-  background: #141414;
-  border: 1px solid #2a2a2a;
-}
+/* —— Challenge number + text (shared styling for the cells above) —— */
 
 .challenge-card-num {
   font-family: var(--epineon-font-display);
@@ -6550,4 +6618,1350 @@
   .megamenu-item-name {
     transition: none !important;
   }
+}
+
+/* ============================================================================
+   Industries — Finance & Bank, page-scoped treatment.
+   Every rule is prefixed with .industry-page--refined so the other
+   eight industry pages (same template, same classes) are left untouched.
+   ========================================================================= */
+
+/* —— Vertical rhythm ————————————————————————————————————————————————
+   The shared template stacks section padding on top of an inner margin-block,
+   which leaves ~390px of empty space between sections. Collapse the inner
+   margin and bring the padding back to a readable cadence. */
+.industry-page--refined.industry-challenges-section .site-content,
+.industry-page--refined.industry-what-we-bring-section .site-content,
+.industry-page--refined.solution-cta-section .site-content {
+  margin-block: 0;
+}
+
+.industry-page--refined.industry-challenges-section,
+.industry-page--refined.industry-what-we-bring-section {
+  padding-top: clamp(3.5rem, 6.5vw, 6rem);
+  padding-bottom: clamp(3.5rem, 6.5vw, 6rem);
+}
+
+.industry-page--refined.solution-cta-section {
+  padding-top: clamp(3rem, 5.5vw, 5rem);
+  padding-bottom: clamp(4.5rem, 8vw, 7rem);
+}
+
+/* —— Hero ——————————————————————————————————————————————————————————— */
+.industry-page--refined.industry-page-hero {
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* A soft spotlight behind the title adds depth without decoration. */
+.industry-page--refined.industry-page-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    62% 48% at 50% 34%,
+    rgba(201, 162, 39, 0.11) 0%,
+    rgba(201, 162, 39, 0.04) 42%,
+    transparent 72%
+  );
+}
+
+/* Eyebrow sits under a short gold rule — a quiet enterprise marker. */
+.industry-page--refined .industry-page-hero__eyebrow,
+.industry-page--refined.industry-page-hero p:first-of-type {
+  position: relative;
+  padding-top: 1.35rem;
+}
+
+.industry-page--refined.industry-page-hero p:first-of-type::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2.75rem;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0), #c9a227, rgba(201, 162, 39, 0));
+}
+
+.industry-page--refined .industry-hero__title {
+  font-size: clamp(2.5rem, 2.4vw + 1rem, 4rem);
+  letter-spacing: 0.045em;
+  line-height: 1.06;
+}
+
+/* Tighter measure so the lede reads as one confident statement. */
+.industry-page--refined.industry-page-hero .epineon-body-large {
+  max-width: 44ch;
+  font-size: clamp(1rem, 0.5vw + 0.85rem, 1.1875rem);
+  line-height: 1.62;
+}
+
+/* —— "What we bring" lead paragraph ———————————————————————————————————
+   Reads as raw text at default size; a gold rule and a wider type scale make
+   it land as the section's lead statement. */
+.landing-page-dark .industry-page--refined .industry-approach__block {
+  max-width: min(100%, 46rem);
+  padding-left: clamp(1rem, 1.8vw, 1.5rem);
+  border-left: 2px solid rgba(201, 162, 39, 0.5);
+  font-size: clamp(1rem, 0.45vw + 0.84rem, 1.125rem) !important;
+  line-height: 1.75;
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.84) !important;
+}
+
+/* —— Product cards ——————————————————————————————————————————————————— */
+.landing-page-dark .industry-page--refined .product-card,
+.landing-page-dark .solution-page--refined .product-card {
+  background: linear-gradient(168deg, #181818 0%, #121212 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1.25rem !important;
+}
+
+.landing-page-dark .industry-page--refined .product-card:hover,
+.landing-page-dark .solution-page--refined .product-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(201, 162, 39, 0.42) !important;
+  box-shadow:
+    0 20px 44px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(201, 162, 39, 0.1) !important;
+}
+
+/* —— Closing CTA ————————————————————————————————————————————————————— */
+.landing-page-dark .industry-page--refined .final-cta-panel,
+.landing-page-dark .solution-page--refined .final-cta-panel {
+  background: linear-gradient(168deg, #171717 0%, #0f0f0f 100%) !important;
+  border: 1px solid rgba(201, 162, 39, 0.2) !important;
+}
+
+@media (min-width: 768px) {
+  .industry-page--refined .industry-what-we-bring__heading {
+    margin-bottom: clamp(0.5rem, 1vw, 1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page-dark .industry-page--refined .product-card:hover,
+  .landing-page-dark .solution-page--refined .product-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   Industries — Finance & Bank only.
+   Layers on top of .industry-page--refined. Scoped to .industry-page--refined so
+   the other refined pages (healthcare, enterprise-workforce) are unaffected.
+   ========================================================================= */
+
+/* —— Hero —————————————————————————————————————————————————————————————
+   The lede previously ended into dead space. A hairline keyline closes the
+   composition and hands off to the first section. */
+.industry-page--refined.industry-page-hero {
+  padding-bottom: clamp(3.25rem, 6vw, 5.5rem);
+}
+
+.industry-page--refined.industry-page-hero .site-content > div {
+  position: relative;
+}
+
+.industry-page--refined.industry-page-hero .site-content > div::after {
+  content: '';
+  display: block;
+  width: min(100%, 15rem);
+  height: 1px;
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.55), transparent);
+}
+
+/* Fine vertical pinstripe behind the hero — a restrained nod to financial
+   documents, sitting under the existing grid and glow. */
+.industry-page--refined.industry-page-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.028) 0 1px,
+    transparent 1px 7px
+  );
+  mask-image: radial-gradient(68% 62% at 50% 42%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(68% 62% at 50% 42%, #000 0%, transparent 78%);
+}
+
+/* —— Section headings ———————————————————————————————————————————————
+   A short gold marker above each heading echoes the hero rule and gives the
+   page a consistent vertical rhythm. */
+.industry-page--refined.industry-challenges-section .site-content > h2,
+.industry-page--refined .industry-what-we-bring__heading {
+  position: relative;
+  padding-top: 1.25rem;
+}
+
+.industry-page--refined.industry-challenges-section .site-content > h2::before,
+.industry-page--refined .industry-what-we-bring__heading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c9a227, rgba(201, 162, 39, 0));
+}
+
+/* —— Product cards ——————————————————————————————————————————————————
+   Two cards in a three-column grid left a third of the row empty. */
+@media (min-width: 1024px) {
+  .industry-page--refined .industry-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 58rem;
+  }
+}
+
+/* A hairline of brand gold rises across the card on hover. */
+.landing-page-dark .industry-page--refined .product-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-page-dark .industry-page--refined .product-card::before,
+.landing-page-dark .solution-page--refined .product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, #c9a227, rgba(201, 162, 39, 0));
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-page-dark .industry-page--refined .product-card:hover::before,
+.landing-page-dark .solution-page--refined .product-card:hover::before {
+  transform: scaleX(1);
+}
+
+/* —— Cross-link to the wider solution ———————————————————————————————— */
+.industry-page--refined .ecosystem-card-cta {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 999px;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.industry-page--refined .ecosystem-card-cta:hover {
+  border-color: rgba(201, 162, 39, 0.65);
+  background: rgba(201, 162, 39, 0.08);
+}
+
+/* —— Closing CTA ————————————————————————————————————————————————————— */
+.landing-page-dark .industry-page--refined .final-cta-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.landing-page-dark .industry-page--refined .final-cta-panel::before,
+.landing-page-dark .solution-page--refined .final-cta-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(58% 70% at 50% 0%, rgba(201, 162, 39, 0.1) 0%, transparent 70%);
+}
+
+.industry-page--refined .final-cta-panel > *,
+.solution-page--refined .final-cta-panel > * {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page-dark .industry-page--refined .product-card::before,
+  .landing-page-dark .solution-page--refined .product-card::before {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   Solution "The challenge" panel — icon list + copy.
+   Scoped to .challenge. Tokens live on the block itself rather than :root so
+   nothing leaks into other sections. Used by /solutions/precision-health.
+   ========================================================================= */
+.challenge {
+  --ch-card: #141414;
+  --ch-card-2: #0c0c0c;
+  --ch-gold: #b8962e;
+  --ch-gold-soft: rgba(184, 150, 46, 0.45);
+  --ch-amber: #ffb21a;
+  --ch-ember: #ff5a00;
+  --ch-muted: #cfcfcf;
+  --ch-radius: 18px;
+  --ch-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+  overflow-x: clip;
+  /* Gutters and vertical rhythm come from the surrounding section. */
+  font-family: Poppins, system-ui, sans-serif;
+  color: #ffffff;
+}
+
+.challenge *,
+.challenge *::before,
+.challenge *::after {
+  box-sizing: border-box;
+}
+
+/* Ambient side glows. */
+.challenge::before,
+.challenge::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  width: min(36vw, 520px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.35;
+  transform: translateY(-35%);
+  background: radial-gradient(circle, rgba(184, 150, 46, 0.55), transparent 65%);
+  pointer-events: none;
+}
+
+.challenge::before { left: -12%; }
+.challenge::after { right: -12%; }
+
+.challenge__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 1.6vw, 22px);
+  align-items: stretch;
+}
+
+/* —— Left card —————————————————————————————————————————————————————— */
+.challenge__visual {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: clamp(24px, 3vw, 48px);
+  min-height: 460px;
+  padding: clamp(28px, 3.4vw, 48px);
+  border: 1px solid rgba(255, 138, 0, 0.18);
+  border-radius: var(--ch-radius);
+  background:
+    radial-gradient(120% 90% at 100% 50%, rgba(255, 138, 0, 0.1), transparent 60%),
+    linear-gradient(160deg, #151515 0%, var(--ch-card-2) 70%);
+  overflow: hidden;
+}
+
+/* Striped ring — a quiet echo of the artwork this replaced. */
+.challenge__ring {
+  position: absolute;
+  right: -90px;
+  top: 50%;
+  width: 440px;
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: repeating-linear-gradient(0deg, rgba(255, 138, 0, 0.55) 0 2px, transparent 2px 9px);
+  -webkit-mask: radial-gradient(circle, transparent 30%, #000 42%, #000 58%, transparent 70%);
+  mask: radial-gradient(circle, transparent 30%, #000 42%, #000 58%, transparent 70%);
+  opacity: 0.16;
+  pointer-events: none;
+  animation: ch-breathe 9s ease-in-out infinite;
+}
+
+@keyframes ch-breathe {
+  0%, 100% { opacity: 0.12; transform: translateY(-50%) scale(1); }
+  50% { opacity: 0.2; transform: translateY(-50%) scale(1.04); }
+}
+
+/* Corner brackets. */
+.challenge__frame { position: relative; }
+
+.challenge__corner {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  border-color: var(--ch-gold);
+  border-style: solid;
+  pointer-events: none;
+}
+
+.challenge__corner--tl {
+  top: -6px;
+  left: -6px;
+  border-width: 2px 0 0 2px;
+  border-top-left-radius: 4px;
+}
+
+.challenge__corner--br {
+  right: -6px;
+  bottom: -6px;
+  border-width: 0 2px 2px 0;
+  border-bottom-right-radius: 4px;
+}
+
+.challenge__title {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-family: Manrope, system-ui, sans-serif;
+  font-weight: 600;
+  font-size: clamp(2rem, 2.8vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.6);
+}
+
+.landing-page-dark .challenge__title { color: #ffffff !important; }
+
+.challenge__title::after {
+  content: '';
+  display: block;
+  width: 56px;
+  height: 3px;
+  margin-top: 18px;
+  border-radius: 3px;
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--ch-amber), var(--ch-ember));
+}
+
+.challenge__list {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.challenge__item {
+  --i: 0;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 16px;
+  padding: 12px 16px 12px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.challenge__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 138, 0, 0.28);
+  border-radius: 12px;
+  color: var(--ch-amber);
+  background: radial-gradient(circle at 30% 25%, rgba(255, 178, 26, 0.22), rgba(255, 90, 0, 0.08) 70%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+.challenge__icon svg { width: 24px; height: 24px; overflow: visible; }
+
+.challenge__icon svg * {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.challenge__label {
+  min-width: 0;
+  font-family: Manrope, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+  letter-spacing: -0.005em;
+  line-height: 1.35;
+  color: #f5f5f5;
+  /* Wraps rather than overflowing: the longest labels can't fit one line in a
+     narrow column. */
+  text-wrap: pretty;
+}
+
+/* —— Right card ———————————————————————————————————————————————————— */
+.challenge__copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(28px, 3.4vw, 48px);
+  border: 1.5px solid var(--ch-gold-soft);
+  border-radius: var(--ch-radius);
+  background: var(--ch-card);
+  transition: border-color 0.4s var(--ch-ease), box-shadow 0.4s var(--ch-ease);
+}
+
+.challenge__copy:hover {
+  border-color: var(--ch-gold);
+  box-shadow: 0 0 40px rgba(184, 150, 46, 0.12);
+}
+
+.landing-page-dark .challenge__copy p {
+  margin: 0;
+  max-width: 62ch;
+  font-size: clamp(0.95rem, 1.05vw, 1.08rem);
+  line-height: 1.75;
+  color: var(--ch-muted) !important;
+}
+
+/* Matches the specificity of the dark-theme rule above, which sets margin: 0. */
+.landing-page-dark .challenge__copy p + p { margin-top: 1.1em; }
+
+/* —— Entrance + icon animations ———————————————————————————————————— */
+.challenge.is-armed .challenge__title,
+.challenge.is-armed .challenge__item,
+.challenge.is-armed .challenge__copy p { opacity: 0; transform: translateY(14px); }
+
+.challenge.is-armed .challenge__title::after { transform: scaleX(0); }
+
+.challenge.is-armed .challenge__icon .draw {
+  stroke-dasharray: var(--len, 60);
+  stroke-dashoffset: var(--len, 60);
+}
+
+.challenge.is-visible .challenge__title,
+.challenge.is-visible .challenge__copy p {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s var(--ch-ease), transform 0.7s var(--ch-ease);
+}
+
+.challenge.is-visible .challenge__title::after {
+  transform: scaleX(1);
+  transition: transform 0.8s 0.25s var(--ch-ease);
+}
+
+.challenge.is-visible .challenge__copy p:nth-child(1) { transition-delay: 0.35s; }
+.challenge.is-visible .challenge__copy p:nth-child(2) { transition-delay: 0.5s; }
+
+.challenge.is-visible .challenge__item {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s calc(0.2s + var(--i) * 0.1s) var(--ch-ease),
+    transform 0.6s calc(0.2s + var(--i) * 0.1s) var(--ch-ease);
+}
+
+.challenge.is-visible .challenge__icon .draw {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.1s calc(0.35s + var(--i) * 0.1s) var(--ch-ease);
+}
+
+/* Per-icon idle motion — small and slow. */
+.ch-anim-scatter .node {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ch-drift 4.8s ease-in-out infinite;
+}
+.ch-anim-scatter .node:nth-of-type(2) { animation-delay: -1.6s; }
+.ch-anim-scatter .node:nth-of-type(3) { animation-delay: -3.2s; }
+
+@keyframes ch-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(0.8px, -0.8px); }
+}
+
+.ch-anim-key .keyhole {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ch-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes ch-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+
+.ch-anim-alert .beat { stroke-dasharray: 6 40; animation: ch-ecg 2.4s linear infinite; }
+
+@keyframes ch-ecg { from { stroke-dashoffset: 46; } to { stroke-dashoffset: 0; } }
+
+.ch-anim-shield .heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ch-heart 2.8s ease-in-out infinite;
+}
+
+@keyframes ch-heart {
+  0%, 100% { transform: scale(1); }
+  12% { transform: scale(1.14); }
+  24% { transform: scale(1); }
+  36% { transform: scale(1.08); }
+}
+
+.ch-anim-check .tick { stroke-dasharray: 12; animation: ch-tick 4s var(--ch-ease) infinite; }
+
+@keyframes ch-tick {
+  0%, 70%, 100% { stroke-dashoffset: 0; }
+  80% { stroke-dashoffset: 12; }
+  90% { stroke-dashoffset: 0; }
+}
+
+/* Idle loops wait for the entrance, and pause off-screen. */
+.challenge:not(.is-visible) [class*='ch-anim-'] *,
+.challenge.is-offscreen [class*='ch-anim-'] *,
+.challenge.is-offscreen .challenge__ring { animation-play-state: paused; }
+
+/* —— Responsive ————————————————————————————————————————————————————— */
+/* Title stacks above the list. The card is still only half the page here, so the
+   list stays single-column — two columns leave ~180px per item, far too narrow. */
+@media (max-width: 1100px) {
+  .challenge__visual { grid-template-columns: 1fr; align-items: start; min-height: 0; }
+}
+
+/* Cards stack full-width, so there is room for two columns again. */
+@media (max-width: 860px) {
+  .challenge__grid { grid-template-columns: 1fr; }
+  .challenge__list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .challenge__ring { width: 340px; right: -120px; }
+}
+
+/* Below this two columns get tight for the longest labels. */
+@media (max-width: 680px) {
+  .challenge__list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .challenge__item { padding: 10px 14px 10px 10px; }
+  .challenge__icon { width: 42px; height: 42px; }
+  .challenge__corner { width: 30px; height: 30px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .challenge *,
+  .challenge *::before,
+  .challenge *::after { animation: none !important; transition: none !important; }
+
+  .challenge.is-armed .challenge__title,
+  .challenge.is-armed .challenge__item,
+  .challenge.is-armed .challenge__copy p { opacity: 1; transform: none; }
+
+  .challenge.is-armed .challenge__title::after { transform: none; }
+  .challenge.is-armed .challenge__icon .draw { stroke-dashoffset: 0; }
+}
+
+/* ============================================================================
+   Use Cases (/solutions/*) — refined layout.
+   Card, CTA-panel and hover treatments are shared with .industry-page--refined
+   above; only the rules specific to this template live here.
+   ========================================================================= */
+
+/* —— Vertical rhythm ————————————————————————————————————————————————
+   Section padding stacked on top of inner margins left ~390px voids between
+   sections. Collapse the inner margins and retune the padding. */
+.solution-page--refined.solution-addresses-section .site-content,
+.solution-page--refined.solution-cta-section .site-content {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.solution-page--refined.solution-challenge-section {
+  padding-block: clamp(3.5rem, 6.5vw, 6rem);
+}
+
+.solution-page--refined.solution-addresses-section {
+  padding-top: clamp(3.5rem, 6.5vw, 6rem);
+  padding-bottom: clamp(3.5rem, 6.5vw, 6rem);
+}
+
+.solution-page--refined.solution-cta-section {
+  padding-top: clamp(3rem, 5.5vw, 5rem);
+  padding-bottom: clamp(4.5rem, 8vw, 7rem);
+}
+
+@media (min-width: 1024px) {
+  .solution-page--refined.solution-addresses-section {
+    padding-top: clamp(3.5rem, 6.5vw, 6rem);
+    padding-bottom: clamp(3.5rem, 6.5vw, 6rem);
+  }
+
+  .solution-page--refined.solution-addresses-section .site-content {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .solution-page--refined .solution-addresses-section__products {
+    margin-top: clamp(2.5rem, 4vw, 3.5rem);
+  }
+}
+
+/* —— Hero ——————————————————————————————————————————————————————————— */
+.solution-page--refined.solution-hero-section {
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+/* Keyline closes the hero and hands off to the first section. */
+.solution-page--refined .solution-hero::after {
+  content: '';
+  display: block;
+  width: min(100%, 15rem);
+  height: 1px;
+  margin-top: clamp(2rem, 4vw, 3rem);
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.55), transparent);
+}
+
+.solution-page--refined .solution-hero__lede {
+  max-width: 52ch;
+  line-height: 1.62;
+}
+
+/* —— Section headings ————————————————————————————————————————————————
+   Gold marker above, matching the industry pages. The default 14ch measure
+   broke "How Epineon addresses it" across three lines. */
+.solution-page--refined .solution-section__heading {
+  position: relative;
+  max-width: 22ch;
+  padding-top: 1.25rem;
+}
+
+.solution-page--refined .solution-section__heading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2.25rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #c9a227, rgba(201, 162, 39, 0));
+}
+
+/* —— Lead paragraph ———————————————————————————————————————————————— */
+.landing-page-dark .solution-page--refined .solution-intro__text {
+  max-width: min(100%, 58rem);
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  font-size: clamp(1rem, 0.45vw + 0.86rem, 1.1875rem) !important;
+  line-height: 1.68;
+  letter-spacing: 0;
+}
+
+/* —— Compliance line ————————————————————————————————————————————————
+   A trust signal for regulated buyers; given the same pill treatment as the
+   cross-links elsewhere so it reads as a credential, not a footnote. */
+.solution-page--refined .solution-addresses-section__credibility {
+  display: inline-block;
+  margin-top: clamp(1.25rem, 2.5vw, 1.75rem);
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgba(201, 162, 39, 0.3);
+  border-radius: 999px;
+  background: rgba(201, 162, 39, 0.06);
+}
+
+/* —— Product grid ————————————————————————————————————————————————————
+   Column count follows the number of cards, so a short row never leaves an
+   empty third. Browsers without :has() fall back to the base 1/2/3 columns. */
+@media (min-width: 1024px) {
+  /* One card — hold it to a readable width instead of a full third. */
+  .solution-page--refined .solution-addresses-section__products:not(:has(> :nth-child(2))) {
+    grid-template-columns: minmax(0, 28rem);
+  }
+
+  /* Exactly two cards. */
+  .solution-page--refined
+    .solution-addresses-section__products:has(> :nth-child(2)):not(:has(> :nth-child(3))) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: 58rem;
+  }
+
+  /* Three or more — a full row. */
+  .solution-page--refined .solution-addresses-section__products:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: none;
+  }
+}
+
+/* ============================================================
+   Contact — refined layout: form card left, narrative right.
+   Everything is scoped to .contact-page--refined (set on the
+   /contact section only), so no other page or shared component
+   changes appearance. Colour rules carry !important because
+   theme-landing-dark.css ships blanket `p`/`label` overrides.
+   ============================================================ */
+
+.landing-page-dark .contact-page--refined {
+  --cp-gold: #c9a227;
+  --cp-gold-soft: rgba(201, 162, 39, 0.5);
+  --cp-line: rgba(255, 255, 255, 0.09);
+  --cp-well: #0c0c0c;
+  --cp-label: rgba(255, 255, 255, 0.68);
+  --cp-muted: rgba(255, 255, 255, 0.58);
+  --cp-radius: 22px;
+  --cp-field-radius: 12px;
+  --cp-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ---------- Two-column shell ---------- */
+
+.landing-page-dark .contact-page--refined .contact-layout {
+  display: grid;
+  align-items: start;
+  gap: clamp(2.25rem, 4.5vw, 3rem);
+  width: 100%;
+  min-width: 0;
+  max-width: 70rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  /* One shell holding both halves: a darker glass card with the narrative
+     on the left and the lighter form panel seated inside it on the right. */
+  .landing-page-dark .contact-page--refined .contact-layout {
+    grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+    column-gap: 0;
+    align-items: stretch;
+    padding: clamp(0.8rem, 1.1vw, 1.15rem);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    background: linear-gradient(
+      135deg,
+      rgba(13, 13, 16, 0.95) 0%,
+      rgba(5, 5, 7, 0.92) 55%,
+      rgba(10, 10, 13, 0.94) 100%
+    );
+    -webkit-backdrop-filter: blur(28px) saturate(110%);
+    backdrop-filter: blur(28px) saturate(110%);
+    overflow: hidden;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 44px 96px -44px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Narrative left, form right — visual order matches DOM order, so reading
+     order and tab order run heading → path → fields. */
+  .landing-page-dark .contact-page--refined .contact-intro {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.6rem, 2.8vw, 2.6rem);
+    padding-left: clamp(2.25rem, 4.2vw, 3.9rem);
+  }
+
+  /* CursorGrid sits behind the narrative, filling the half edge to edge. */
+  .landing-page-dark .contact-page--refined .contact-intro__grid {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .landing-page-dark .contact-page--refined .contact-formcol {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @media (min-width: 1024px) {
+    .landing-page-dark .contact-page--refined .contact-layout {
+      background: linear-gradient(135deg, #16161a 0%, #0c0c0e 55%, #121215 100%);
+    }
+  }
+}
+
+.landing-page-dark .contact-page--refined .contact-intro,
+.landing-page-dark .contact-page--refined .contact-formcol {
+  min-width: 0;
+}
+
+.landing-page-dark .contact-page--refined .contact-intro {
+  position: relative;
+}
+
+.landing-page-dark .contact-page--refined .contact-intro > *:not(.contact-intro__grid) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- Narrative column ---------- */
+
+.landing-page-dark .contact-page--refined .contact-intro__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cp-gold) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-intro__title {
+  margin-top: 0.85rem;
+}
+
+@media (min-width: 1024px) {
+  /* The narrative half carries far less content than the form, so the
+     heading scales up to hold its side of the card. */
+  .landing-page-dark .contact-page--refined .contact-intro__title {
+    font-size: clamp(2.25rem, 3.15vw, 3.25rem);
+    line-height: 1.1;
+  }
+
+  .landing-page-dark .contact-page--refined .contact-intro__lead {
+    margin-top: 1.35rem;
+  }
+}
+
+.landing-page-dark .contact-page--refined .contact-intro__lead {
+  margin-top: 1.1rem;
+  max-width: 46ch;
+  font-size: clamp(1rem, 0.3vw + 0.92rem, 1.125rem);
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.76) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.75rem;
+}
+
+.landing-page-dark .contact-page--refined .contact-tabs--sub {
+  margin-top: 0.6rem;
+}
+
+.landing-page-dark .contact-page--refined .contact-tab {
+  padding: 0.55rem 1.1rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.02);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition:
+    border-color 0.25s var(--cp-ease),
+    background-color 0.25s var(--cp-ease),
+    color 0.25s var(--cp-ease);
+}
+
+.landing-page-dark .contact-page--refined .contact-tab--sub {
+  padding: 0.45rem 0.95rem;
+  font-size: 0.8rem;
+}
+
+.landing-page-dark .contact-page--refined .contact-tab:hover {
+  border-color: var(--cp-gold-soft);
+  color: #ffffff;
+}
+
+.landing-page-dark .contact-page--refined .contact-tab.is-active {
+  background: var(--cp-gold);
+  border-color: var(--cp-gold);
+  color: #0a0a0a;
+  font-weight: 600;
+}
+
+.landing-page-dark .contact-page--refined .contact-tab:focus-visible {
+  outline: 2px solid var(--cp-gold);
+  outline-offset: 2px;
+}
+
+.landing-page-dark .contact-page--refined .contact-intro__blurb {
+  margin-top: 1.1rem;
+  max-width: 52ch;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--cp-muted) !important;
+}
+
+/* ---------- Form panel ---------- */
+
+.landing-page-dark .contact-page--refined .contact-panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(1.4rem, 2.6vw, 2.15rem);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--cp-radius);
+  /* Frosted glass: a faint tinted gradient is what the blurred backdrop
+     shows through, so it stays low-opacity on purpose. */
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.17) 0%,
+    rgba(255, 255, 255, 0.075) 48%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  -webkit-backdrop-filter: blur(26px) saturate(112%);
+  backdrop-filter: blur(26px) saturate(112%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 32px 72px -30px rgba(0, 0, 0, 0.9);
+}
+
+/* Specular light-fall across the top-left — the highlight that reads as a
+   pane catching the light rather than a flat translucent rectangle. */
+.landing-page-dark .contact-page--refined .contact-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    115% 75% at 0% 0%,
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 58%
+  );
+}
+
+/* Without backdrop-filter there is nothing to frost, so fall back to the
+   opaque panel rather than a washed-out transparent one. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .landing-page-dark .contact-page--refined .contact-panel {
+    background: linear-gradient(180deg, #26262a 0%, #1a1a1d 100%);
+  }
+}
+
+/* Inside the shell the panel fills its half edge to edge. */
+@media (min-width: 1024px) {
+  .landing-page-dark .contact-page--refined .contact-formcol {
+    display: flex;
+  }
+
+  .landing-page-dark .contact-page--refined .contact-panel {
+    width: 100%;
+    border-radius: 22px;
+  }
+}
+
+/* Give the glass something to refract: the section's warm glow is pulled in
+   behind the card. Scoped to /contact so Careers, which shares the class,
+   is untouched. */
+.landing-page-dark .contact-page--refined .careers-section__glow--right {
+  top: 4%;
+  right: 1%;
+  background: radial-gradient(circle, rgba(255, 120, 48, 0.17) 0%, transparent 72%);
+}
+
+.landing-page-dark .contact-page--refined .contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.05rem;
+}
+
+.landing-page-dark .contact-page--refined .contact-field {
+  min-width: 0;
+}
+
+.landing-page-dark .contact-page--refined .contact-field__label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--cp-label) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-field__optional {
+  color: rgba(255, 255, 255, 0.5) !important;
+  font-weight: 400;
+}
+
+.landing-page-dark .contact-page--refined .contact-field__help {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+/* ---------- Fields ---------- */
+
+.landing-page-dark .contact-page--refined .contact-input {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.875rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: var(--cp-field-radius) !important;
+  background-color: rgba(8, 8, 10, 0.4) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #ffffff !important;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  box-shadow: none !important;
+  transition:
+    border-color 0.22s var(--cp-ease),
+    box-shadow 0.22s var(--cp-ease),
+    background-color 0.22s var(--cp-ease);
+}
+
+/* 0.62 not 0.5: the translucent well composites to ~rgb(63,63,63), where
+   0.5 white measures 4.01:1 — under AA. */
+.landing-page-dark .contact-page--refined .contact-input::placeholder,
+.landing-page-dark .contact-page--refined .contact-input [data-placeholder],
+.landing-page-dark .contact-page--refined .contact-input[data-placeholder] {
+  color: rgba(255, 255, 255, 0.62) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-input:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.24) !important;
+  background-color: rgba(8, 8, 10, 0.5) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-input:focus,
+.landing-page-dark .contact-page--refined .contact-input:focus-visible,
+.landing-page-dark .contact-page--refined .contact-input[data-state='open'] {
+  outline: none;
+  border-color: rgba(201, 162, 39, 0.65) !important;
+  background-color: rgba(8, 8, 10, 0.58) !important;
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.18) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.landing-page-dark .contact-page--refined .contact-input--area {
+  display: block;
+  min-height: 6.25rem;
+  resize: none;
+  line-height: 1.6;
+}
+
+.landing-page-dark .contact-page--refined .contact-input--select {
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.landing-page-dark .contact-page--refined .contact-input--select svg {
+  flex: none;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- Submit ---------- */
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  margin-top: 0.35rem;
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--cp-gold) !important;
+  border-radius: 9999px !important;
+  background: var(--cp-gold) !important;
+  background-image: none !important;
+  color: #0a0a0a !important;
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 10px 26px -14px rgba(201, 162, 39, 0.9) !important;
+  cursor: pointer;
+  transition:
+    background-color 0.25s var(--cp-ease),
+    box-shadow 0.25s var(--cp-ease),
+    transform 0.25s var(--cp-ease);
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover: a light sweep crosses the face once, with a 1px lift. */
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.38) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  transition: transform 0.75s var(--cp-ease);
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit:hover:not(:disabled) {
+  background: #d8b23a !important;
+  border-color: #d8b23a !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 16px 34px -12px rgba(201, 162, 39, 0.75) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit:hover:not(:disabled)::after {
+  transform: translateX(120%);
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit:active:not(:disabled) {
+  transform: translateY(0) !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit--quiet {
+  width: auto;
+  margin-top: 1.5rem;
+  background: transparent !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit--quiet:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: var(--cp-gold-soft) !important;
+  box-shadow: none !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-panel .contact-submit--quiet::after {
+  content: none;
+}
+
+/* The glass alert sits on the glass panel, so it needs its own translucency. */
+.landing-page-dark .contact-page--refined .contact-alert {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+/* ---------- Error + success states ---------- */
+
+.landing-page-dark .contact-page--refined .contact-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: var(--cp-field-radius);
+  background: rgba(248, 113, 113, 0.1);
+}
+
+.landing-page-dark .contact-page--refined .contact-alert__icon {
+  flex: none;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.1rem;
+  color: #f87171;
+}
+
+.landing-page-dark .contact-page--refined .contact-alert__text {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #fca5a5 !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-success {
+  padding: 1.25rem 0;
+  text-align: center;
+}
+
+.landing-page-dark .contact-page--refined .contact-success__icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 auto 1rem;
+  color: #5fd38d;
+}
+
+.landing-page-dark .contact-page--refined .contact-success__title {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #5fd38d !important;
+}
+
+.landing-page-dark .contact-page--refined .contact-success__body {
+  margin: 0.6rem auto 0;
+  max-width: 32ch;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page-dark .contact-page--refined .contact-tab,
+  .landing-page-dark .contact-page--refined .contact-input,
+  .landing-page-dark .contact-page--refined .contact-panel .contact-submit {
+    transition: none;
+  }
+
+  .landing-page-dark .contact-page--refined .contact-panel .contact-submit::after {
+    content: none;
+  }
+
+  .landing-page-dark .contact-page--refined .contact-panel .contact-submit:hover:not(:disabled) {
+    transform: none !important;
+  }
+}
+
+/* The landing-section glow orbs are taller than their section, and
+   .landing-section__bg clips them with overflow:hidden. Where an orb reaches
+   the bottom edge that leaves a hard horizontal line, because the next
+   section paints opaque black over it. Fading the background out before the
+   boundary dissolves the glow instead of cutting it.
+   Listed per section: only the ones whose glow actually reaches the edge, so
+   sections that already meet cleanly keep their grid at full strength. */
+.landing-page-dark .why-epineon-section .landing-section__bg,
+.landing-page-dark .solution-challenge-section .landing-section__bg,
+.landing-page-dark .solution-addresses-section .landing-section__bg,
+.landing-page-dark .industry-challenges-section .landing-section__bg,
+.landing-page-dark .industry-what-we-bring-section .landing-section__bg,
+.landing-page-dark .products-ecosystem-section .landing-section__bg {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 97%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 70%, transparent 97%);
+}
+
+/* .landing-section__grid draws the first line of its 52px pattern at y=0, so
+   every section opens with a full-width 1px rule that reads as a divider.
+   Nudging the pattern up by 1px drops that opening line; the rest of the grid
+   shifts imperceptibly. */
+.landing-page-dark .landing-section__grid {
+  background-position-y: -1px;
+}
+
+/* Tailwind preflight ships `img, video, svg { height: auto }` and outranks
+   anything inside @layer components. A replaced element with height:auto takes
+   its intrinsic size instead of stretching, so the photo stopped short of its
+   box once the box height came from aspect-ratio. Pin it from an unlayered
+   rule so it always fills the 6/5 frame and object-fit does the cropping. */
+.venture-studio-card__visual > .venture-studio-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Homepage metrics — the figures count up as they enter the viewport.
+   tabular-nums keeps every digit the same width so the number does not
+   jitter sideways while counting, and the glow matches the "lit on dark"
+   treatment the rest of the section uses. */
+.landing-page-dark .epineon-metrics .epineon-stat-number {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, 0.2),
+    0 0 28px rgba(255, 255, 255, 0.22);
 }
