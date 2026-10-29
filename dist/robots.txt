@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+# Keeps the dashboard out of search results. This is hygiene, NOT access
+# control — the admin area is protected by Supabase Auth and database RLS.
+Disallow: /admin
 
 Sitemap: https://epineon.ai/sitemap.xml

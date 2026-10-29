@@ -2,7 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import SolutionPage from './pages/SolutionPage.jsx'
 import IndustryPage from './pages/IndustryPage.jsx'
 import NotFound from './pages/NotFound.jsx'
-import { STATIC_PAGES } from './routes.js'
+import { STATIC_PAGES } from './routes.jsx'
 
 export function AppRoutes() {
   return (

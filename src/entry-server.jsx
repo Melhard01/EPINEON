@@ -4,7 +4,7 @@ import { StaticRouter } from 'react-router-dom'
 import { AppRoutes } from './AppRoutes.jsx'
 import { SeoCollectorContext } from './seo/seoMeta.js'
 
-export { PRERENDER_PATHS } from './routes.js'
+export { PRERENDER_PATHS } from './routes.jsx'
 export { buildStructuredData } from './seo/structuredData.js'
 
 export function render(url) {

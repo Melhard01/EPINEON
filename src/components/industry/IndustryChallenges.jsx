@@ -15,7 +15,7 @@ const CARD_HOLD_MS = 7000
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export function IndustryChallenges({ challenges, fallbackImage, fallbackAlt = '' }) {
+export function IndustryChallenges({ challenges, fallbackImage, fallbackAlt = '', fallbackDisplay }) {
   const items = useMemo(
     () =>
       (challenges ?? [])
@@ -106,7 +106,10 @@ export function IndustryChallenges({ challenges, fallbackImage, fallbackAlt = ''
           })}
         </div>
 
-        <div className="challenges-panel__media">
+        <div
+          className={`challenges-panel__media${fallbackDisplay?.ratio ? ' challenges-panel__media--fit' : ''}`}
+          style={fallbackDisplay?.ratio ? { '--challenges-media-ratio': fallbackDisplay.ratio } : undefined}
+        >
           <div className="challenges-media">
             {items.map((item, i) => (
               <MediaLayer
@@ -114,6 +117,7 @@ export function IndustryChallenges({ challenges, fallbackImage, fallbackAlt = ''
                 item={item}
                 fallbackImage={fallbackImage}
                 fallbackAlt={fallbackAlt}
+                fallbackDisplay={fallbackDisplay}
                 isActive={i === index}
                 isNext={i === (index + 1) % count}
                 paused={isPaused}
@@ -130,7 +134,7 @@ export function IndustryChallenges({ challenges, fallbackImage, fallbackAlt = ''
   )
 }
 
-function MediaLayer({ item, fallbackImage, fallbackAlt, isActive, isNext, paused }) {
+function MediaLayer({ item, fallbackImage, fallbackAlt, fallbackDisplay, isActive, isNext, paused }) {
   const videoRef = useRef(null)
 
   useEffect(() => {
@@ -163,5 +167,13 @@ function MediaLayer({ item, fallbackImage, fallbackAlt, isActive, isNext, paused
 
   if (!fallbackImage) return <div className={className} />
 
-  return <img className={className} src={fallbackImage} alt={fallbackAlt} loading="lazy" decoding="async" />
+  return (
+    <img
+      className={`${className}${fallbackDisplay?.contain ? ' challenges-media__layer--contain' : ''}`}
+      src={fallbackImage}
+      alt={fallbackAlt}
+      loading="lazy"
+      decoding="async"
+    />
+  )
 }

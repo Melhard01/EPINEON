@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { Card, CardContent } from '../components/ui/card'
 import { Button } from '../components/ui/button'
@@ -8,12 +8,14 @@ import { ContactFormSelect } from '../components/contact/ContactFormSelect'
 import CursorGrid from '../components/visuals/CursorGrid'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 
+// Same-origin Vercel function by default. VITE_API_BASE_URL still overrides it so a
+// separate backend can be pointed at during development.
 const CONTACT_SUBMIT_URL = (() => {
   const base =
     typeof import.meta.env.VITE_API_BASE_URL === 'string'
       ? import.meta.env.VITE_API_BASE_URL.trim().replace(/\/+$/, '')
       : ''
-  return base ? `${base}/api/submit` : '/api/submit'
+  return base ? `${base}/api/contact` : '/api/contact'
 })()
 
 const USE_CASES = [
@@ -123,6 +125,10 @@ export default function Contact() {
   )
   const [status, setStatus] = useState({ submitting: false, submitted: false, error: null })
   const showCursorGrid = useMinWidth(CURSOR_GRID_MIN)
+  // Abuse checks the visitor never sees: a field bots fill in, and how long the
+  // form was open. Both are validated server-side.
+  const [honeypot, setHoneypot] = useState('')
+  const formStartedAt = useRef(Date.now())
 
   useEffect(() => {
     const next = resolveFromHash(hash)
@@ -199,7 +205,15 @@ export default function Contact() {
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firstName: name, lastName: '', email, message }),
+        body: JSON.stringify({
+          name,
+          email,
+          subject: tab.label,
+          message,
+          companyWebsite: honeypot,
+          formStartedAt: formStartedAt.current,
+          sourcePath: '/contact',
+        }),
       })
       if (res.ok) {
         setStatus({ submitting: false, submitted: true, error: null })
@@ -335,6 +349,20 @@ export default function Contact() {
                         <p className="contact-alert__text">{status.error}</p>
                       </div>
                     )}
+
+                    {/* Honeypot: off-screen, not tabbable, hidden from assistive tech. */}
+                    <div className="contact-hp" aria-hidden>
+                      <label htmlFor="company-website">Company website</label>
+                      <input
+                        id="company-website"
+                        name="company_website"
+                        type="text"
+                        tabIndex={-1}
+                        autoComplete="off"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </div>
 
                     {tab.fields.map((f) => (
                       <div key={f.name} className="contact-field">

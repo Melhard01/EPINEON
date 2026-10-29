@@ -6292,6 +6292,11 @@
   overflow: hidden;
 }
 
+/* The layer sits at its true size: no scale, so the rendered image is exactly
+   the media box and nothing is magnified out of the card. The cross-dissolve
+   between steps stays. (A slow zoom used to run here from scale(1.04) to
+   scale(1.13), which kept the image 4-13% larger than its card and cropped
+   progressively more of it the longer a step was shown.) */
 .challenges-media__layer {
   position: absolute;
   inset: 0;
@@ -6299,21 +6304,12 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transform: scale(1.04);
-  transition:
-    opacity 900ms cubic-bezier(0.33, 0, 0.2, 1),
-    transform 900ms cubic-bezier(0.33, 0, 0.2, 1);
-  will-change: opacity, transform;
+  transition: opacity 900ms cubic-bezier(0.33, 0, 0.2, 1);
+  will-change: opacity;
 }
 
 .challenges-media__layer.is-active {
   opacity: 1;
-  animation: challenges-drift 18s linear forwards;
-}
-
-@keyframes challenges-drift {
-  from { transform: scale(1.04); }
-  to   { transform: scale(1.13); }
 }
 
 @media (min-width: 768px) {
@@ -6815,11 +6811,36 @@
 }
 
 /* —— Product cards ——————————————————————————————————————————————————
-   Two cards in a three-column grid left a third of the row empty. */
+   Column count follows the number of cards, the same way the solution pages
+   do it, so a short row never leaves an empty third and a third card never
+   orphans onto its own row. Browsers without :has() fall back to the base
+   1/2/3 columns. */
+/* Tablet keeps the base two columns, which left a single card sitting at half
+   width with dead space beside it. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .industry-page--refined .industry-products-grid:not(:has(> :nth-child(2))) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (min-width: 1024px) {
-  .industry-page--refined .industry-products-grid {
+  /* One card — hold it to a readable width instead of a full half. */
+  .industry-page--refined .industry-products-grid:not(:has(> :nth-child(2))) {
+    grid-template-columns: minmax(0, 28rem);
+    max-width: 58rem;
+  }
+
+  /* Exactly two cards. */
+  .industry-page--refined
+    .industry-products-grid:has(> :nth-child(2)):not(:has(> :nth-child(3))) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     max-width: 58rem;
+  }
+
+  /* Three or more — a full row. */
+  .industry-page--refined .industry-products-grid:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: none;
   }
 }
 
@@ -7964,4 +7985,31 @@
   text-shadow:
     0 0 6px rgba(255, 255, 255, 0.2),
     0 0 28px rgba(255, 255, 255, 0.22);
+}
+
+/* Infographic stills in "Where it gets hard": show the whole image instead of
+   cropping it, and let the panel take the image's own ratio below the
+   two-column breakpoint so it fits the card with no dead space. Above that the
+   panel keeps its height to stay level with the list beside it; the image's own
+   near-black background makes the small letterbox invisible. */
+.challenges-media__layer--contain {
+  object-fit: contain;
+}
+
+/* Only while the panel is stacked. From 768px the media sits beside the list,
+   where taking the image's ratio would leave the column short of the list. */
+@media (max-width: 767.98px) {
+  .challenges-panel__media--fit {
+    min-height: 0;
+    aspect-ratio: var(--challenges-media-ratio, 16 / 9);
+  }
+}
+
+/* Honeypot: off-screen rather than display:none, which some bots skip. */
+.contact-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
 }

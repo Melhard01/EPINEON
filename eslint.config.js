@@ -30,4 +30,15 @@ export default [
       ],
     },
   },
+  {
+    // Serverless functions, build scripts and tests run on Node, not in a browser.
+    files: ['api/**/*.js', 'scripts/**/*.{js,mjs}', 'tests/**/*.{js,mjs}'],
+    languageOptions: {
+      globals: globals.node,
+      parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ]

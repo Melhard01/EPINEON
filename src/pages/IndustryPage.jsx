@@ -6,14 +6,11 @@ import { LandingSection } from '../components/home/LandingSection'
 import { Button } from '../components/ui/button'
 import { ProductCard } from '../components/ProductCard'
 import { IndustryChallenges } from '../components/industry/IndustryChallenges.jsx'
-import { INDUSTRY_FALLBACK_IMAGE } from '../data/industryMedia.js'
+import { INDUSTRY_FALLBACK_IMAGE, INDUSTRY_FALLBACK_DISPLAY } from '../data/industryMedia.js'
 import { INDUSTRIES } from '../data/industries.js'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
 
 const PRODUCT_BY_ID = Object.fromEntries(ALL_PRODUCTS.map((p) => [p.id, p]))
-
-/** Industry pages carrying the refined layout (see `.industry-page--refined` in App.css). */
-const REFINED_INDUSTRY_SLUGS = new Set(['finance-banking', 'healthcare', 'enterprise-workforce'])
 
 const WHITE_CTA_INDUSTRY_SLUGS = new Set([
   'finance-banking',
@@ -45,8 +42,8 @@ export default function IndustryPage() {
   }
 
   const products = ind.productIds.map((id) => PRODUCT_BY_ID[id]).filter(Boolean)
-  // Opt-in visual treatment: pages outside REFINED_INDUSTRY_SLUGS render as before.
-  const pageClass = REFINED_INDUSTRY_SLUGS.has(slug) ? 'industry-page--refined' : ''
+  // Every industry page carries the refined layout (see `.industry-page--refined` in App.css).
+  const pageClass = 'industry-page--refined'
   const whiteCta = WHITE_CTA_INDUSTRY_SLUGS.has(slug)
   const ctaButtonClass = whiteCta
     ? 'epineon-btn-secondary solution-final-cta__btn--white rounded-full px-9 py-4 text-base'
@@ -82,6 +79,7 @@ export default function IndustryPage() {
           <IndustryChallenges
             challenges={ind.challenges}
             fallbackImage={INDUSTRY_FALLBACK_IMAGE[slug]}
+            fallbackDisplay={INDUSTRY_FALLBACK_DISPLAY[slug]}
           />
         </div>
       </LandingSection>
