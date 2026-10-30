@@ -122,13 +122,14 @@ export default function AdminLogin() {
           Forgot password?
         </button>
 
+        {/*
+          "sign-up" is the link rather than a separate call to action, so the
+          sentence stays true — the page it opens asks for an invitation token
+          and shows no form without one.
+        */}
         <p className="admin-login__note">
-          Hold an invitation link?{' '}
-          <Link className="admin-inline-link" to="/admin/signup">Create account</Link>
-        </p>
-
-        <p className="admin-login__note">
-          Access is by invitation only. There is no public sign-up.
+          Access is by invitation only. There is no public{' '}
+          <Link className="admin-inline-link" to="/admin/signup">sign-up</Link>.
         </p>
       </form>
     </AdminShell>
