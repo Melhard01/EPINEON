@@ -311,6 +311,33 @@
 
 .admin-invite { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; }
 
+/* ------------------------------------------------- inline links and hints */
+.admin-inline-link { color: var(--ad-gold); text-decoration: underline; text-underline-offset: 2px; }
+.admin-inline-link:hover { text-decoration-thickness: 2px; }
+
+/* A per-field hint sits under its own input rather than above the next one. */
+.admin-hint--field { display: block; margin: 0.35rem 0 0; font-size: 0.78rem; }
+/* Same text colour as .admin-alert--error, which is already proven legible here. */
+.admin-hint--warn { color: #fca5a5; }
+
+/* ----------------------------------------- issued one-time sign-up link */
+.admin-issued {
+  margin-top: 1rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 10px;
+  background: rgba(201, 162, 39, 0.07);
+}
+.admin-issued__lead { margin: 0 0 0.7rem; color: var(--ad-muted); font-size: 0.85rem; }
+.admin-issued__row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.admin-issued__input {
+  flex: 1 1 18rem;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+}
+.admin-issued .admin-btn { flex: 0 0 auto; }
+
 @media (prefers-reduced-motion: reduce) {
   .admin-root * { transition: none !important; }
 }

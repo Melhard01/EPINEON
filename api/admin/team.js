@@ -1,19 +1,31 @@
 /**
  * /api/admin/team — the administrator allowlist.
  *
- *   GET    list members
- *   POST   invite one by email   { email }
+ *   GET    list members and outstanding invitations
+ *   POST   invite one by email   { email }  → returns a one-time sign-up link
  *   PATCH  revoke or restore     { id, status }
  *
  * Every method re-checks the caller through requireAdmin(); nothing here trusts
  * the client. Because admin_users has no write policy for `authenticated`, this
  * endpoint (service role) is the only way the allowlist can change — which is
  * what stops an authenticated user authorising themselves.
+ *
+ * Inviting deliberately does NOT create a Supabase auth user and does not send
+ * mail: SMTP cannot be assumed to be configured. It writes the allowlist row
+ * and mints a one-time invitation token, returning the link ONCE so the
+ * inviting administrator can pass it on however they choose. The invitee sets
+ * their own password at /admin/signup; no password is ever handled here.
  */
 import { requireAdmin } from '../_lib/auth.js'
 import { getSupabaseAdmin } from '../_lib/supabaseAdmin.js'
 import { isValidEmail, normaliseLine } from '../_lib/validation.js'
 import { withinRateLimit } from '../_lib/rateLimit.js'
+import {
+  generateInvitationToken,
+  hashInvitationToken,
+  invitationExpiry,
+  buildSignupUrl,
+} from '../_lib/invitations.js'
 import { ok, badRequest, forbidden, unauthorized, tooMany, serverError, methodNotAllowed, readJsonBody, json } from '../_lib/http.js'
 
 const ALLOWED = ['GET', 'POST', 'PATCH']
@@ -39,7 +51,21 @@ export default async function handler(req, res) {
       console.error('[team] list failed:', error.message)
       return serverError(res)
     }
-    return ok(res, { members: data ?? [] })
+
+    // Outstanding invitations, so the page can show who has a live link. Note
+    // that token_hash is not selected: nothing can reconstruct a link from the
+    // API, and the raw token was only ever shown once at creation.
+    const { data: invitations, error: inviteError } = await supabase
+      .from('admin_invitations')
+      .select('id, email, created_at, expires_at')
+      .is('accepted_at', null)
+      .is('revoked_at', null)
+      .order('created_at', { ascending: false })
+    if (inviteError) {
+      console.error('[team] invitation list failed:', inviteError.message)
+    }
+
+    return ok(res, { members: data ?? [], invitations: invitations ?? [] })
   }
 
   const limited = !(await withinRateLimit({
@@ -63,14 +89,22 @@ export default async function handler(req, res) {
 
     const { data: existing } = await supabase
       .from('admin_users')
-      .select('id, status')
+      .select('id, status, last_seen_at')
       .eq('email', email)
       .maybeSingle()
 
+    // Someone who has actually used the dashboard already has an account, so a
+    // sign-up link would only be refused. Send them to "Forgot password?".
+    if (existing?.status === 'active' && existing.last_seen_at) {
+      return ok(res, { alreadyActive: true })
+    }
+
     // Re-inviting a revoked member reactivates them; re-inviting an active one
-    // is a no-op rather than an error, so the button is safe to press twice.
+    // who never signed in just re-issues their link. The button is safe to
+    // press twice either way.
+    let outcome = 'invited'
     if (existing) {
-      if (existing.status === 'active') return ok(res, { alreadyActive: true })
+      outcome = existing.status === 'active' ? 'reinvited' : 'reactivated'
       const { error } = await supabase
         .from('admin_users')
         .update({ status: 'active', revoked_at: null, invited_by: auth.user.id, invited_at: new Date().toISOString() })
@@ -79,37 +113,25 @@ export default async function handler(req, res) {
         console.error('[team] reactivate failed:', error.message)
         return serverError(res)
       }
-      return ok(res, { reactivated: true })
-    }
-
-    // Create the auth user so they receive a real Supabase invitation email.
-    // A pre-existing auth account is fine — we only need its id.
-    let invitedUserId = null
-    try {
-      const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
-        redirectTo: `${siteUrl(req)}/admin/login`,
+    } else {
+      // user_id stays null until they redeem the invitation; requireAdmin()
+      // and /api/admin/signup bind it then.
+      const { error } = await supabase.from('admin_users').insert({
+        email,
+        user_id: null,
+        status: 'active',
+        invited_by: auth.user.id,
       })
-      if (error && !/already.*registered|already been registered/i.test(error.message)) {
-        console.error('[team] invite failed:', error.message)
+      if (error) {
+        console.error('[team] insert failed:', error.message)
         return serverError(res)
       }
-      invitedUserId = data?.user?.id ?? null
-    } catch (err) {
-      console.error('[team] invite threw:', err.message)
-      return serverError(res)
     }
 
-    const { error } = await supabase.from('admin_users').insert({
-      email,
-      user_id: invitedUserId,
-      status: 'active',
-      invited_by: auth.user.id,
-    })
-    if (error) {
-      console.error('[team] insert failed:', error.message)
-      return serverError(res)
-    }
-    return ok(res, { invited: true })
+    const signupUrl = await mintInvitation(supabase, { email, invitedBy: auth.user.id, req })
+    if (!signupUrl) return serverError(res)
+
+    return ok(res, { [outcome]: true, signupUrl })
   }
 
   // PATCH — revoke or restore.
@@ -151,7 +173,55 @@ export default async function handler(req, res) {
     console.error('[team] status change failed:', error.message)
     return serverError(res)
   }
+
+  // Revoking access also kills any live sign-up link for that address. Sign-up
+  // already re-checks the allowlist, so this is defence in depth rather than
+  // the control — but it stops a dead link looking usable on the Team page.
+  if (status === 'revoked') {
+    const { error: inviteError } = await supabase
+      .from('admin_invitations')
+      .update({ revoked_at: new Date().toISOString() })
+      .eq('email', String(target.email).toLowerCase())
+      .is('accepted_at', null)
+      .is('revoked_at', null)
+    if (inviteError) console.error('[team] invitation revoke failed:', inviteError.message)
+  }
+
   return ok(res, { status })
+}
+
+/**
+ * Issue a fresh single-use invitation, superseding any live one for the same
+ * address so only one link works at a time.
+ *
+ * @returns the absolute sign-up URL, or null if it could not be stored. The raw
+ *          token is returned to the caller exactly once; only its hash is kept.
+ */
+async function mintInvitation(supabase, { email, invitedBy, req }) {
+  const { error: supersedeError } = await supabase
+    .from('admin_invitations')
+    .update({ revoked_at: new Date().toISOString() })
+    .eq('email', email)
+    .is('accepted_at', null)
+    .is('revoked_at', null)
+  if (supersedeError) {
+    console.error('[team] could not supersede invitations:', supersedeError.message)
+    return null
+  }
+
+  const token = generateInvitationToken()
+  const { error } = await supabase.from('admin_invitations').insert({
+    email,
+    token_hash: hashInvitationToken(token),
+    expires_at: invitationExpiry(),
+    created_by: invitedBy,
+  })
+  if (error) {
+    console.error('[team] could not store invitation:', error.message)
+    return null
+  }
+
+  return buildSignupUrl(siteUrl(req), token)
 }
 
 function siteUrl(req) {

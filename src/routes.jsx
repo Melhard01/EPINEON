@@ -11,6 +11,7 @@ import Careers from './pages/company/Careers.jsx'
 import Press from './pages/company/Press.jsx'
 import Trust from './pages/Trust.jsx'
 import AdminLogin from './pages/admin/Login.jsx'
+import AdminSignup from './pages/admin/Signup.jsx'
 import AdminDashboard from './pages/admin/Dashboard.jsx'
 import AdminMessages from './pages/admin/Messages.jsx'
 import AdminTeam from './pages/admin/Team.jsx'
@@ -49,6 +50,9 @@ export const STATIC_PAGES = [
   // fallback in production. The shells carry noindex; they render no data until
   // the client has a session, and the data itself is gated by RLS.
   { path: '/admin/login', Component: AdminLogin },
+  // Unguarded by design: an invitee has no session yet. The page shows no form
+  // without a token, and /api/admin/signup re-verifies the token server-side.
+  { path: '/admin/signup', Component: AdminSignup },
   { path: '/admin', Component: guarded(AdminDashboard) },
   { path: '/admin/messages', Component: guarded(AdminMessages) },
   { path: '/admin/team', Component: guarded(AdminTeam) },

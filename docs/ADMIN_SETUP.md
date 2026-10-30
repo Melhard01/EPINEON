@@ -12,12 +12,14 @@
 
 | Route | Purpose |
 |---|---|
-| `/admin/login` | Sign-in. No registration exists anywhere. |
+| `/admin/login` | Sign-in. |
+| `/admin/signup` | Redeem an invitation link and set a password. Useless without a token. |
 | `/admin` | Overview — message counts and the five latest submissions. |
 | `/admin/messages` | Search, filter, read, change status, delete. |
 | `/admin/team` | Invite and revoke administrators. |
 
-Plus `POST /api/contact`, which is now where the public contact form submits.
+Plus `POST /api/contact`, which is now where the public contact form submits,
+and `GET|POST /api/admin/signup`, which verifies invitations.
 
 ### How access is actually enforced
 
@@ -36,6 +38,36 @@ Three independent layers; the UI is the weakest and is **not** relied upon.
 `admin_users` has **no insert or update policy** for authenticated users, so an
 authenticated user cannot add themselves. Only the service role can write it,
 and the server checks the caller is already an admin first.
+
+### How sign-up stays invitation-only
+
+There is a `/admin/signup` page, and it is still true that nobody can create an
+administrator account. Creating one requires **two independent facts to agree**:
+
+1. A live invitation — unexpired, unclaimed, unrevoked — whose `token_hash`
+   matches the token in the link.
+2. An `active` row in `admin_users` for that same address, which only an
+   existing administrator can create.
+
+An invitation on its own grants nothing: it authorises creating an account for
+**one named address, once**. The address still has to be on the allowlist, and
+being on the allowlist is what makes someone an admin. So a leaked token is
+worth no more than the allowlist already permits, and a token can never be
+pointed at a different address.
+
+Other properties worth knowing:
+
+- Only a **SHA-256 digest** of each token is stored. A database leak yields no
+  usable links, and the raw token is shown to the inviting admin exactly once.
+- Claiming is an `UPDATE … WHERE accepted_at IS NULL`, so two concurrent
+  redemptions cannot both succeed — single use holds under a race.
+- An address that **already has an auth account** is refused, so an invitation
+  can never overwrite somebody's existing password.
+- `admin_invitations` has a select policy for admins and **no write policy**, so
+  an authenticated user cannot mint themselves an invitation either.
+- Nothing in the request body affects authorisation. No role, status or
+  `isAdmin` field is read anywhere in the flow.
+- Inviting **sends no email**, so none of this depends on SMTP.
 
 ---
 
@@ -58,9 +90,16 @@ and the server checks the caller is already an admin first.
 
 ## 2. Apply the database migration
 
+There are **two** migration files, and they must be applied in filename order:
+
+| Order | File | Adds |
+|---|---|---|
+| 1 | `20261029000000_contact_dashboard.sql` | `admin_users`, `contact_messages`, `rate_limits`, `is_admin()` |
+| 2 | `20261029120000_admin_invitations.sql` | `admin_invitations` (needed for sign-up) |
+
 **Option A — dashboard (simplest).** Open **SQL Editor → New query**, paste the
-whole of `supabase/migrations/20261029000000_contact_dashboard.sql`, press
-**Run**. It is idempotent, so running it twice is harmless.
+whole of the first file, press **Run**; then repeat with the second. Both are
+idempotent, so running either twice is harmless.
 
 **Option B — Supabase CLI.**
 
@@ -74,12 +113,12 @@ npx supabase db push
 In **SQL Editor**:
 
 ```sql
--- Expect: admin_users, contact_messages, rate_limits — all rowsecurity = true
+-- Expect 4 rows, every one with rowsecurity = true
 select tablename, rowsecurity from pg_tables
 where schemaname = 'public'
-  and tablename in ('admin_users','contact_messages','rate_limits');
+  and tablename in ('admin_users','contact_messages','rate_limits','admin_invitations');
 
--- Expect 4 policies, all for the `authenticated` role, none for `anon`
+-- Expect 5 policies, all for the `authenticated` role, none for `anon`
 select tablename, policyname, roles, cmd from pg_policies where schemaname = 'public';
 ```
 
@@ -90,19 +129,62 @@ If `rowsecurity` is `false` anywhere, stop — the table is world-readable.
 ## 3. Create the first administrator
 
 The dashboard's invite screen is only usable by an existing administrator, so
-the first one is created from your machine:
+the first one is created from your machine. Holding the service-role key is what
+authorises this, and that key never leaves your machine.
 
 ```bash
 cp .env.example .env.local        # then fill in the real values
 node scripts/bootstrap-admin.mjs you@epineon.ai
 ```
 
-It sends a Supabase invitation email and adds the address to the allowlist. Open
-the email, set a password, then sign in at `/admin/login`. The script never sees
-or stores your password.
+It allowlists the address and prints a **single-use sign-up link**. Open the
+link, choose a password, and you are in. No email is sent, so this works before
+SMTP exists. The script never sees or stores a password.
+
+> The printed link uses `PUBLIC_SITE_URL`. If that is unset it points at
+> `http://localhost:5173`, which is fine when you are running `npm run dev` and
+> wrong otherwise — the script warns you when this happens.
+
+The link works once, and only its hash is stored, so it cannot be reprinted.
+Re-run the script to issue a fresh one; that supersedes the old link.
+
+<details>
+<summary>Alternative: Supabase's own invitation email (<code>--email</code>)</summary>
+
+```bash
+node scripts/bootstrap-admin.mjs you@epineon.ai --email
+```
+
+Requires working SMTP, and the redirect URL must be allow-listed (§6). This
+creates the auth user immediately, which means the sign-up link path will
+**not** work for that address afterwards — use the emailed link instead. The
+two are alternatives, not steps.
+</details>
 
 Everyone after that is invited from **`/admin/team`** — you should not need the
 script again.
+
+### Creating an admin entirely from the dashboard
+
+If you would rather not run anything locally, this works too and needs no
+service-role key on your machine:
+
+1. **Authentication → Users → Add user → Create new user**: enter the address
+   and a password, and tick **Auto Confirm User**.
+2. **SQL Editor**, with both addresses replaced by yours:
+
+```sql
+insert into public.admin_users (email, user_id, status)
+select lower('you@epineon.ai'), u.id, 'active'
+from auth.users u
+where lower(u.email) = lower('you@epineon.ai');
+
+select email, status, user_id from public.admin_users;
+```
+
+The final select must return one row, `status = 'active'`, with a non-null
+`user_id`. Then sign in at `/admin/login`. No invitation is involved, because
+you are creating the account directly.
 
 ---
 
@@ -121,7 +203,8 @@ Fill in:
 | `SUPABASE_URL` | serverless functions | No |
 | `SUPABASE_SERVICE_ROLE_KEY` | serverless functions only | **Yes** |
 | `RATE_LIMIT_SALT` | hashing IPs before counting | **Yes** |
-| `PUBLIC_SITE_URL` | invitation redirect links | No |
+| `PUBLIC_SITE_URL` | the origin in invitation sign-up links | No |
+| `ADMIN_INVITE_TTL_HOURS` | optional; invitation lifetime, default 168 | No |
 
 `.env*` is already in `.gitignore`. Generate the salt with:
 
@@ -165,10 +248,16 @@ RATE_LIMIT_SALT            <random 64-char hex>    ← mark as Sensitive
 PUBLIC_SITE_URL            https://epineon.ai
 ```
 
-Then **Project → Settings → Supabase → Authentication → URL Configuration** (in
-the Supabase dashboard): set **Site URL** to your production origin and add
-`https://<your-domain>/admin/login` to **Redirect URLs**, or invitation links
-will bounce.
+Optionally add `ADMIN_INVITE_TTL_HOURS` to shorten invitation lifetimes.
+
+Then, **in the Supabase dashboard**, under **Authentication → URL
+Configuration**: set **Site URL** to your production origin and add
+`https://<your-domain>/admin/login` to **Redirect URLs**.
+
+Invitation sign-up links do **not** need this — they carry their own token and
+are verified by our own endpoint. It is needed for "Forgot password?" and for
+the `--email` bootstrap path, both of which rely on Supabase's own mail and
+redirects.
 
 Nothing else changes: `vercel.json` already runs `npm run build`, and Vercel
 picks up `api/*.js` as Node functions automatically. `engines.node` is pinned to
@@ -192,9 +281,23 @@ Vercel builds from the push. If you deploy by CLI instead: `npx vercel --prod`.
 
 ## 8. Invite the rest of the team
 
-`/admin/team` → enter an address → **Send invitation**. They get a Supabase
-email, set a password, and can then sign in. **Revoke** removes access
-immediately — the next request their browser makes fails the `is_admin()` check.
+`/admin/team` → enter an address → **Send invitation**. The page then shows a
+**one-time sign-up link**. Copy it and pass it to them over a channel you trust
+— Signal, a password manager share, in person. Nothing is emailed.
+
+They open the link, choose their own password at `/admin/signup`, and are signed
+in. You never see their password.
+
+- The link is shown **once**. Only a hash is stored, so it cannot be shown
+  again; invite the same address again to issue a fresh one, which supersedes
+  the previous link.
+- Links expire after 7 days by default (`ADMIN_INVITE_TTL_HOURS`).
+- Pending members show a **Pending** pill; hover it to see when their link
+  expires, or whether they have none.
+- **Revoke** removes access immediately *and* kills any outstanding link. The
+  next request their browser makes fails the `is_admin()` check.
+- Someone who has already signed in needs no link — if they are locked out,
+  they use **Forgot password?**, which does need SMTP.
 
 Guard rails: you cannot revoke yourself, and the last remaining administrator
 cannot be revoked.
@@ -252,6 +355,11 @@ both. Fastest route first:
 |---|---|
 | "Dashboard not configured" | `VITE_SUPABASE_*` missing at **build** time. Vite inlines them during the build, so set them in Vercel and redeploy. |
 | Signed in, but "not an approved administrator" | No `active` row in `admin_users` for that address. Invite them, or run the bootstrap script. |
-| Invitation links land on an error | The redirect URL is not in Supabase's allow-list (§6). |
+| Sign-up says the link "is not valid" | Wrong, truncated or superseded token. Inviting the same address again supersedes earlier links, so only the newest works. |
+| Sign-up says "already been used" | Single use by design. Invite them again for a fresh link. |
+| Sign-up says "an account already exists" | That address has a Supabase auth user already. They should sign in, or use "Forgot password?" — an invitation never overwrites a password. |
+| Sign-up link points at `localhost` | `PUBLIC_SITE_URL` is unset wherever the link was minted. |
+| Invitation links land on an error | Only applies to the `--email` path: the redirect URL is not in Supabase's allow-list (§6). |
+| Sign-up returns 500 | Usually `20261029120000_admin_invitations.sql` has not been applied. |
 | Contact form returns 500 | `SUPABASE_SERVICE_ROLE_KEY` missing or wrong in Vercel. |
 | Build fails on `WebSocket` | Node < 22 on the builder. `engines.node` should pin it; check the project's Node version setting. |

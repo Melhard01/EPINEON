@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { getSupabase, isSupabaseConfigured } from '../../admin/supabaseClient.js'
 import { useAdminAuth } from '../../admin/useAdminAuth.js'
 import { AdminShell } from '../../admin/AdminShell.jsx'
@@ -65,6 +65,19 @@ export default function AdminLogin() {
   return (
     <AdminShell title="Sign in" heading="Administrator sign-in">
       <form className="admin-card admin-login" onSubmit={onSubmit} noValidate={false}>
+        {/*
+          Without build-time Supabase credentials there is nothing to sign in
+          against, and onSubmit returns immediately. Say so, rather than letting
+          the button look functional and do nothing.
+        */}
+        {!isSupabaseConfigured ? (
+          <p className="admin-alert admin-alert--error" role="alert">
+            This build has no Supabase connection, so sign-in cannot work yet. Set{' '}
+            <code>VITE_SUPABASE_URL</code> and <code>VITE_SUPABASE_ANON_KEY</code>, then rebuild.
+            See <code>docs/ADMIN_SETUP.md</code>.
+          </p>
+        ) : null}
+
         {error ? <p className="admin-alert admin-alert--error" role="alert">{error}</p> : null}
         {notice ? <p className="admin-alert admin-alert--ok" role="status">{notice}</p> : null}
 
@@ -96,13 +109,23 @@ export default function AdminLogin() {
           />
         </label>
 
-        <button type="submit" className="admin-btn admin-btn--primary" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn--primary" disabled={busy || !isSupabaseConfigured}>
           {busy ? 'Signing in…' : 'Sign in'}
         </button>
 
-        <button type="button" className="admin-btn admin-btn--link" onClick={onReset} disabled={busy}>
+        <button
+          type="button"
+          className="admin-btn admin-btn--link"
+          onClick={onReset}
+          disabled={busy || !isSupabaseConfigured}
+        >
           Forgot password?
         </button>
+
+        <p className="admin-login__note">
+          Hold an invitation link?{' '}
+          <Link className="admin-inline-link" to="/admin/signup">Create account</Link>
+        </p>
 
         <p className="admin-login__note">
           Access is by invitation only. There is no public sign-up.
