@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AdminShell } from '../../admin/AdminShell.jsx'
 import { useMessages, countByForm, STATUS_LABELS } from '../../admin/useMessages.js'
 import { FORMS, LEGACY_FORM_ID, displayFormName } from '../../../api/_lib/forms.js'
@@ -36,9 +36,15 @@ function useSections(messages) {
 
 export default function AdminMessages() {
   const { formId } = useParams()
+  const [searchParams] = useSearchParams()
   const { messages, state, error, reload, setStatus, remove } = useMessages()
-  const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState('all')
+  // Seeded from the URL so the header search box and the unread bell on the
+  // Overview actually land somewhere filtered.
+  const [query, setQuery] = useState(() => searchParams.get('q') ?? '')
+  const [filter, setFilter] = useState(() => {
+    const requested = searchParams.get('status')
+    return FILTERS.includes(requested) ? requested : 'all'
+  })
   const [selectedId, setSelectedId] = useState(null)
   const [confirmId, setConfirmId] = useState(null)
   const [actionError, setActionError] = useState(null)

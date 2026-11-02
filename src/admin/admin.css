@@ -13,8 +13,13 @@
   --ad-text: #f4f4f5;
   --ad-muted: rgba(255, 255, 255, 0.62);
   --ad-gold: #c9a227;
+  --ad-gold-soft: #e2bb46;
   --ad-danger: #f87171;
-  --ad-radius: 12px;
+  --ad-radius: 14px;
+  --ad-rail-w: 15rem;
+  /* Figures are read and compared, not prose — they get a mono face and
+     tabular digits so columns of numbers line up. */
+  --ad-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
 
   min-height: 100vh;
   background: var(--ad-bg);
@@ -24,82 +29,251 @@
   line-height: 1.5;
 }
 
+.admin-figure {
+  font-family: var(--ad-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
 .admin-root *,
 .admin-root *::before,
 .admin-root *::after { box-sizing: border-box; }
 
-/* ---------------------------------------------------------------- topbar */
-.admin-topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
+/* ------------------------------------------------------------------ shell
+   A fixed left rail beside a scrolling canvas. Below 1024px the rail becomes a
+   horizontal bar at the top — a drawer would need focus trapping and an
+   overlay for a tool used almost entirely on a desktop. */
+.admin-shell { display: grid; grid-template-columns: 1fr; min-height: 100vh; }
+
+.admin-rail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.5rem;
+  padding: 0.85rem clamp(1rem, 3vw, 2rem);
   border-bottom: 1px solid var(--ad-line);
   background: rgba(9, 9, 11, 0.92);
   backdrop-filter: blur(10px);
 }
 
-.admin-topbar__inner {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  max-width: 76rem;
-  margin: 0 auto;
-  padding: 0.85rem clamp(1rem, 3vw, 2rem);
-}
+/* Brand lockup — the same wordmark asset the public site uses
+   (src/assets/epineon_logo_wordmark.png).
 
+   That file is a 500x500 canvas whose artwork occupies only x 79-401,
+   y 208-314, i.e. 322x106 with transparent padding all round. The public
+   header copes by scaling a square box up by a fixed ratio and then adding a
+   wide margin-right to compensate; here the padding is cropped off instead, so
+   the lockup occupies exactly the space it appears to.
+
+   The four numbers below come from the asset's opaque bounding box. If it is
+   ever re-exported, recompute them. */
 .admin-brand {
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  --ad-mark-h: 1.9rem; /* rendered height of the artwork itself */
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   color: var(--ad-text);
   text-decoration: none;
   white-space: nowrap;
 }
-.admin-brand span { color: var(--ad-gold); }
 
-.admin-nav { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+.admin-brand__mark {
+  flex: none;
+  display: block;
+  overflow: hidden;
+  width: calc(var(--ad-mark-h) * 322 / 106);
+  height: var(--ad-mark-h);
+}
 
-.admin-nav__link {
-  padding: 0.4rem 0.75rem;
-  border-radius: 8px;
+.admin-brand__mark img {
+  display: block;
+  width: calc(var(--ad-mark-h) * 500 / 106);
+  height: calc(var(--ad-mark-h) * 500 / 106);
+  max-width: none;
+  margin-left: calc(var(--ad-mark-h) * -79 / 106);
+  margin-top: calc(var(--ad-mark-h) * -208 / 106);
+}
+
+.admin-brand__label {
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ad-gold);
+}
+
+.admin-rail__nav { display: flex; flex-wrap: wrap; gap: 0.25rem; }
+
+.admin-rail__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 10px;
   font-size: 0.9rem;
   color: var(--ad-muted);
   text-decoration: none;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-.admin-nav__link:hover { background: var(--ad-surface-2); color: var(--ad-text); }
-.admin-nav__link.is-active { background: var(--ad-surface-2); color: var(--ad-gold); }
+.admin-rail__link:hover { background: var(--ad-surface-2); color: var(--ad-text); }
+.admin-rail__link.is-active { background: var(--ad-surface-2); color: var(--ad-gold); }
 
-.admin-account {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-left: auto;
-  min-width: 0;
+.admin-rail__icon { width: 1rem; height: 1rem; flex: none; }
+
+.admin-rail__foot { display: flex; align-items: center; gap: 0.75rem; margin-left: auto; min-width: 0; }
+
+.admin-who { display: flex; align-items: center; gap: 0.6rem; min-width: 0; }
+
+.admin-who__disc {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 50%;
+  background: rgba(201, 162, 39, 0.12);
+  color: var(--ad-gold);
+  font-size: 0.8rem;
+  font-weight: 700;
 }
-.admin-account__email {
-  font-size: 0.85rem;
+
+.admin-who__text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.admin-who__name { font-size: 0.88rem; font-weight: 600; }
+.admin-who__email {
+  font-size: 0.75rem;
   color: var(--ad-muted);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 18ch;
+  max-width: 20ch;
+}
+.admin-who__out { gap: 0.45rem; }
+
+/* ----------------------------------------------------------------- canvas */
+.admin-canvas { position: relative; isolation: isolate; min-width: 0; }
+
+/* Ambient gold wash behind the content, and a faint grid for depth. */
+.admin-canvas__glow {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: -1;
+  height: 32rem;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 100% at 18% 0%, rgba(201, 162, 39, 0.1) 0%, transparent 70%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: auto, 56px 56px, 56px 56px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 100%);
 }
 
-/* ------------------------------------------------------------------ layout */
-.admin-main { padding: clamp(1.25rem, 4vw, 2.5rem) 0 4rem; }
-.admin-container { max-width: 76rem; margin: 0 auto; padding-inline: clamp(1rem, 3vw, 2rem); }
+.admin-container { max-width: 84rem; margin: 0 auto; padding-inline: clamp(1rem, 3vw, 2rem); }
+.admin-main { padding-bottom: 4rem; }
 
-.admin-page-head {
+.admin-head {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem) 0 clamp(1.25rem, 3vw, 1.75rem);
 }
 
-.admin-h1 { margin: 0; font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 650; letter-spacing: -0.01em; }
+.admin-head__titles { min-width: 0; }
+.admin-head__eyebrow {
+  margin: 0 0 0.3rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad-muted);
+}
+.admin-head__tools { display: flex; align-items: center; gap: 0.5rem; }
+
+.admin-headsearch { position: relative; display: flex; align-items: center; }
+.admin-headsearch__icon {
+  position: absolute;
+  left: 0.7rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--ad-muted);
+  pointer-events: none;
+}
+.admin-headsearch__input {
+  width: clamp(9rem, 22vw, 15rem);
+  min-height: 2.4rem;
+  padding: 0.4rem 0.7rem 0.4rem 2.1rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  background: var(--ad-surface);
+  color: var(--ad-text);
+  font: inherit;
+  font-size: 0.88rem;
+}
+.admin-headsearch__input:focus-visible { outline: 2px solid rgba(201, 162, 39, 0.6); outline-offset: 1px; }
+
+.admin-iconbtn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  background: var(--ad-surface);
+  color: var(--ad-text);
+  cursor: pointer;
+  text-decoration: none;
+}
+.admin-iconbtn:hover { border-color: rgba(255, 255, 255, 0.22); }
+.admin-iconbtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.admin-iconbtn__icon { width: 1rem; height: 1rem; }
+.admin-iconbtn__dot {
+  position: absolute;
+  top: -0.25rem;
+  right: -0.25rem;
+  min-width: 1.15rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--ad-gold);
+  color: #0a0a0a;
+  font-family: var(--ad-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.15rem;
+  text-align: center;
+}
+
+.admin-h1 { margin: 0; font-size: clamp(1.5rem, 2.8vw, 2.1rem); font-weight: 650; letter-spacing: -0.015em; }
 .admin-h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+
+@media (min-width: 1024px) {
+  .admin-shell { grid-template-columns: var(--ad-rail-w) minmax(0, 1fr); }
+
+  .admin-rail {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.75rem;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid var(--ad-line);
+    border-bottom: 0;
+  }
+
+  .admin-rail__nav { flex-direction: column; gap: 0.2rem; }
+  .admin-rail__foot {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-top: auto;
+    margin-left: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--ad-line);
+  }
+  .admin-who__out { justify-content: flex-start; }
+}
 
 /* ------------------------------------------------------------------- cards */
 .admin-card {
@@ -203,6 +377,7 @@
 .admin-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .admin-btn:focus-visible { outline: 2px solid var(--ad-gold); outline-offset: 2px; }
 
+.admin-btn { white-space: nowrap; }
 .admin-btn--primary { background: var(--ad-gold); border-color: var(--ad-gold); color: #0a0a0a; font-weight: 600; }
 .admin-btn--primary:hover:not(:disabled) { background: #d8b23a; border-color: #d8b23a; }
 .admin-btn--quiet { background: transparent; }
@@ -413,3 +588,221 @@
 
 .admin-formlist__name { font-size: 0.95rem; }
 .admin-formlist__count { font-size: 1.05rem; font-weight: 600; color: var(--ad-gold); }
+
+/* ============================================================================
+   Overview dashboard
+   ========================================================================== */
+
+.admin-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.admin-grid__main { display: grid; gap: 1.25rem; min-width: 0; }
+.admin-grid__rail { display: grid; gap: 1.25rem; min-width: 0; }
+
+@media (min-width: 1280px) {
+  .admin-grid { grid-template-columns: minmax(0, 1fr) 21rem; }
+  .admin-card--sticky { position: sticky; top: 1.25rem; }
+}
+
+.admin-duo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+@media (min-width: 900px) { .admin-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ------------------------------------------------------------------- hero */
+.admin-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  border-radius: var(--ad-radius);
+  background: linear-gradient(135deg, #121214 0%, #0b0b0d 60%, #0a0a0b 100%);
+}
+
+.admin-hero__glow {
+  position: absolute;
+  z-index: -1;
+  right: -6rem;
+  top: -8rem;
+  width: 26rem;
+  height: 26rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.22) 0%, transparent 68%);
+  filter: blur(32px);
+  pointer-events: none;
+}
+
+.admin-hero__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ad-muted);
+}
+.admin-hero__value { margin: 0 0 0.6rem; font-size: clamp(2.2rem, 5vw, 3rem); font-weight: 700; line-height: 1; }
+.admin-hero__side { display: grid; gap: 0.85rem; }
+.admin-hero__sub { margin: 0; font-size: 0.85rem; color: var(--ad-muted); }
+.admin-hero__dot {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  margin: 0 0.6rem;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+}
+.admin-hero__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+.admin-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #86efac;
+}
+.admin-delta--down { color: #fca5a5; }
+.admin-delta--flat { color: var(--ad-muted); font-weight: 400; }
+.admin-delta__icon { width: 0.95rem; height: 0.95rem; }
+
+/* ---------------------------------------------------------------- metrics */
+.admin-metrics { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
+@media (min-width: 720px) { .admin-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+.admin-metric {
+  display: block;
+  padding: clamp(0.9rem, 2vw, 1.2rem);
+  border: 1px solid var(--ad-line);
+  border-radius: var(--ad-radius);
+  background: var(--ad-surface);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+}
+.admin-metric:hover { border-color: rgba(201, 162, 39, 0.4); transform: translateY(-2px); }
+
+.admin-metric__head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.admin-metric__name {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ad-muted);
+  /* Two lines reserved: "Partnerships & Ventures" wraps where the others do
+     not, and without this its figure drops out of line with the rest. */
+  min-height: 2.55em;
+}
+.admin-metric__go { width: 0.9rem; height: 0.9rem; color: var(--ad-muted); flex: none; }
+.admin-metric__value { margin: 0.35rem 0 0.5rem; font-size: 1.85rem; font-weight: 700; line-height: 1; }
+.admin-metric__foot { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.6rem 0 0; }
+.admin-metric__chip {
+  padding: 0.1rem 0.45rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: var(--ad-muted);
+}
+
+.admin-spark { display: block; width: 100%; height: 1.75rem; }
+
+/* ------------------------------------------------------------------ chart */
+.admin-card__note { font-size: 0.8rem; color: var(--ad-muted); }
+
+.admin-chart__legend { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem; }
+.admin-chart__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ad-text);
+  font: inherit;
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+.admin-chart__key.is-off { color: rgba(255, 255, 255, 0.35); }
+.admin-chart__key.is-off .admin-chart__swatch { opacity: 0.3; }
+.admin-chart__swatch { width: 0.5rem; height: 0.5rem; border-radius: 50%; flex: none; }
+
+.admin-chart__plot { position: relative; }
+.admin-chart__svg { display: block; width: 100%; height: auto; touch-action: none; }
+.admin-chart__axis { fill: rgba(255, 255, 255, 0.4); font-size: 11px; font-family: var(--ad-mono); }
+/* The SVG scales to its container, so axis text shrinks with it. On a phone the
+   plot is roughly 45% of the viewBox width, which takes 11px down to ~5px —
+   this buys it back. Not exact at every width, but legible rather than not. */
+@media (max-width: 560px) { .admin-chart__axis { font-size: 22px; } }
+
+.admin-chart__tip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 9rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 10px;
+  background: rgba(18, 18, 20, 0.97);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.admin-chart__tip-day { margin: 0 0 0.35rem; font-size: 0.75rem; color: var(--ad-muted); }
+.admin-chart__tip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+}
+.admin-chart__tip-value { margin-left: auto; font-family: var(--ad-mono); font-weight: 600; }
+
+/* ------------------------------------------------------------------- feed */
+.admin-feed { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.1rem; }
+
+.admin-feed__row { display: flex; gap: 0.7rem; padding: 0.65rem 0; border-top: 1px solid var(--ad-line); }
+.admin-feed__row:first-child { border-top: 0; }
+.admin-feed__tick { width: 2px; border-radius: 2px; flex: none; opacity: 0.8; }
+.admin-feed__body { display: grid; gap: 0.3rem; min-width: 0; flex: 1; }
+.admin-feed__top { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
+.admin-feed__who {
+  font-size: 0.9rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-feed__when { flex: none; font-size: 0.72rem; color: rgba(255, 255, 255, 0.4); font-family: var(--ad-mono); }
+.admin-feed__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
+
+/* ----------------------------------------------------------------- people */
+.admin-people { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.1rem; }
+.admin-people__row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--ad-line);
+}
+.admin-people__row:first-child { border-top: 0; }
+.admin-people__text { display: grid; min-width: 0; line-height: 1.3; }
+.admin-people__name { font-size: 0.88rem; font-weight: 600; }
+.admin-people__email {
+  font-size: 0.75rem;
+  color: var(--ad-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-people__row .admin-pill { margin-left: auto; flex: none; }
+
+/* A quieter companion to .admin-btn--primary, for the pair in the hero. */
+.admin-btn--ghost {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+.admin-btn--ghost:hover { border-color: rgba(255, 255, 255, 0.3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-metric { transition: none; }
+  .admin-metric:hover { transform: none; }
+}
