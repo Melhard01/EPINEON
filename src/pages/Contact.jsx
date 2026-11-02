@@ -7,6 +7,7 @@ import { PageShell } from '../components/PageShell'
 import { ContactFormSelect } from '../components/contact/ContactFormSelect'
 import CursorGrid from '../components/visuals/CursorGrid'
 import { ALL_PRODUCTS } from '../data/ecosystem.js'
+import { resolveContactTab, contactTabSearch } from '../lib/contactTabs.js'
 
 // Same-origin Vercel function by default. VITE_API_BASE_URL still overrides it so a
 // separate backend can be pointed at during development.
@@ -85,12 +86,6 @@ const INQUIRE_TABS = [
   },
 ]
 
-function resolveFromHash(hash) {
-  if (hash === '#sales') return { mode: 'inquire', inquireId: 'sales' }
-  if (hash === '#partnerships') return { mode: 'inquire', inquireId: 'partnerships' }
-  return { mode: 'demo', inquireId: 'sales' }
-}
-
 const inputClass = 'contact-form-field contact-input'
 
 // The cursor grid only has meaning with a pointer, and it only has room inside
@@ -117,7 +112,7 @@ export default function Contact() {
   const { hash, search } = useLocation()
   const productParam = new URLSearchParams(search).get('product') || ''
 
-  const initial = resolveFromHash(hash)
+  const initial = resolveContactTab(search, hash)
   const [mode, setMode] = useState(initial.mode) // 'demo' | 'inquire'
   const [inquireId, setInquireId] = useState(initial.inquireId) // 'sales' | 'partnerships'
   const [values, setValues] = useState(() =>
@@ -130,41 +125,50 @@ export default function Contact() {
   const [honeypot, setHoneypot] = useState('')
   const formStartedAt = useRef(Date.now())
 
+  // Follow the URL whenever it changes: ?tab=/?sub= first, then the legacy
+  // hash that links across the site still use.
   useEffect(() => {
-    const next = resolveFromHash(hash)
+    const next = resolveContactTab(search, hash)
     setMode(next.mode)
     setInquireId(next.inquireId)
-  }, [hash])
+  }, [search, hash])
 
+  // ?product= only prefills the product field. It used to also force the tab,
+  // which would have overridden an explicit ?tab=inquire&sub=partnerships.
   useEffect(() => {
     if (!productParam || !PRODUCT_OPTIONS.includes(productParam)) return
     setValues((v) => ({ ...v, product: productParam }))
-    if (hash === '#sales') {
-      setMode('inquire')
-      setInquireId('sales')
-    } else {
-      setMode('demo')
-    }
-  }, [productParam, hash])
+  }, [productParam])
 
   const tab = mode === 'demo' ? DEMO_FORM : INQUIRE_TABS.find((t) => t.id === inquireId)
 
   const resetStatus = () => setStatus({ submitting: false, submitted: false, error: null })
-  const setHash = (h) => {
-    if (typeof window !== 'undefined') window.history.replaceState(null, '', h)
+
+  /**
+   * Write the active tab back as query parameters, so the address bar can be
+   * copied and will reopen the same tab. replaceState rather than a router
+   * navigation: this must not add history entries or move the scroll position
+   * while someone is part-way through the form. The hash is dropped, since the
+   * query parameters are now what decides the tab and a leftover #sales would
+   * say something different.
+   */
+  const syncUrl = (nextMode, nextInquireId) => {
+    if (typeof window === 'undefined') return
+    const next = contactTabSearch(nextMode, nextInquireId, window.location.search)
+    window.history.replaceState(null, '', `${window.location.pathname}${next}`)
   }
 
   const switchMode = (m) => {
     setMode(m)
     resetStatus()
-    setHash(m === 'demo' ? '#demo' : `#${inquireId}`)
+    syncUrl(m, inquireId)
   }
 
   const switchInquire = (id) => {
     setMode('inquire')
     setInquireId(id)
     resetStatus()
-    setHash(`#${id}`)
+    syncUrl('inquire', id)
   }
 
   const onChange = (e) => setValues((v) => ({ ...v, [e.target.name]: e.target.value }))
