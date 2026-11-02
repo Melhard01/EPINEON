@@ -341,3 +341,75 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-root * { transition: none !important; }
 }
+
+/* ------------------------------------------------- messages: form sections */
+/* One row of links, one per website form. Same visual language as
+   .admin-nav__link so the dashboard still reads as one design. */
+.admin-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--ad-line);
+}
+
+.admin-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--ad-muted);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.admin-section:hover { background: var(--ad-surface-2); color: var(--ad-text); }
+.admin-section.is-active { background: var(--ad-surface-2); color: var(--ad-gold); }
+
+.admin-section__count {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  background: var(--ad-bg);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: center;
+}
+.admin-section.is-active .admin-section__count {
+  border-color: rgba(201, 162, 39, 0.45);
+  color: var(--ad-gold);
+}
+
+/* Which form a row came from, where the section does not already say so. */
+.admin-tag {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--ad-line);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  color: var(--ad-muted);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------- overview: submissions by form */
+.admin-formlist { list-style: none; margin: 0; padding: 0; }
+
+.admin-formlist__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-top: 1px solid var(--ad-line);
+  color: var(--ad-text);
+  text-decoration: none;
+}
+.admin-formlist li:first-child .admin-formlist__row { border-top: 0; }
+.admin-formlist__row:hover .admin-formlist__name { color: var(--ad-gold); }
+
+.admin-formlist__name { font-size: 0.95rem; }
+.admin-formlist__count { font-size: 1.05rem; font-weight: 600; color: var(--ad-gold); }

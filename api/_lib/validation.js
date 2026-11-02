@@ -6,8 +6,11 @@
  * being spread through the handler.
  */
 
+import { resolveFormId, formNameFor } from './forms.js'
+
 export const LIMITS = {
   name: 120,
+  company: 160,
   email: 254, // RFC 5321 maximum
   subject: 200,
   message: 5000,
@@ -86,7 +89,21 @@ export function validateSubmission(input) {
   if (message.length < LIMITS.messageMin) return { ok: false, error: 'Please add a little more detail.', field: 'message' }
   if (message.length > LIMITS.message) return { ok: false, error: 'That message is too long.', field: 'message' }
 
+  // Optional on every form, and named "Organization" on the partnerships tab.
+  const company = normaliseLine(input.company ?? '')
+  if (company.length > LIMITS.company) {
+    return { ok: false, error: 'That company name is too long.', field: 'company' }
+  }
+
   const sourcePath = normaliseLine(input.sourcePath ?? '')
+
+  // Which form this came from is decided HERE, not by the caller. The id is
+  // matched against the registry (an unknown one falls back to the legacy
+  // bucket rather than erroring, so a stale bundle can still reach us) and the
+  // display name is then looked up from that id. A `formName` in the body is
+  // never read, so a visitor cannot file their message under a label of their
+  // own choosing or inject markup into one.
+  const formId = resolveFormId(input.formId)
 
   return {
     ok: true,
@@ -95,6 +112,9 @@ export function validateSubmission(input) {
       email,
       subject,
       message,
+      company: company || null,
+      form_id: formId,
+      form_name: formNameFor(formId),
       source_path: sourcePath.startsWith('/') ? sourcePath.slice(0, 200) : null,
     },
   }

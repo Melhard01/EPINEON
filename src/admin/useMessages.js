@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getSupabase } from './supabaseClient.js'
+import { LEGACY_FORM_ID } from '../../api/_lib/forms.js'
 
 /**
  * Reads and mutates contact_messages directly through Supabase using the
@@ -17,7 +18,7 @@ export function useMessages() {
     setError(null)
     const { data, error: queryError } = await getSupabase()
       .from('contact_messages')
-      .select('id, name, email, subject, message, status, created_at')
+      .select('id, name, email, company, subject, message, status, created_at, form_id, form_name')
       .order('created_at', { ascending: false })
       .limit(500)
 
@@ -55,6 +56,20 @@ export function useMessages() {
   }, [messages])
 
   return { messages, state, error, reload: load, setStatus, remove }
+}
+
+/**
+ * Submissions per form id, for the section counts. Derived from the rows the
+ * hook already holds, so it costs no extra query — which also means it reflects
+ * the same 500-row window the list does.
+ */
+export function countByForm(messages) {
+  const counts = new Map()
+  for (const message of messages) {
+    const id = message.form_id || LEGACY_FORM_ID
+    counts.set(id, (counts.get(id) ?? 0) + 1)
+  }
+  return counts
 }
 
 export const STATUS_LABELS = {

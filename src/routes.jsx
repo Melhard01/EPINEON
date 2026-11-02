@@ -16,6 +16,7 @@ import AdminDashboard from './pages/admin/Dashboard.jsx'
 import AdminMessages from './pages/admin/Messages.jsx'
 import AdminTeam from './pages/admin/Team.jsx'
 import { RequireAdmin } from './admin/RequireAdmin.jsx'
+import { FORMS } from '../api/_lib/forms.js'
 import { SOLUTIONS } from './data/solutions.js'
 import { INDUSTRIES } from './data/industries.js'
 
@@ -54,6 +55,9 @@ export const STATIC_PAGES = [
   // without a token, and /api/admin/signup re-verifies the token server-side.
   { path: '/admin/signup', Component: AdminSignup },
   { path: '/admin', Component: guarded(AdminDashboard) },
+  // The per-form sections are one dynamic route, /admin/messages/:formId,
+  // declared in AppRoutes beside the other dynamic ones — a literal path per
+  // form would leave useParams() empty and every section would render as "All".
   { path: '/admin/messages', Component: guarded(AdminMessages) },
   { path: '/admin/team', Component: guarded(AdminTeam) },
 ]
@@ -62,6 +66,10 @@ export const STATIC_PAGES = [
 // production, so a route missing from this list is a hard 404.
 export const PRERENDER_PATHS = [
   ...STATIC_PAGES.map((page) => page.path),
+  // One static file per form section, so a refresh on /admin/messages/demo
+  // resolves instead of 404ing. The set is closed: /api/contact only ever
+  // writes a form_id that came from this same registry.
+  ...FORMS.map((form) => `/admin/messages/${form.id}`),
   ...Object.keys(SOLUTIONS).map((slug) => `/solutions/${slug}`),
   ...Object.keys(INDUSTRIES).map((slug) => `/industries/${slug}`),
 ]

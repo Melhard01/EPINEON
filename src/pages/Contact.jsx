@@ -195,6 +195,9 @@ export default function Contact() {
     // Compose a single message body from this tab's fields (backend takes name/email/message).
     const name = (values.name || '').trim()
     const email = (values.email || '').trim()
+    // Sent as its own field as well as inside the body, so the dashboard can
+    // show it as a column. The partnerships tab calls this "Organization".
+    const company = (values.company || values.organization || '').trim()
     const extraLines = tab.fields
       .filter((f) => !['name', 'email'].includes(f.name))
       .map((f) => `${f.label}: ${(values[f.name] || '').trim() || '—'}`)
@@ -210,6 +213,11 @@ export default function Contact() {
           email,
           subject: tab.label,
           message,
+          company,
+          // Which form this is. The id only — the server looks the display name
+          // up in its own registry (api/_lib/forms.js) and ignores any name
+          // sent from here, so this cannot decide where the message files.
+          formId: tab.id,
           companyWebsite: honeypot,
           formStartedAt: formStartedAt.current,
           sourcePath: '/contact',

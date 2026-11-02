@@ -90,16 +90,22 @@ Other properties worth knowing:
 
 ## 2. Apply the database migration
 
-There are **two** migration files, and they must be applied in filename order:
+There are **three** migration files, and they must be applied in filename order:
 
 | Order | File | Adds |
 |---|---|---|
 | 1 | `20261029000000_contact_dashboard.sql` | `admin_users`, `contact_messages`, `rate_limits`, `is_admin()` |
 | 2 | `20261029120000_admin_invitations.sql` | `admin_invitations` (needed for sign-up) |
+| 3 | `20261102000000_submission_forms.sql` | `form_id`, `form_name`, `company` on `contact_messages` — the per-form sections |
 
 **Option A — dashboard (simplest).** Open **SQL Editor → New query**, paste the
-whole of the first file, press **Run**; then repeat with the second. Both are
-idempotent, so running either twice is harmless.
+whole of the first file, press **Run**; then repeat with the others. All three
+are idempotent, so running any of them twice is harmless.
+
+Migration 3 is safe to apply to a table that already holds submissions: the new
+columns have defaults, so every existing row stays valid, and the backfill at
+the end of the file sorts historical rows into their forms using the `subject`
+the old client sent. It changes no policy and no existing column.
 
 **Option B — Supabase CLI.**
 
@@ -276,6 +282,32 @@ git push
 ```
 
 Vercel builds from the push. If you deploy by CLI instead: `npx vercel --prod`.
+
+---
+
+## 7b. Which form a submission came from
+
+Every public form posts to the same `/api/contact`. The form's identity travels
+as an **id only** (`formId`), which the server resolves against the registry in
+[`api/_lib/forms.js`](../api/_lib/forms.js); the display name is looked up there
+too. A `formName` in a request body is never read, so a visitor cannot file
+their message under a label of their own choosing.
+
+| `form_id` | Shown as | Where on the site |
+|---|---|---|
+| `demo` | Demo request | `/contact` and `/contact#demo` |
+| `sales` | Sales & Enterprise | `/contact#sales` |
+| `partnerships` | Partnerships & Ventures | `/contact#partnerships` |
+| `contact` | Contact | fallback — submissions that predate `form_id`, or any unrecognised id |
+
+An unknown id is **not** rejected: it lands in the `contact` bucket so a visitor
+on a cached bundle can still reach us. The dashboard shows that bucket as its
+own section whenever it holds anything, so nothing is ever invisible.
+
+**Adding a form later** means adding a tab in `src/pages/Contact.jsx` *and* an
+entry in `api/_lib/forms.js`. `npm test` fails if the two disagree — it reads
+the tabs out of the Contact page and compares them with the registry. No
+database migration is needed: `form_id` is shape-checked, not enumerated.
 
 ---
 
