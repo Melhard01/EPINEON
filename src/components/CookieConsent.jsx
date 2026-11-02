@@ -94,7 +94,7 @@ const CookieConsent = ({ openFromButton = false, onClose }) => {
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm pointer-events-auto" />
 
       {/* Cookie Consent Card */}
-      <Card className="relative w-full max-w-2xl gap-0 py-0 pointer-events-auto rounded-[2rem] border border-[#333333] bg-[#1a1a1a] text-white shadow-[0_24px_48px_rgba(0,0,0,0.45)]">
+      <Card className="relative max-h-[90vh] w-full max-w-2xl gap-0 overflow-y-auto overscroll-contain py-0 pointer-events-auto rounded-[2rem] border border-[#333333] bg-[#1a1a1a] text-white shadow-[0_24px_48px_rgba(0,0,0,0.45)]">
         {/* Close button */}
         <button
           onClick={handleRejectAll}

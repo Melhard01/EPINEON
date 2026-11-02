@@ -166,75 +166,79 @@ export default function AdminTeam() {
         {state === 'ready' && members.length === 0 ? <p className="admin-empty">No administrators yet.</p> : null}
 
         {members.length > 0 ? (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th scope="col">Email</th>
-                <th scope="col">Status</th>
-                <th scope="col">Invited</th>
-                <th scope="col"><span className="sr-only">Actions</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map((member) => {
-                const isSelf = member.email === (myEmail || '').toLowerCase()
-                const pending = member.status === 'active' && !member.last_seen_at
-                const liveInvite = invitations.find((row) => row.email === member.email)
-                return (
-                  <tr key={member.id}>
-                    <td>
-                      {member.email}
-                      {isSelf ? <span className="admin-tag">you</span> : null}
-                    </td>
-                    <td>
-                      <span
-                        className={`admin-pill admin-pill--${member.status === 'active' ? (pending ? 'unread' : 'replied') : 'archived'}`}
-                        title={
-                          pending && liveInvite
-                            ? `Sign-up link expires ${new Date(liveInvite.expires_at).toLocaleString()}`
-                            : pending
-                              ? 'No live sign-up link — invite them again to issue one'
-                              : undefined
-                        }
-                      >
-                        {member.status === 'revoked' ? 'Revoked' : pending ? 'Pending' : 'Active'}
-                      </span>
-                    </td>
-                    <td>{new Date(member.invited_at).toLocaleDateString()}</td>
-                    <td className="admin-table__actions">
-                      {member.status === 'active' ? (
-                        confirmId === member.id ? (
-                          <span className="admin-confirm-inline">
-                            Revoke access?
-                            <button type="button" className="admin-btn admin-btn--danger" disabled={busy} onClick={() => changeStatus(member.id, 'revoked')}>
-                              Yes
+          <div className="admin-tablewrap">
+            {/* A long email would otherwise push the table out of its card:
+                .admin-tablewrap scrolls sideways instead. */}
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th scope="col">Email</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Invited</th>
+                  <th scope="col"><span className="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {members.map((member) => {
+                  const isSelf = member.email === (myEmail || '').toLowerCase()
+                  const pending = member.status === 'active' && !member.last_seen_at
+                  const liveInvite = invitations.find((row) => row.email === member.email)
+                  return (
+                    <tr key={member.id}>
+                      <td>
+                        {member.email}
+                        {isSelf ? <span className="admin-tag">you</span> : null}
+                      </td>
+                      <td>
+                        <span
+                          className={`admin-pill admin-pill--${member.status === 'active' ? (pending ? 'unread' : 'replied') : 'archived'}`}
+                          title={
+                            pending && liveInvite
+                              ? `Sign-up link expires ${new Date(liveInvite.expires_at).toLocaleString()}`
+                              : pending
+                                ? 'No live sign-up link — invite them again to issue one'
+                                : undefined
+                          }
+                        >
+                          {member.status === 'revoked' ? 'Revoked' : pending ? 'Pending' : 'Active'}
+                        </span>
+                      </td>
+                      <td>{new Date(member.invited_at).toLocaleDateString()}</td>
+                      <td className="admin-table__actions">
+                        {member.status === 'active' ? (
+                          confirmId === member.id ? (
+                            <span className="admin-confirm-inline">
+                              Revoke access?
+                              <button type="button" className="admin-btn admin-btn--danger" disabled={busy} onClick={() => changeStatus(member.id, 'revoked')}>
+                                Yes
+                              </button>
+                              <button type="button" className="admin-btn admin-btn--quiet" onClick={() => setConfirmId(null)}>
+                                No
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-btn admin-btn--quiet"
+                              disabled={busy || isSelf}
+                              title={isSelf ? 'You cannot revoke your own access' : undefined}
+                              onClick={() => setConfirmId(member.id)}
+                            >
+                              Revoke
                             </button>
-                            <button type="button" className="admin-btn admin-btn--quiet" onClick={() => setConfirmId(null)}>
-                              No
-                            </button>
-                          </span>
+                          )
                         ) : (
-                          <button
-                            type="button"
-                            className="admin-btn admin-btn--quiet"
-                            disabled={busy || isSelf}
-                            title={isSelf ? 'You cannot revoke your own access' : undefined}
-                            onClick={() => setConfirmId(member.id)}
-                          >
-                            Revoke
+                          <button type="button" className="admin-btn admin-btn--quiet" disabled={busy} onClick={() => changeStatus(member.id, 'active')}>
+                            Restore
                           </button>
-                        )
-                      ) : (
-                        <button type="button" className="admin-btn admin-btn--quiet" disabled={busy} onClick={() => changeStatus(member.id, 'active')}>
-                          Restore
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
         ) : null}
       </section>
     </AdminShell>

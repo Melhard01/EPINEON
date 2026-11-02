@@ -472,6 +472,13 @@
 .admin-recent__meta { display: flex; align-items: center; gap: 0.75rem; color: rgba(255, 255, 255, 0.4); font-size: 0.8rem; white-space: nowrap; }
 
 /* ------------------------------------------------------------------- table */
+/* Horizontal escape hatch for the one table in the admin area. The card
+   itself must not scroll, or its padding and border would scroll with it. */
+.admin-tablewrap {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
 .admin-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .admin-table th, .admin-table td { padding: 0.65rem 0.5rem; text-align: left; border-bottom: 1px solid var(--ad-line); vertical-align: middle; }
 .admin-table th { color: var(--ad-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
