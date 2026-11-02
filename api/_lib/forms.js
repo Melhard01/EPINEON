@@ -41,10 +41,37 @@ export const FORMS = [
     path: '/contact',
     // Not a form on the site: the bucket for submissions that predate form_id.
     legacy: true,
+    // Unknown shape, so the body is shown as it was written.
+    fields: [],
+    messageField: null,
   },
-  { id: 'demo', name: 'Demo request', path: '/contact#demo' },
-  { id: 'sales', name: 'Sales & Enterprise', path: '/contact#sales' },
-  { id: 'partnerships', name: 'Partnerships & Ventures', path: '/contact#partnerships' },
+  {
+    id: 'demo',
+    name: 'Demo request',
+    path: '/contact#demo',
+    // Field labels exactly as the form renders them, in order, excluding name
+    // and email (those are columns of their own). The client composes the
+    // message body as "<label>: <value>" lines, so these are what lets the
+    // dashboard take it apart again. tests/forms.test.js fails if they drift
+    // from src/pages/Contact.jsx.
+    fields: ['Company or organisation', 'Role', 'Product of interest', 'What would you like to see?'],
+    // The free-text answer — the only part that is really a "message".
+    messageField: 'What would you like to see?',
+  },
+  {
+    id: 'sales',
+    name: 'Sales & Enterprise',
+    path: '/contact#sales',
+    fields: ['Company', 'Role', 'Product of interest', 'Use case', 'Message'],
+    messageField: 'Message',
+  },
+  {
+    id: 'partnerships',
+    name: 'Partnerships & Ventures',
+    path: '/contact#partnerships',
+    fields: ['Organization', 'Nature of partnership'],
+    messageField: 'Nature of partnership',
+  },
 ]
 
 const BY_ID = new Map(FORMS.map((form) => [form.id, form]))
@@ -171,4 +198,68 @@ export function formLabelForRow(row) {
 /** Label for a bare id + stored name pair. Also never "Unknown form". */
 export function displayFormName(formId, storedName) {
   return formLabelForRow({ form_id: formId, form_name: storedName })
+}
+
+/** What the client writes for a field the visitor left blank. */
+const BLANK = '\u2014'
+
+const notBlank = (value) => {
+  const trimmed = String(value ?? '').trim()
+  return trimmed && trimmed !== BLANK ? trimmed : ''
+}
+
+/**
+ * Take a stored submission body apart.
+ *
+ * The public form flattens every answer into one string — "[Demo request]"
+ * followed by "<label>: <value>" lines — because the API takes a single
+ * message. Showing that raw puts the company, role and product inside the
+ * message box, where only the visitor's own words belong.
+ *
+ * Splitting happens on the form's known labels rather than on any "x: y"
+ * pattern, so a colon inside the free text does not start a phantom field, and
+ * a multi-line answer keeps its line breaks.
+ *
+ * Anything that does not parse is returned whole as the message: an
+ * administrator seeing the raw body is far better than one seeing nothing.
+ *
+ * @returns {{fields: Array<{label: string, value: string}>, message: string,
+ *            messageLabel: string}}
+ */
+export function parseSubmissionBody(row) {
+  const raw = String(row?.message ?? '')
+  // Drop the "[Demo request]" header line the client prepends.
+  const body = raw.replace(/^\s*\[[^\]\n]{1,60}\][ \t]*\n?/, '')
+
+  const form = getForm(inferFormId(row))
+  const labels = form?.fields ?? []
+  // What this form calls its free-text answer, for the heading above the box.
+  const messageLabel = form?.messageField || 'Message'
+  if (!labels.length) return { fields: [], message: body.trim(), messageLabel }
+
+  const entries = []
+  let current = null
+  for (const line of body.split('\n')) {
+    const hit = labels.find((l) => line === `${l}:` || line.startsWith(`${l}: `))
+    if (hit) {
+      current = { label: hit, value: line.slice(hit.length + 1).trimStart() }
+      entries.push(current)
+    } else if (current) {
+      // A continuation of the previous answer — textareas keep their newlines.
+      current.value = current.value ? `${current.value}\n${line}` : line
+    }
+  }
+
+  // Nothing recognisable: hand the whole thing back rather than swallow it.
+  if (!entries.length) return { fields: [], message: body.trim(), messageLabel }
+
+  const messageEntry = entries.find((entry) => entry.label === form.messageField)
+  return {
+    messageLabel,
+    fields: entries
+      .filter((entry) => entry !== messageEntry)
+      .map((entry) => ({ label: entry.label, value: notBlank(entry.value) }))
+      .filter((entry) => entry.value),
+    message: notBlank(messageEntry?.value),
+  }
 }

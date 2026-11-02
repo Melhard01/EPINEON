@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AdminShell } from '../../admin/AdminShell.jsx'
 import { useMessages, countByForm, unreadByForm, STATUS_LABELS } from '../../admin/useMessages.js'
-import { FORMS, inferFormId, formLabelForRow } from '../../../api/_lib/forms.js'
+import { FORMS, inferFormId, formLabelForRow, parseSubmissionBody } from '../../../api/_lib/forms.js'
 
 const FILTERS = ['all', 'unread', 'read', 'replied', 'archived']
 
@@ -74,6 +74,10 @@ export default function AdminMessages() {
   }, [sectionMessages, query, filter])
 
   const selected = sectionMessages.find((m) => m.id === selectedId) ?? null
+  // The stored body is every answer flattened into one string. Split it so the
+  // box below holds only what the visitor actually wrote, and the rest of the
+  // answers join the field list above it.
+  const details = useMemo(() => (selected ? parseSubmissionBody(selected) : null), [selected])
   // A section with nothing in it is not in `sections` (the legacy bucket is
   // hidden while empty), so fall back to the registry rather than to a label
   // no administrator should ever be shown.
@@ -222,12 +226,24 @@ export default function AdminMessages() {
                   <div><dt>From</dt><dd>{selected.name}</dd></div>
                   <div><dt>Email</dt><dd><a href={`mailto:${selected.email}`}>{selected.email}</a></dd></div>
                   {selected.company ? <div><dt>Company</dt><dd>{selected.company}</dd></div> : null}
+                  {/* The form's other answers. The company one is skipped where
+                      it only repeats the column above. */}
+                  {details.fields
+                    .filter((field) => field.value.toLowerCase() !== String(selected.company ?? '').toLowerCase())
+                    .map((field) => (
+                      <div key={field.label}><dt>{field.label}</dt><dd>{field.value}</dd></div>
+                    ))}
                   <div><dt>Received</dt><dd>{new Date(selected.created_at).toLocaleString()}</dd></div>
                   <div><dt>Status</dt><dd>{STATUS_LABELS[selected.status]}</dd></div>
                 </dl>
 
-                {/* Rendered as text, never as HTML — React escapes it. */}
-                <p className="admin-message">{selected.message}</p>
+                <p className="admin-message__label">{details.messageLabel}</p>
+                {details.message ? (
+                  /* Rendered as text, never as HTML — React escapes it. */
+                  <p className="admin-message">{details.message}</p>
+                ) : (
+                  <p className="admin-message admin-message--empty">Left blank.</p>
+                )}
 
                 <div className="admin-detail__actions">
                   {['unread', 'read', 'replied', 'archived'].map((value) => (

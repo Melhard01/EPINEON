@@ -12,6 +12,7 @@ import {
   displayFormName,
   inferFormId,
   formLabelForRow,
+  parseSubmissionBody,
 } from '../api/_lib/forms.js'
 import { validateSubmission, LIMITS } from '../api/_lib/validation.js'
 
@@ -281,4 +282,104 @@ test('resolveFormId accepts an alias, so a renamed client still files correctly'
   assert.equal(resolveFormId('demo_request'), 'demo')
   assert.equal(resolveFormId('sales_inquiry'), 'sales')
   assert.equal(resolveFormId('partnership_inquiry'), 'partnerships')
+})
+
+// --------------------------------------------- taking a stored body apart
+
+const demoBody = [
+  '[Demo request]',
+  'Company or organisation: test',
+  'Role: —',
+  'Product of interest: EPIWELL',
+  'What would you like to see?: textvATVXUBAsxb',
+].join('\n')
+
+test('parse: the message box gets only what the visitor wrote', () => {
+  const { message } = parseSubmissionBody({ form_id: 'demo', message: demoBody })
+  assert.equal(message, 'textvATVXUBAsxb')
+})
+
+test('parse: the other answers come back as fields, blanks dropped', () => {
+  const { fields } = parseSubmissionBody({ form_id: 'demo', message: demoBody })
+  assert.deepEqual(fields, [
+    { label: 'Company or organisation', value: 'test' },
+    { label: 'Product of interest', value: 'EPIWELL' },
+  ])
+  assert.ok(!fields.some((f) => f.label === 'Role'), 'a blank answer should not take up a row')
+})
+
+test('parse: each form names its own message field', () => {
+  assert.equal(parseSubmissionBody({ form_id: 'demo', message: demoBody }).messageLabel, 'What would you like to see?')
+  assert.equal(parseSubmissionBody({ form_id: 'sales', message: '[Sales & Enterprise]\nMessage: hi' }).messageLabel, 'Message')
+  assert.equal(
+    parseSubmissionBody({ form_id: 'partnerships', message: '[Partnerships & Ventures]\nNature of partnership: joint research' }).messageLabel,
+    'Nature of partnership',
+  )
+  // Unknown shape still gets a sensible heading.
+  assert.equal(parseSubmissionBody({ form_id: 'contact', message: 'anything' }).messageLabel, 'Message')
+})
+
+test('parse: a colon inside the free text does not start a phantom field', () => {
+  const body = '[Sales & Enterprise]\nCompany: Acme\nMessage: Budget: unknown\nTimeline: Q1'
+  const { fields, message } = parseSubmissionBody({ form_id: 'sales', message: body })
+  assert.deepEqual(fields, [{ label: 'Company', value: 'Acme' }])
+  assert.equal(message, 'Budget: unknown\nTimeline: Q1', 'a multi-line answer keeps its line breaks')
+})
+
+test('parse: a body it cannot read is handed back whole, never swallowed', () => {
+  for (const row of [
+    { form_id: 'contact', message: 'A message that predates form_id.' },
+    { form_id: 'demo', message: 'written by hand, no labels at all' },
+    { form_id: 'demo', message: '[Demo request]\nfree text with no labels' },
+  ]) {
+    const { message } = parseSubmissionBody(row)
+    assert.ok(message.length > 0, `lost the body of ${JSON.stringify(row.message)}`)
+  }
+})
+
+test('parse: an empty message reports empty rather than an em dash', () => {
+  const body = '[Demo request]\nCompany or organisation: X\nWhat would you like to see?: —'
+  const parsed = parseSubmissionBody(body ? { form_id: 'demo', message: body } : null)
+  assert.equal(parsed.message, '')
+  assert.deepEqual(parsed.fields, [{ label: 'Company or organisation', value: 'X' }])
+})
+
+test('parse: survives a missing or malformed row', () => {
+  for (const row of [null, undefined, {}, { message: null }, 'nope']) {
+    const parsed = parseSubmissionBody(row)
+    assert.ok(Array.isArray(parsed.fields))
+    assert.equal(typeof parsed.message, 'string')
+    assert.ok(parsed.messageLabel)
+  }
+})
+
+/**
+ * Drift guard. The parser splits on the registry's field labels, so a label
+ * renamed on the form without being renamed here would silently stop matching
+ * and dump the whole body back into the message box.
+ */
+test('registry field labels match the Contact page, in order', () => {
+  const source = readFileSync(new URL('../src/pages/Contact.jsx', import.meta.url), 'utf8')
+  const stop = source.indexOf('const inputClass')
+  assert.ok(stop > 0, 'could not find the end of the form definitions')
+
+  for (const form of FORMS.filter((f) => !f.legacy)) {
+    const from = source.indexOf(`id: '${form.id}'`)
+    assert.ok(from > 0, `no tab with id '${form.id}' in Contact.jsx`)
+    // Up to the next tab's id, or the end of the definitions.
+    const nextIds = FORMS.filter((f) => !f.legacy)
+      .map((f) => source.indexOf(`id: '${f.id}'`))
+      .filter((i) => i > from)
+    const to = Math.min(stop, ...(nextIds.length ? nextIds : [stop]))
+
+    const labels = [...source.slice(from, to).matchAll(/name:\s*'([^']+)',\s*label:\s*'([^']+)'/g)]
+      .filter(([, name]) => !['name', 'email'].includes(name))
+      .map(([, , label]) => label)
+
+    assert.deepEqual(labels, form.fields, `field labels for "${form.id}" have drifted`)
+    assert.ok(
+      form.fields.includes(form.messageField),
+      `messageField "${form.messageField}" is not one of ${form.id}'s fields`,
+    )
+  }
 })
