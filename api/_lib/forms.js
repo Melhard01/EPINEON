@@ -49,6 +49,50 @@ export const FORMS = [
 
 const BY_ID = new Map(FORMS.map((form) => [form.id, form]))
 
+/** Registry name -> id, so a stored form_name or subject can be matched back. */
+const BY_NAME = new Map(FORMS.map((form) => [form.name.toLowerCase(), form.id]))
+
+/**
+ * Other spellings that mean one of our forms.
+ *
+ * Rows can carry these for three reasons: a different naming scheme was used
+ * before the registry existed, the backfill in
+ * 20261102000000_submission_forms.sql did not recognise a subject, or a row was
+ * written by something other than /api/contact. Aliasing them here means the
+ * dashboard counts and labels them correctly without a second migration.
+ */
+const ALIASES = new Map([
+  ['demo_request', 'demo'],
+  ['demo-request', 'demo'],
+  ['demorequest', 'demo'],
+  ['request_a_demo', 'demo'],
+  ['book_a_demo', 'demo'],
+  ['sales_inquiry', 'sales'],
+  ['sales-inquiry', 'sales'],
+  ['sales_enquiry', 'sales'],
+  ['salesinquiry', 'sales'],
+  ['enterprise', 'sales'],
+  ['sales_enterprise', 'sales'],
+  ['partnership_inquiry', 'partnerships'],
+  ['partnerships_inquiry', 'partnerships'],
+  ['partnership-inquiry', 'partnerships'],
+  ['partnership', 'partnerships'],
+  ['partner', 'partnerships'],
+  ['ventures', 'partnerships'],
+])
+
+const normalise = (value) => String(value ?? '').trim().toLowerCase()
+
+/** An id, an alias of one, or a registry name — otherwise null. */
+function canonicalise(value) {
+  const key = normalise(value)
+  if (!key) return null
+  if (BY_ID.has(key)) return key
+  if (ALIASES.has(key)) return ALIASES.get(key)
+  if (BY_NAME.has(key)) return BY_NAME.get(key)
+  return null
+}
+
 export const FORM_IDS = FORMS.map((form) => form.id)
 
 export function isKnownFormId(value) {
@@ -67,8 +111,7 @@ export function getForm(id) {
  * the legacy bucket rather than being lost.
  */
 export function resolveFormId(value) {
-  const id = typeof value === 'string' ? value.trim().toLowerCase() : ''
-  return BY_ID.has(id) ? id : LEGACY_FORM_ID
+  return canonicalise(value) ?? LEGACY_FORM_ID
 }
 
 /**
@@ -80,13 +123,52 @@ export function formNameFor(id) {
 }
 
 /**
- * Label for a row whose form_id is not in the registry — only reachable if a
- * row were written outside /api/contact. Falls back to the stored name, then
- * to the raw id, so an administrator always sees something truthful.
+ * Work out which form a stored row came from.
+ *
+ * form_id is believed first, but rows written before the registry — or before
+ * the backfill ran — may carry nothing useful there. The old client always put
+ * the tab's label in `subject` and opened the body with "[Label]", so those are
+ * reliable secondary evidence. Anything still unidentifiable lands in the
+ * legacy bucket, which is a real section, never a hole.
  */
+export function inferFormId(row) {
+  if (!row || typeof row !== 'object') return LEGACY_FORM_ID
+
+  const fromId = canonicalise(row.form_id)
+  // A stored 'contact' is the backfill default, not a positive identification,
+  // so keep looking before settling for it.
+  if (fromId && fromId !== LEGACY_FORM_ID) return fromId
+
+  const fromName = canonicalise(row.form_name)
+  if (fromName && fromName !== LEGACY_FORM_ID) return fromName
+
+  const fromSubject = canonicalise(row.subject)
+  if (fromSubject && fromSubject !== LEGACY_FORM_ID) return fromSubject
+
+  // "[Demo request]\nCompany: ..." — the prefix the old client composed.
+  const prefix = /^\s*\[([^\]]{1,60})\]/.exec(String(row.message ?? ''))
+  const fromBody = prefix ? canonicalise(prefix[1]) : null
+  if (fromBody && fromBody !== LEGACY_FORM_ID) return fromBody
+
+  return fromId ?? LEGACY_FORM_ID
+}
+
+/**
+ * What to show an administrator for a row. Never "Unknown form": an
+ * unrecognised id still has its stored name, and failing that it is the legacy
+ * bucket, which has a name of its own.
+ */
+export function formLabelForRow(row) {
+  const id = inferFormId(row)
+  if (id !== LEGACY_FORM_ID) return formNameFor(id)
+  const stored = typeof row?.form_name === 'string' ? row.form_name.trim() : ''
+  if (stored) return stored
+  const raw = typeof row?.form_id === 'string' ? row.form_id.trim() : ''
+  if (raw && raw !== LEGACY_FORM_ID) return raw
+  return formNameFor(LEGACY_FORM_ID)
+}
+
+/** Label for a bare id + stored name pair. Also never "Unknown form". */
 export function displayFormName(formId, storedName) {
-  const known = BY_ID.get(formId)
-  if (known) return known.name
-  const stored = typeof storedName === 'string' ? storedName.trim() : ''
-  return stored || formId || 'Unknown form'
+  return formLabelForRow({ form_id: formId, form_name: storedName })
 }

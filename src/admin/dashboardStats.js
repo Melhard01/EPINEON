@@ -9,7 +9,7 @@
  * state something honestly (a growth figure with no previous period to compare
  * against) the function returns null and the UI shows a dash.
  */
-import { LEGACY_FORM_ID } from '../../api/_lib/forms.js'
+import { inferFormId } from '../../api/_lib/forms.js'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 
@@ -27,7 +27,8 @@ function startOfDay(ts) {
   return d.getTime()
 }
 
-export const formIdOf = (message) => message.form_id || LEGACY_FORM_ID
+/** Single definition of which form a row belongs to, shared with the hook. */
+export const formIdOf = (message) => inferFormId(message)
 
 /**
  * One bucket per day for the last `days` days, newest last.

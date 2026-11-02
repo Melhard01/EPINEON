@@ -189,28 +189,6 @@
 }
 .admin-head__tools { display: flex; align-items: center; gap: 0.5rem; }
 
-.admin-headsearch { position: relative; display: flex; align-items: center; }
-.admin-headsearch__icon {
-  position: absolute;
-  left: 0.7rem;
-  width: 0.95rem;
-  height: 0.95rem;
-  color: var(--ad-muted);
-  pointer-events: none;
-}
-.admin-headsearch__input {
-  width: clamp(9rem, 22vw, 15rem);
-  min-height: 2.4rem;
-  padding: 0.4rem 0.7rem 0.4rem 2.1rem;
-  border: 1px solid var(--ad-line);
-  border-radius: 999px;
-  background: var(--ad-surface);
-  color: var(--ad-text);
-  font: inherit;
-  font-size: 0.88rem;
-}
-.admin-headsearch__input:focus-visible { outline: 2px solid rgba(201, 162, 39, 0.6); outline-offset: 1px; }
-
 .admin-iconbtn {
   position: relative;
   display: grid;
@@ -553,6 +531,15 @@
   font-weight: 600;
   text-align: center;
 }
+/* Only where something is actually waiting. */
+.admin-section__flag {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--ad-gold);
+  flex: none;
+}
+
 .admin-section.is-active .admin-section__count {
   border-color: rgba(201, 162, 39, 0.45);
   color: var(--ad-gold);

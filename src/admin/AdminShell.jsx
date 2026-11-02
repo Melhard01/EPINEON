@@ -1,6 +1,5 @@
-import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Inbox, Users, LogOut, Search } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { LayoutDashboard, Inbox, Users, LogOut } from 'lucide-react'
 import './admin.css'
 import epineonWordmarkLogo from '../assets/epineon_logo_wordmark.png'
 import { Seo } from '../components/Seo'
@@ -31,15 +30,7 @@ const isActive = (pathname, to) =>
 export function AdminShell({ title, heading, eyebrow, children, actions }) {
   const { email, signOut, status } = useAdminAuth()
   const { pathname } = useLocation()
-  const navigate = useNavigate()
-  const [query, setQuery] = useState('')
   const signedIn = status === 'authorised'
-
-  const onSearch = (event) => {
-    event.preventDefault()
-    const q = query.trim()
-    navigate(q ? `/admin/messages?q=${encodeURIComponent(q)}` : '/admin/messages')
-  }
 
   return (
     <div className="admin-root">
@@ -104,22 +95,9 @@ export function AdminShell({ title, heading, eyebrow, children, actions }) {
                 {eyebrow ? <p className="admin-head__eyebrow">{eyebrow}</p> : null}
                 <h1 className="admin-h1">{heading}</h1>
               </div>
-              <div className="admin-head__tools">
-                {signedIn ? (
-                  <form className="admin-headsearch" onSubmit={onSearch} role="search">
-                    <Search className="admin-headsearch__icon" aria-hidden />
-                    <input
-                      className="admin-headsearch__input"
-                      type="search"
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search submissions"
-                      aria-label="Search submissions"
-                    />
-                  </form>
-                ) : null}
-                {actions}
-              </div>
+              {/* No search box here: Messages has its own, directly under the
+                  form tabs, and two on one screen was one too many. */}
+              <div className="admin-head__tools">{actions}</div>
             </header>
 
             <main className="admin-main">{children}</main>

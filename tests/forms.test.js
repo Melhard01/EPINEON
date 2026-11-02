@@ -10,6 +10,8 @@ import {
   resolveFormId,
   formNameFor,
   displayFormName,
+  inferFormId,
+  formLabelForRow,
 } from '../api/_lib/forms.js'
 import { validateSubmission, LIMITS } from '../api/_lib/validation.js'
 
@@ -98,7 +100,9 @@ test('displayFormName: never hides a row with an unregistered id', () => {
   assert.equal(displayFormName('demo', 'Ignored'), 'Demo request') // registry wins
   assert.equal(displayFormName('mystery', 'Stored name'), 'Stored name')
   assert.equal(displayFormName('mystery', ''), 'mystery')
-  assert.equal(displayFormName('', ''), 'Unknown form')
+  // Was 'Unknown form'. An administrator should never be shown that: with
+  // nothing to go on the row belongs to the legacy bucket, which has a name.
+  assert.equal(displayFormName('', ''), 'Contact')
 })
 
 // ------------------------------------------------------- validateSubmission
@@ -196,4 +200,85 @@ test('end to end: a forged form id cannot choose its own section', async () => {
 test('end to end: the stored row carries no client-controlled form_name key', async () => {
   const row = await submit({ formId: 'sales', form_name: 'Spoofed' })
   assert.equal(row.form_name, 'Sales & Enterprise')
+})
+
+// ------------------------------------------------- inference over real rows
+
+test('inferFormId: a correct form_id is believed', () => {
+  assert.equal(inferFormId({ form_id: 'demo' }), 'demo')
+  assert.equal(inferFormId({ form_id: 'sales' }), 'sales')
+  assert.equal(inferFormId({ form_id: 'partnerships' }), 'partnerships')
+})
+
+test('inferFormId: other spellings of the same form are aliased, not lost', () => {
+  for (const [stored, expected] of [
+    ['demo_request', 'demo'],
+    ['demo-request', 'demo'],
+    ['book_a_demo', 'demo'],
+    ['sales_inquiry', 'sales'],
+    ['sales_enterprise', 'sales'],
+    ['enterprise', 'sales'],
+    ['partnership_inquiry', 'partnerships'],
+    ['partnership', 'partnerships'],
+    ['ventures', 'partnerships'],
+    ['  DEMO_REQUEST  ', 'demo'],
+  ]) {
+    assert.equal(inferFormId({ form_id: stored }), expected, `${stored} should map to ${expected}`)
+  }
+})
+
+/**
+ * The case behind the form tabs all reading 0: rows written before form_id
+ * existed, or whose backfill did not match, sit on the 'contact' default. The
+ * old client always put the tab label in `subject` and opened the body with
+ * "[Label]", so the form is still recoverable.
+ */
+test('inferFormId: falls back to the subject when form_id is the backfill default', () => {
+  assert.equal(inferFormId({ form_id: 'contact', subject: 'Demo request' }), 'demo')
+  assert.equal(inferFormId({ form_id: 'contact', subject: 'Sales & Enterprise' }), 'sales')
+  assert.equal(inferFormId({ form_id: null, subject: 'Partnerships & Ventures' }), 'partnerships')
+  assert.equal(inferFormId({ subject: 'partnerships & ventures' }), 'partnerships')
+})
+
+test('inferFormId: falls back to the [Label] prefix in the message body', () => {
+  assert.equal(
+    inferFormId({ form_id: null, subject: '', message: '[Sales & Enterprise]\nCompany: Acme' }),
+    'sales',
+  )
+  assert.equal(inferFormId({ message: '[Demo request]\nCompany or organisation: Acme' }), 'demo')
+})
+
+test('inferFormId: a genuinely unidentifiable row lands in the legacy bucket', () => {
+  assert.equal(inferFormId({ form_id: null, subject: 'General enquiry' }), LEGACY_FORM_ID)
+  assert.equal(inferFormId({}), LEGACY_FORM_ID)
+  assert.equal(inferFormId(null), LEGACY_FORM_ID)
+  assert.equal(inferFormId('not an object'), LEGACY_FORM_ID)
+})
+
+test('formLabelForRow never says "Unknown form"', () => {
+  const rows = [
+    {}, null, undefined, { form_id: '' }, { form_id: null, form_name: null },
+    { form_id: 'contact' }, { form_id: 'mystery' }, { form_id: 'mystery', form_name: 'Some Old Form' },
+    { form_id: null, subject: 'Demo request' }, { form_id: 'demo_request' },
+  ]
+  for (const row of rows) {
+    const label = formLabelForRow(row)
+    assert.ok(label && label.trim(), `empty label for ${JSON.stringify(row)}`)
+    assert.notEqual(label, 'Unknown form', `"Unknown form" for ${JSON.stringify(row)}`)
+  }
+  assert.equal(formLabelForRow({ form_id: 'demo_request' }), 'Demo request')
+  assert.equal(formLabelForRow({ form_id: 'mystery', form_name: 'Some Old Form' }), 'Some Old Form')
+  assert.equal(formLabelForRow({}), 'Contact')
+})
+
+test('displayFormName keeps working and also never says "Unknown form"', () => {
+  assert.equal(displayFormName('demo', 'ignored'), 'Demo request')
+  assert.equal(displayFormName('mystery', 'Stored'), 'Stored')
+  assert.equal(displayFormName(undefined, undefined), 'Contact')
+})
+
+test('resolveFormId accepts an alias, so a renamed client still files correctly', () => {
+  assert.equal(resolveFormId('demo_request'), 'demo')
+  assert.equal(resolveFormId('sales_inquiry'), 'sales')
+  assert.equal(resolveFormId('partnership_inquiry'), 'partnerships')
 })

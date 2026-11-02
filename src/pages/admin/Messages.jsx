@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { AdminShell } from '../../admin/AdminShell.jsx'
-import { useMessages, countByForm, STATUS_LABELS } from '../../admin/useMessages.js'
-import { FORMS, LEGACY_FORM_ID, displayFormName } from '../../../api/_lib/forms.js'
+import { useMessages, countByForm, unreadByForm, STATUS_LABELS } from '../../admin/useMessages.js'
+import { FORMS, inferFormId, formLabelForRow } from '../../../api/_lib/forms.js'
 
 const FILTERS = ['all', 'unread', 'read', 'replied', 'archived']
 
@@ -19,17 +19,19 @@ const FILTERS = ['all', 'unread', 'read', 'replied', 'archived']
 function useSections(messages) {
   return useMemo(() => {
     const counts = countByForm(messages)
+    const unread = unreadByForm(messages)
     const known = FORMS.filter((form) => !form.legacy || (counts.get(form.id) ?? 0) > 0)
     const unregistered = [...counts.keys()]
       .filter((id) => !FORMS.some((form) => form.id === id))
       .map((id) => ({
         id,
-        name: displayFormName(id, messages.find((m) => m.form_id === id)?.form_name),
+        name: formLabelForRow(messages.find((m) => inferFormId(m) === id)),
       }))
 
     return [...known, ...unregistered].map((form) => ({
       ...form,
       count: counts.get(form.id) ?? 0,
+      unread: unread.get(form.id) ?? 0,
     }))
   }, [messages])
 }
@@ -56,7 +58,7 @@ export default function AdminMessages() {
   // Rows belonging to this section. Categorisation is entirely automatic —
   // form_id is stamped at insert time, so there is nothing here to move by hand.
   const sectionMessages = useMemo(
-    () => (formId ? messages.filter((m) => (m.form_id || LEGACY_FORM_ID) === formId) : messages),
+    () => (formId ? messages.filter((m) => inferFormId(m) === formId) : messages),
     [messages, formId],
   )
 
@@ -65,14 +67,17 @@ export default function AdminMessages() {
     return sectionMessages.filter((m) => {
       if (filter !== 'all' && m.status !== filter) return false
       if (!needle) return true
-      return [m.name, m.email, m.company, m.subject, m.message, m.form_name].some((field) =>
+      return [m.name, m.email, m.company, m.subject, m.message, formLabelForRow(m)].some((field) =>
         String(field || '').toLowerCase().includes(needle),
       )
     })
   }, [sectionMessages, query, filter])
 
   const selected = sectionMessages.find((m) => m.id === selectedId) ?? null
-  const heading = formId ? (active?.name ?? 'Unknown form') : 'Messages'
+  // A section with nothing in it is not in `sections` (the legacy bucket is
+  // hidden while empty), so fall back to the registry rather than to a label
+  // no administrator should ever be shown.
+  const heading = formId ? (active?.name ?? formLabelForRow({ form_id: formId })) : 'Messages'
 
   const run = async (fn) => {
     setBusy(true)
@@ -118,7 +123,12 @@ export default function AdminMessages() {
             to={`/admin/messages/${section.id}`}
             className={`admin-section${formId === section.id ? ' is-active' : ''}`}
             aria-current={formId === section.id ? 'page' : undefined}
+            title={section.unread > 0 ? `${section.unread} unread` : undefined}
           >
+            {/* A dot only where something is actually waiting. It is driven by
+                the same rows as the list, so marking a message read clears it
+                immediately. */}
+            {section.unread > 0 ? <span className="admin-section__flag" aria-hidden /> : null}
             {section.name}
             <span className="admin-section__count">{section.count}</span>
           </Link>
@@ -192,7 +202,7 @@ export default function AdminMessages() {
                   <span className="admin-list__date">
                     {/* Which form it came from, only where it is not implied by the section. */}
                     {!formId ? (
-                      <span className="admin-tag">{displayFormName(m.form_id, m.form_name)}</span>
+                      <span className="admin-tag">{formLabelForRow(m)}</span>
                     ) : null}
                     {new Date(m.created_at).toLocaleString()}
                   </span>
@@ -208,7 +218,7 @@ export default function AdminMessages() {
               <>
                 <h2 className="admin-h2">{selected.subject || 'No subject'}</h2>
                 <dl className="admin-meta">
-                  <div><dt>Form</dt><dd>{displayFormName(selected.form_id, selected.form_name)}</dd></div>
+                  <div><dt>Form</dt><dd>{formLabelForRow(selected)}</dd></div>
                   <div><dt>From</dt><dd>{selected.name}</dd></div>
                   <div><dt>Email</dt><dd><a href={`mailto:${selected.email}`}>{selected.email}</a></dd></div>
                   {selected.company ? <div><dt>Company</dt><dd>{selected.company}</dd></div> : null}

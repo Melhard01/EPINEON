@@ -8,7 +8,7 @@ import { useTeam } from '../../admin/useTeam.js'
 import { adminDisplayName, adminInitial } from '../../admin/identity.js'
 import { useAdminAuth } from '../../admin/useAdminAuth.js'
 import { bucketByDay, growth, formSummary, formIdOf, relativeTime } from '../../admin/dashboardStats.js'
-import { FORMS, displayFormName } from '../../../api/_lib/forms.js'
+import { FORMS, formLabelForRow } from '../../../api/_lib/forms.js'
 
 const WINDOW_DAYS = 14
 
@@ -237,7 +237,7 @@ export default function AdminDashboard() {
                           <span className="admin-feed__when">{relativeTime(m.created_at)}</span>
                         </span>
                         <span className="admin-feed__meta">
-                          <span className="admin-tag">{displayFormName(m.form_id, m.form_name)}</span>
+                          <span className="admin-tag">{formLabelForRow(m)}</span>
                           <span className={`admin-pill admin-pill--${m.status}`}>{STATUS_LABELS[m.status]}</span>
                         </span>
                       </span>
