@@ -17,8 +17,12 @@ export function startFakeSupabase({
   invitations = [],
   authUsers = [],
   rateLimitAllows = true,
+  // Tables to answer as if the migration that creates them never ran, with the
+  // shape PostgREST actually returns. This is what an unapplied migration looks
+  // like to a handler.
+  missingTables = [],
 } = {}) {
-  const state = { users, admins, invitations, authUsers, rateLimitAllows, inserted: [], calls: [] }
+  const state = { users, admins, invitations, authUsers, rateLimitAllows, missingTables, inserted: [], calls: [] }
 
   /** Translate one PostgREST filter value, e.g. "eq.abc" or "is.null". */
   const matches = (row, column, expression) => {
@@ -85,6 +89,16 @@ export function startFakeSupabase({
       })
     })
     state.calls.push({ method: req.method, path: url.pathname })
+
+    const missing = state.missingTables.find((t) => url.pathname === `/rest/v1/${t}`)
+    if (missing) {
+      return send(404, {
+        code: '42P01',
+        message: `relation "public.${missing}" does not exist`,
+        details: null,
+        hint: null,
+      })
+    }
 
     // --- Auth: resolve a bearer token to a user -----------------------------
     if (url.pathname === '/auth/v1/user') {

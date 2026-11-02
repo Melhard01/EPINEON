@@ -39,11 +39,34 @@ import {
   readJsonBody,
   clientIp,
   json,
+  errorRef,
+  logError,
+  setupError,
 } from '../_lib/http.js'
 
 const ALLOWED = ['GET', 'POST']
 
+/** Nothing here may throw past this point — see api/admin/team.js. */
 export default async function handler(req, res) {
+  const ref = errorRef()
+  try {
+    return await handleSignup(req, res)
+  } catch (err) {
+    logError('signup:unhandled', err, ref)
+    if (res.headersSent) return undefined
+    if (/configuration is missing/i.test(String(err?.message ?? ''))) {
+      return setupError(
+        res,
+        'The server is missing its Supabase configuration. Set SUPABASE_URL and '
+          + 'SUPABASE_SERVICE_ROLE_KEY in the deployment environment.',
+        ref,
+      )
+    }
+    return serverError(res, ref)
+  }
+}
+
+async function handleSignup(req, res) {
   if (!ALLOWED.includes(req.method)) return methodNotAllowed(res, ALLOWED)
 
   // Token guessing is the attack this endpoint invites, and it is IP-bound.

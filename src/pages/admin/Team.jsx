@@ -16,6 +16,9 @@ export default function AdminTeam() {
   const [members, setMembers] = useState([])
   const [invitations, setInvitations] = useState([])
   const [state, setState] = useState('loading')
+  // Set when the server reports that admin_invitations is missing. Inviting
+  // would fail, so say so before anyone presses the button.
+  const [schemaIncomplete, setSchemaIncomplete] = useState(false)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
   const [invite, setInvite] = useState('')
@@ -33,6 +36,7 @@ export default function AdminTeam() {
       const data = await adminFetch('/api/admin/team')
       setMembers(data.members ?? [])
       setInvitations(data.invitations ?? [])
+      setSchemaIncomplete(Boolean(data.schemaIncomplete))
       setState('ready')
     } catch (err) {
       setError(err.message)
@@ -156,6 +160,14 @@ export default function AdminTeam() {
             ))}
           </div>
         </>
+      ) : null}
+
+      {schemaIncomplete ? (
+        <div className="admin-alert admin-alert--error" role="alert">
+          This project is missing the <code>admin_invitations</code> table, so invitations cannot be
+          issued. Apply the migrations in <code>supabase/migrations</code> — in filename order — and
+          reload.
+        </div>
       ) : null}
 
       <section className="admin-card">

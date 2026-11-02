@@ -176,3 +176,65 @@ test('error responses never leak internals', async () => {
     assert.ok(!text.includes(leak), `response leaked ${leak}`)
   }
 })
+
+// ============================================================================
+// Failure reporting — what an operator is told when the database is wrong.
+// ============================================================================
+
+/**
+ * The reported production symptom: the member list loads but sending an
+ * invitation returns "Something went wrong". admin_users exists;
+ * admin_invitations does not, because its migration was never applied.
+ *
+ * The fake's state is toggled rather than a second server started: the
+ * service-role client is cached at module scope, so a new server would never
+ * be the one the handler talks to.
+ */
+test('team: a missing table is named rather than hidden behind a generic 500', async () => {
+  fake.state.admins = [{ id: 'row-1', email: 'admin@epineon.ai', status: 'active', user_id: 'uuid-admin' }]
+  fake.state.missingTables = ['admin_invitations']
+  try {
+    // GET still succeeds — which is exactly why this went unnoticed. The
+    // invitation query is logged and skipped, not treated as fatal.
+    const listRes = mockRes()
+    await teamHandler(mockReq({ method: 'GET', headers: { authorization: `Bearer ${ADMIN_TOKEN}` } }), listRes)
+    assert.equal(listRes.statusCode, 200)
+    assert.ok(Array.isArray(listRes.payload.members))
+
+    // POST cannot, and must say why.
+    const res = mockRes()
+    await teamHandler(
+      mockReq({
+        method: 'POST',
+        headers: { authorization: `Bearer ${ADMIN_TOKEN}` },
+        body: { email: 'new.person@epineon.ai' },
+      }),
+      res,
+    )
+    assert.equal(res.statusCode, 500)
+    assert.equal(res.payload.ok, false)
+    assert.match(res.payload.error, /migration/i, 'the operator should be told the schema is incomplete')
+    assert.doesNotMatch(res.payload.error, /^Something went wrong/, 'the generic message hides the cause')
+    assert.ok(res.payload.ref, 'a reference is needed to find the matching log line')
+  } finally {
+    fake.state.missingTables = []
+    fake.state.admins = []
+  }
+})
+
+test('team: an unexpected throw still answers with JSON rather than crashing', async () => {
+  const res = mockRes()
+  // A request object that blows up when the handler reads from it. Before the
+  // top-level guard this rejected, and the platform returned its own 500 with
+  // nothing in a log of ours.
+  const hostile = new Proxy(mockReq({ method: 'GET' }), {
+    get(target, prop) {
+      if (prop === 'headers') throw new Error('boom: simulated infrastructure failure')
+      return target[prop]
+    },
+  })
+  await teamHandler(hostile, res)
+  assert.equal(res.statusCode, 500)
+  assert.equal(res.payload.ok, false)
+  assert.ok(res.payload.ref)
+})

@@ -8,7 +8,7 @@
 import { validateSubmission, LIMITS } from './_lib/validation.js'
 import { withinRateLimit, hashIdentifier } from './_lib/rateLimit.js'
 import { getSupabaseAdmin } from './_lib/supabaseAdmin.js'
-import { ok, badRequest, tooMany, serverError, methodNotAllowed, readJsonBody, clientIp, json } from './_lib/http.js'
+import { ok, badRequest, tooMany, serverError, methodNotAllowed, readJsonBody, clientIp, json, logError } from './_lib/http.js'
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return methodNotAllowed(res, ['POST'])
@@ -49,12 +49,15 @@ export default async function handler(req, res) {
     })
 
     if (error) {
-      // Log the failure, never the submitter's details.
-      console.error('[contact] insert failed:', error.message)
+      // Log the failure, never the submitter's details. logError prints the
+      // PostgREST code and hint too: a missing column shows as 42703/PGRST204
+      // rather than an opaque message.
+      logError('contact:insert', error)
       return serverError(res)
     }
   } catch (err) {
-    console.error('[contact] unavailable:', err.message)
+    // getSupabaseAdmin() throws here when the service-role key is unset.
+    logError('contact:unavailable', err)
     return serverError(res)
   }
 
