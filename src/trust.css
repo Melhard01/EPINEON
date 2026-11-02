@@ -1,0 +1,1093 @@
+/* ============================================================================
+   Trust Center — page-scoped visual system (imported by src/pages/Trust.jsx only).
+
+   Every selector below is nested under `.trust-page`, the wrapper Trust.jsx puts
+   around its sections. Nothing here can reach another route, the same way
+   src/legal-doc.css only ever applies inside LegalDocLayout.
+
+   TYPOGRAPHY IS DELIBERATELY ABSENT. This file declares no font-family,
+   font-size, font-weight, letter-spacing, text-transform or font-style — type
+   comes entirely from the existing .epineon-* / Tailwind classes in the markup,
+   so the page keeps the site's typographic identity exactly. Hierarchy here is
+   built from layout, colour, spacing and motion instead.
+
+   Remotion vocabulary, expressed in CSS:
+     spring()               -> cubic-bezier(.16, 1, .3, 1) (var(--trust-spring))
+     <Sequence from={n}>    -> --i on an element, multiplied by --trust-stagger
+     interpolate() on frames-> transitions / keyframes on transform + opacity
+     useCurrentFrame() loops-> ambient keyframes (orb drift, radar sweep, flow)
+   Reveals are driven by the shared IntersectionObserver in PageShell, which adds
+   `.page-section--active` to the <section> and `.visible` to .scroll-animate
+   descendants. Entry animations are gated on `.page-section--active` so they
+   start when their own section arrives, not on page load.
+   ============================================================================ */
+
+.trust-page {
+  --trust-gold: #c9a227;
+  --trust-gold-soft: #d4b85c;
+  --trust-gold-line: rgba(201, 162, 39, 0.42);
+  --trust-hairline: rgba(255, 255, 255, 0.09);
+  --trust-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --trust-stagger: 80ms;
+  /* Matches .why-item-icon's clamp so the rails can find a chip's centre. */
+  --trust-chip: clamp(2.5rem, 6vw, 2.75rem);
+  position: relative;
+}
+
+/* ---------------------------------------------------------------- section frame */
+
+.trust-page .trust-section {
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.trust-page .trust-section__inner {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------------------------------------------------------------- ambience
+
+   Each section carries its own grid + orbs so the page has depth all the way
+   down. The layer is feathered top and bottom: without the mask the orbs get
+   clipped at the section box and the page reads as a stack of hard-edged bands
+   instead of one continuous field. The hero opts out — its wash starts at y=0. */
+
+.trust-page .trust-ambience {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 15%, #000 85%, transparent 100%);
+}
+
+.trust-page .trust-ambience__grid {
+  position: absolute;
+  inset: -2rem;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 68px 68px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 0%, transparent 78%);
+}
+
+.trust-page .trust-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(74px);
+  will-change: transform;
+}
+
+.trust-page .trust-orb--a {
+  left: -14%;
+  top: -10%;
+  width: min(90vw, 38rem);
+  height: min(90vw, 38rem);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(212, 175, 55, 0.34) 0%,
+    rgba(146, 112, 24, 0.13) 46%,
+    transparent 72%
+  );
+  animation: trustDriftA 27s ease-in-out infinite alternate;
+}
+
+.trust-page .trust-orb--b {
+  right: -12%;
+  bottom: -18%;
+  width: min(84vw, 35rem);
+  height: min(84vw, 35rem);
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(201, 162, 39, 0.28) 0%,
+    rgba(201, 162, 39, 0.1) 44%,
+    transparent 72%
+  );
+  animation: trustDriftB 33s ease-in-out infinite alternate;
+}
+
+/* Per-section orb placement — each block gets its own light, so the sections
+   read as different rooms rather than one repeated backdrop. */
+.trust-page .trust-compliance .trust-orb--a {
+  left: auto;
+  right: -16%;
+  top: -22%;
+}
+
+.trust-page .trust-compliance .trust-orb--b {
+  right: auto;
+  left: -18%;
+  bottom: -20%;
+}
+
+.trust-page .trust-privacy .trust-orb--a {
+  left: -22%;
+  top: 10%;
+}
+
+.trust-page .trust-privacy .trust-orb--b {
+  right: -8%;
+  bottom: -10%;
+  opacity: 0.7;
+}
+
+.trust-page .trust-ethics .trust-orb--a {
+  left: 20%;
+  top: -26%;
+  opacity: 0.8;
+}
+
+.trust-page .trust-ethics .trust-orb--b {
+  right: 12%;
+  bottom: -24%;
+}
+
+@keyframes trustDriftA {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 5%, 0) scale(1.07);
+  }
+}
+
+@keyframes trustDriftB {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  to {
+    transform: translate3d(-5%, -4%, 0) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------- base reveal
+
+   The shared .scroll-animate enters from the left (translateX(-50px)). On this
+   page everything rises instead, with a spring, and each element can place
+   itself in the sequence with --i. */
+
+.trust-page .scroll-animate {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.85s var(--trust-spring),
+    transform 0.85s var(--trust-spring);
+  transition-delay: calc(var(--i, 0) * var(--trust-stagger));
+}
+
+.trust-page .scroll-animate.visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ---------------------------------------------------------------- seam
+
+   The connective tissue between sections: a hairline that draws downward as the
+   next section arrives, with a light travelling down it and a node where it
+   lands. This is what makes the scroll feel like one continuous story rather
+   than five stacked blocks. */
+
+.trust-page .trust-seam {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  width: 1px;
+  height: clamp(2.25rem, 6vw, 4.5rem);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.trust-page .trust-seam__line {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent, var(--trust-gold-line) 55%, var(--trust-gold));
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+
+.trust-page .trust-section.page-section--active .trust-seam__line {
+  animation: trustSeamDraw 1s var(--trust-spring) both;
+}
+
+/* Travelling light. The glow block is a percentage of its track, so a
+   translateY in multiples of its own height walks it the full length — which
+   keeps the whole thing on the compositor. */
+.trust-page .trust-seam__pulse {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.trust-page .trust-seam__pulse::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 34%;
+  background: linear-gradient(to bottom, transparent, rgba(255, 232, 160, 0.95));
+}
+
+.trust-page .trust-section.page-section--active .trust-seam__pulse {
+  opacity: 1;
+  animation: trustSeamPulseIn 0.4s linear both;
+  animation-delay: 0.75s;
+}
+
+.trust-page .trust-section.page-section--active .trust-seam__pulse::before {
+  animation: trustSeamPulse 2.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: 0.75s;
+}
+
+.trust-page .trust-seam__node {
+  position: absolute;
+  left: 50%;
+  bottom: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--trust-gold);
+  box-shadow: 0 0 10px 2px rgba(201, 162, 39, 0.5);
+  transform: translate(-50%, 0) scale(0);
+}
+
+.trust-page .trust-section.page-section--active .trust-seam__node {
+  animation: trustNodePop 0.7s var(--trust-spring) both;
+  animation-delay: 0.6s;
+}
+
+@keyframes trustSeamDraw {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes trustSeamPulseIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes trustSeamPulse {
+  0% {
+    transform: translateY(-110%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(210%);
+    opacity: 0;
+  }
+}
+
+@keyframes trustNodePop {
+  from {
+    transform: translate(-50%, 0) scale(0);
+  }
+  to {
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* ============================================================================
+   1 — HERO. Cinematic entrance: a gold wash lifts, a perspective grid settles,
+   concentric perimeter rings expand outward, a slow radar sweep turns behind it
+   all, then the headline rises word by word. Layers arrive in sequence, the way
+   a Remotion composition stacks <Sequence> children.
+   ============================================================================ */
+
+.trust-page .trust-hero {
+  padding-top: clamp(7.5rem, 14vw, 11rem);
+  padding-bottom: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.trust-page .trust-hero__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Same gold ramp as the homepage hero at roughly two-thirds strength, so the
+   two entrances read as one brand rather than two gradients. */
+.trust-page .trust-hero__glow {
+  position: absolute;
+  left: 50%;
+  top: -40%;
+  width: min(230%, 145rem);
+  height: 150%;
+  transform: translateX(-50%);
+  background:
+    radial-gradient(
+      ellipse 92% 86% at 50% 8%,
+      rgba(240, 190, 40, 0.5) 0%,
+      rgba(214, 168, 42, 0.34) 26%,
+      rgba(186, 146, 38, 0.2) 48%,
+      rgba(92, 70, 16, 0.08) 70%,
+      transparent 92%
+    ),
+    radial-gradient(
+      ellipse 140% 66% at 50% 0%,
+      rgba(255, 215, 95, 0.2) 0%,
+      rgba(201, 162, 39, 0.07) 44%,
+      transparent 78%
+    );
+  filter: blur(2px);
+  opacity: 0;
+}
+
+.trust-page .trust-hero.page-section--active .trust-hero__glow {
+  animation: trustFadeIn 1.5s ease-out both;
+}
+
+.trust-page .trust-hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 62% 70% at 50% 28%, #000 0%, transparent 76%);
+  -webkit-mask-image: radial-gradient(ellipse 62% 70% at 50% 28%, #000 0%, transparent 76%);
+  opacity: 0;
+}
+
+.trust-page .trust-hero.page-section--active .trust-hero__grid {
+  animation: trustGridSettle 1.8s var(--trust-spring) both;
+  animation-delay: 0.1s;
+}
+
+.trust-page .trust-hero__content {
+  position: relative;
+}
+
+/* Eyebrow keeps its original type classes; the hairlines beside it are
+   pseudo-elements, so no text is added. */
+.trust-page .trust-hero__eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 1.6vw, 1rem);
+}
+
+.trust-page .trust-hero__eyebrow::before,
+.trust-page .trust-hero__eyebrow::after {
+  content: '';
+  display: block;
+  width: clamp(1.5rem, 6vw, 3.25rem);
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--trust-gold-line));
+}
+
+.trust-page .trust-hero__eyebrow::after {
+  background: linear-gradient(to left, transparent, var(--trust-gold-line));
+}
+
+/* The reveal clips descenders while the words are mid-rise; the padding gives
+   them room and the negative margin keeps the layout box where it was. */
+.trust-page .trust-hero__title {
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
+}
+
+.trust-page .trust-hero__title span {
+  white-space: pre;
+}
+
+/* .epineon-body-large pins itself to text-align: left, which beats Tailwind's
+   .text-center on the centred hero wrapper (same specificity, later in source). */
+.trust-page .trust-hero__lead {
+  text-align: center;
+}
+
+.trust-page .trust-hero__rule {
+  display: block;
+  width: clamp(3.5rem, 9vw, 6rem);
+  margin: clamp(1.6rem, 3.5vw, 2.25rem) auto;
+  height: 1px;
+  border: 0;
+  background: linear-gradient(to right, transparent, var(--trust-gold), transparent);
+  transform-origin: center;
+}
+
+@keyframes trustFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes trustGridSettle {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ============================================================================
+   2 — SECURITY POSTURE. Asymmetric: copy on the wide left behind a gold
+   boundary rule that wipes downward, and a layered-perimeter figure on the
+   right — nested rings drawing one after another around a closing lock, with a
+   satellite held inside the outer boundary. That is the paragraph's own claim
+   (data kept inside customer-controlled boundaries, encrypted at rest and in
+   transit) drawn rather than decorated.
+   ============================================================================ */
+
+.trust-page .trust-split {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 3.5rem);
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .trust-page .trust-posture__split {
+    grid-template-columns: minmax(0, 1fr) clamp(15rem, 25vw, 20rem);
+    gap: clamp(3rem, 6vw, 5rem);
+  }
+
+  /* Data privacy carries no figure, so the block itself is offset to the right
+     — the posture copy sits left, this one sits right, and the page keeps
+     alternating without an empty column standing in for the old diagram. */
+  .trust-page .trust-privacy__offset {
+    width: min(100%, 46rem);
+    margin-left: auto;
+  }
+}
+
+/* The boundary rule: a gold spine down the left of the copy that fills on
+   arrival. No card, no glass — the copy sits on the page itself here, which is
+   what keeps this section visually distinct from the ledger further down. */
+.trust-page .trust-copy {
+  position: relative;
+  padding-left: clamp(1.25rem, 3vw, 2rem);
+}
+
+.trust-page .trust-copy::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.2rem;
+  bottom: 0.2rem;
+  width: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, var(--trust-gold), rgba(201, 162, 39, 0.18) 72%, transparent);
+  transform: scaleY(0);
+  transform-origin: top center;
+}
+
+.trust-page .trust-section.page-section--active .trust-copy::before {
+  animation: trustSpineWipe 1.3s var(--trust-spring) both;
+  animation-delay: 0.2s;
+}
+
+@keyframes trustSpineWipe {
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Links keep their gold; the underline grows out of the baseline on hover
+   instead of snapping on, and it is visible at rest so the link still reads as
+   a link without hovering. */
+.trust-page .trust-link {
+  background-image: linear-gradient(to right, var(--trust-gold), var(--trust-gold));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
+  padding-bottom: 0.1em;
+  transition: background-size 0.35s var(--trust-spring), color 0.35s ease;
+}
+
+.trust-page .trust-link:hover,
+.trust-page .trust-link:focus-visible {
+  color: var(--trust-gold-soft);
+  background-size: 100% 2px;
+}
+
+/* ---- the perimeter figure ---- */
+
+.trust-page .trust-perimeter {
+  position: relative;
+  width: 100%;
+  max-width: 20rem;
+  margin-inline: auto;
+  aspect-ratio: 1;
+}
+
+.trust-page .trust-perimeter__rings {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* pathLength="1" on the circles normalises the dash maths: dasharray 1 and
+   dashoffset 1 is a fully retracted stroke whatever the radius. */
+.trust-page .trust-perimeter__ring {
+  fill: none;
+  stroke: var(--trust-gold);
+  stroke-width: 1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: calc(0.5 - var(--i) * 0.1);
+}
+
+.trust-page .trust-section.page-section--active .trust-perimeter__ring {
+  animation: trustDraw 1.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: calc(0.25s + var(--i) * 0.18s);
+}
+
+.trust-page .trust-perimeter__halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 46%;
+  height: 46%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(201, 162, 39, 0.3) 0%, transparent 70%);
+  filter: blur(14px);
+  opacity: 0;
+}
+
+.trust-page .trust-section.page-section--active .trust-perimeter__halo {
+  animation: trustHaloBreathe 5.5s ease-in-out 0.9s infinite;
+}
+
+/* Satellite held inside the outer boundary — data that never leaves. */
+.trust-page .trust-perimeter__orbit {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: transform;
+}
+
+.trust-page .trust-section.page-section--active .trust-perimeter__orbit {
+  animation:
+    trustFadeIn 1.2s ease-out 1.1s both,
+    trustSweepSpin2 17s linear 1.1s infinite;
+}
+
+.trust-page .trust-perimeter__sat {
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: var(--trust-gold-soft);
+  box-shadow: 0 0 12px 3px rgba(201, 162, 39, 0.45);
+}
+
+.trust-page .trust-perimeter__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+}
+
+.trust-page .trust-section.page-section--active .trust-perimeter__core {
+  animation: trustCoreLock 1.1s var(--trust-spring) both;
+  animation-delay: 0.85s;
+}
+
+@keyframes trustDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes trustHaloBreathe {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
+@keyframes trustSweepSpin2 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes trustCoreLock {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* ============================================================================
+   3 — COMPLIANCE FRAMEWORKS. Restructured from a 2x2 card grid into a single
+   certification ledger: one glass surface, four rows, each with a seal whose
+   ring draws a full turn before the mark lands, and a hairline that wipes
+   across between rows. Structured and audited, not four tiles.
+   ============================================================================ */
+
+.trust-page .trust-glass {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: clamp(1rem, 2vw, 1.5rem);
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.065) 0%, rgba(255, 255, 255, 0.02) 100%);
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* One-shot light sweep across the surface as the section lands. */
+.trust-page .trust-glass::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 238, 180, 0.085) 50%, transparent 62%);
+  transform: translate3d(-130%, 0, 0);
+}
+
+.trust-page .trust-section.page-section--active .trust-glass::after {
+  animation: trustSweep 1.8s var(--trust-spring) both;
+  animation-delay: 0.45s;
+}
+
+@keyframes trustSweep {
+  to {
+    transform: translate3d(130%, 0, 0);
+  }
+}
+
+.trust-page .trust-ledger {
+  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(1.1rem, 3vw, 2.25rem);
+}
+
+.trust-page .trust-ledger__row {
+  position: relative;
+  display: grid;
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'seal name'
+    '.    body';
+  column-gap: clamp(0.9rem, 2.5vw, 1.25rem);
+  row-gap: 0.4rem;
+  padding-block: clamp(1.1rem, 2.8vw, 1.6rem);
+  align-items: start;
+}
+
+.trust-page .trust-section.page-section--active .trust-ledger__row {
+  animation: trustRowIn 0.95s var(--trust-spring) both;
+  animation-delay: calc(0.3s + var(--i, 0) * var(--trust-stagger));
+}
+
+@keyframes trustRowIn {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Hairline between rows, drawn from the left as each row arrives. */
+.trust-page .trust-ledger__row + .trust-ledger__row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(to right, var(--trust-hairline), rgba(255, 255, 255, 0.03) 85%, transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.trust-page .trust-section.page-section--active .trust-ledger__row + .trust-ledger__row::before {
+  animation: trustHairline 1s var(--trust-spring) both;
+  animation-delay: calc(0.35s + var(--i, 0) * var(--trust-stagger));
+}
+
+@keyframes trustHairline {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.trust-page .trust-ledger__seal {
+  grid-area: seal;
+  position: relative;
+  display: block;
+  width: clamp(1.75rem, 4vw, 2.1rem);
+  height: clamp(1.75rem, 4vw, 2.1rem);
+  margin-top: 0.1rem;
+}
+
+.trust-page .trust-ledger__seal svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.trust-page .trust-ledger__ring {
+  fill: none;
+  stroke: var(--trust-gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0.75;
+}
+
+.trust-page .trust-section.page-section--active .trust-ledger__ring {
+  animation: trustDraw 1.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+  animation-delay: calc(0.45s + var(--i, 0) * var(--trust-stagger));
+}
+
+.trust-page .trust-ledger__mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36%;
+  height: 36%;
+  border-radius: 50%;
+  background: var(--trust-gold);
+  box-shadow: 0 0 10px 1px rgba(201, 162, 39, 0.45);
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.trust-page .trust-section.page-section--active .trust-ledger__mark {
+  animation: trustMarkPop 0.75s var(--trust-spring) both;
+  animation-delay: calc(1.25s + var(--i, 0) * var(--trust-stagger));
+}
+
+@keyframes trustMarkPop {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.trust-page .trust-ledger__name {
+  grid-area: name;
+  min-width: 0;
+}
+
+.trust-page .trust-ledger__body {
+  grid-area: body;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .trust-page .trust-ledger__row {
+    grid-template-columns: auto minmax(0, 11rem) minmax(0, 1fr);
+    grid-template-areas: 'seal name body';
+    column-gap: clamp(1.25rem, 3vw, 2.25rem);
+    align-items: center;
+  }
+}
+
+/* ============================================================================
+   4 — AI ETHICS PRINCIPLES. Restructured from four equal cards into a connected
+   rail: the line draws across first, then each chip lands on it with a ring
+   pulse and its text rises underneath. Alternating tick lengths give the row a
+   gentle wave rather than a flat strip of boxes. Interconnection, drawn.
+   ============================================================================ */
+
+.trust-page .trust-rail {
+  position: relative;
+  display: grid;
+  gap: clamp(2rem, 5vw, 2.75rem);
+}
+
+/* Mobile and tablet: the rail runs vertically through the chip column. */
+.trust-page .trust-rail__line {
+  position: absolute;
+  left: calc(var(--trust-chip) / 2);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent, var(--trust-gold-line) 12%, var(--trust-gold-line) 88%, transparent);
+  transform: scaleY(0);
+  transform-origin: top center;
+  pointer-events: none;
+}
+
+.trust-page .trust-section.page-section--active .trust-rail__line {
+  animation: trustSeamDraw 1.4s var(--trust-spring) both;
+  animation-delay: 0.15s;
+}
+
+.trust-page .trust-rail__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--trust-chip) minmax(0, 1fr);
+  grid-template-areas:
+    'chip title'
+    'chip body';
+  column-gap: clamp(1rem, 3vw, 1.5rem);
+  row-gap: 0.45rem;
+  align-items: start;
+}
+
+.trust-page .trust-rail__chip {
+  grid-area: chip;
+  position: relative;
+  z-index: 1;
+  align-self: start;
+}
+
+.trust-page .trust-section.page-section--active .trust-rail__chip {
+  animation: trustChipLand 1s var(--trust-spring) both;
+  animation-delay: calc(0.35s + var(--i, 0) * var(--trust-stagger));
+}
+
+/* Ring pulse leaving the chip — one soft breath per chip, offset so the four
+   never pulse together. */
+.trust-page .trust-rail__item::after {
+  content: '';
+  position: absolute;
+  left: calc(var(--trust-chip) / 2);
+  top: calc(var(--trust-chip) / 2);
+  width: var(--trust-chip);
+  height: var(--trust-chip);
+  margin: calc(var(--trust-chip) / -2) 0 0 calc(var(--trust-chip) / -2);
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  border-radius: clamp(0.7rem, 1.5vw, 0.85rem);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.trust-page .trust-section.page-section--active .trust-rail__item::after {
+  animation: trustChipPulse 4.2s ease-out infinite;
+  animation-delay: calc(1.1s + var(--i, 0) * 0.5s);
+}
+
+.trust-page .trust-rail__tick {
+  display: none;
+}
+
+.trust-page .trust-rail__title {
+  grid-area: title;
+  min-width: 0;
+}
+
+.trust-page .trust-rail__body {
+  grid-area: body;
+  min-width: 0;
+}
+
+@keyframes trustChipLand {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes trustChipPulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.75);
+  }
+}
+
+@media (min-width: 1024px) {
+  .trust-page .trust-rail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(1.75rem, 3vw, 2.75rem);
+  }
+
+  /* Horizontal rail, pinned to the chips' centre line. */
+  .trust-page .trust-rail__line {
+    left: 0;
+    right: 0;
+    top: calc(var(--trust-chip) / 2);
+    bottom: auto;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--trust-gold-line) 8%, var(--trust-gold-line) 92%, transparent);
+    transform: scaleX(0);
+    transform-origin: left center;
+  }
+
+  .trust-page .trust-section.page-section--active .trust-rail__line {
+    animation: trustHairline 1.6s var(--trust-spring) both;
+    animation-delay: 0.15s;
+  }
+
+  .trust-page .trust-rail__item {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'chip'
+      'tick'
+      'title'
+      'body';
+    row-gap: 0;
+  }
+
+  /* Alternating tick length: items 2 and 4 hang lower, so the row reads as a
+     wave instead of a flat strip. */
+  .trust-page .trust-rail__tick {
+    grid-area: tick;
+    display: block;
+    width: 1px;
+    height: calc(1rem + var(--drop, 0) * 1.75rem);
+    margin-top: 0.65rem;
+    margin-left: calc(var(--trust-chip) / 2);
+    background: linear-gradient(to bottom, var(--trust-gold-line), transparent);
+    transform: scaleY(0);
+    transform-origin: top center;
+  }
+
+  .trust-page .trust-section.page-section--active .trust-rail__tick {
+    animation: trustSeamDraw 0.9s var(--trust-spring) both;
+    animation-delay: calc(0.65s + var(--i, 0) * var(--trust-stagger));
+  }
+}
+
+@media (min-width: 1024px) {
+  .trust-page .trust-rail__title {
+    margin-top: 0.85rem;
+  }
+
+  .trust-page .trust-rail__body {
+    margin-top: 0.5rem;
+  }
+}
+
+/* ============================================================================
+   Reduced motion — everything resolves to its finished state and nothing moves.
+   The hook already activates every section immediately in this mode; this makes
+   sure the entry keyframes, ambient loops and drawn strokes end up resolved too.
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .trust-page .scroll-animate,
+  .trust-page .scroll-animate.visible {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .trust-page .trust-hero__glow,
+  .trust-page .trust-hero__grid,
+  .trust-page .trust-perimeter__orbit,
+  .trust-page .trust-perimeter__core,
+  .trust-page .trust-perimeter__halo,
+  .trust-page .trust-seam__pulse {
+    opacity: 1 !important;
+  }
+
+  .trust-page .trust-seam__line,
+  .trust-page .trust-seam__pulse::before,
+  .trust-page .trust-seam__node,
+  .trust-page .trust-copy::before,
+  .trust-page .trust-ledger__row + .trust-ledger__row::before,
+  .trust-page .trust-ledger__mark,
+  .trust-page .trust-rail__line,
+  .trust-page .trust-rail__tick,
+  .trust-page .trust-rail__chip,
+  .trust-page .trust-hero__glow,
+  .trust-page .trust-hero__grid,
+  .trust-page .trust-perimeter__orbit,
+  .trust-page .trust-perimeter__core,
+  .trust-page .trust-perimeter__halo,
+  .trust-page .trust-orb,
+  .trust-page .trust-glass::after,
+  .trust-page .trust-rail__item::after,
+  .trust-page .trust-perimeter__ring,
+  .trust-page .trust-ledger__ring,
+  .trust-page .trust-seam__pulse {
+    animation: none !important;
+  }
+
+  .trust-page .trust-seam__line,
+  .trust-page .trust-copy::before,
+  .trust-page .trust-rail__tick {
+    transform: scaleY(1) !important;
+  }
+
+  .trust-page .trust-ledger__row + .trust-ledger__row::before {
+    transform: scaleX(1) !important;
+  }
+
+  .trust-page .trust-rail__line {
+    transform: none !important;
+  }
+
+  .trust-page .trust-perimeter__ring,
+  .trust-page .trust-ledger__ring {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .trust-page .trust-perimeter__core,
+  .trust-page .trust-ledger__mark,
+  .trust-page .trust-perimeter__halo {
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+
+  .trust-page .trust-rail__chip {
+    transform: none !important;
+  }
+
+  .trust-page .trust-ledger__row {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .trust-page .trust-seam__pulse,
+  .trust-page .trust-rail__item::after,
+  .trust-page .trust-glass::after {
+    opacity: 0 !important;
+  }
+}
