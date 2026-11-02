@@ -5304,7 +5304,10 @@
   }
 }
 
-/* Homepage hero — slightly smaller top gold glow */
+/* Homepage hero — slightly smaller top gold glow.
+   Every stop sits in the gold band (hue 43-45deg, matching the brand gold
+   #c9a227) rather than the amber/orange ~30deg the other heroes still use.
+   Geometry and alphas are unchanged, so only the hue moves. */
 .landing-page-dark section#home.landing-hero-section--top-glow .landing-hero-section__glow {
   top: -30%;
   bottom: auto;
@@ -5313,15 +5316,15 @@
   background:
     radial-gradient(
       ellipse 80% 72% at 50% 10%,
-      rgba(255, 176, 56, 0.68) 0%,
-      rgba(232, 145, 32, 0.46) 26%,
-      rgba(201, 162, 39, 0.28) 48%,
-      rgba(90, 52, 8, 0.1) 68%,
+      rgba(240, 190, 40, 0.68) 0%,
+      rgba(214, 168, 42, 0.46) 26%,
+      rgba(186, 146, 38, 0.28) 48%,
+      rgba(92, 70, 16, 0.1) 68%,
       transparent 90%
     ),
     radial-gradient(
       ellipse 125% 58% at 50% 0%,
-      rgba(255, 210, 120, 0.26) 0%,
+      rgba(255, 215, 95, 0.26) 0%,
       rgba(201, 162, 39, 0.09) 42%,
       transparent 75%
     );
