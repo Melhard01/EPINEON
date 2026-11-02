@@ -5,7 +5,7 @@ import { AdminShell } from '../../admin/AdminShell.jsx'
 import { MessageFlowChart, Sparkline } from '../../admin/MessageFlowChart.jsx'
 import { useMessages, STATUS_LABELS } from '../../admin/useMessages.js'
 import { useTeam } from '../../admin/useTeam.js'
-import { adminDisplayName, adminInitial } from '../../admin/identity.js'
+import { adminDisplayName, adminInitial, adminDateline } from '../../admin/identity.js'
 import { useAdminAuth } from '../../admin/useAdminAuth.js'
 import { bucketByDay, growth, formSummary, formIdOf, relativeTime } from '../../admin/dashboardStats.js'
 import { FORMS, formLabelForRow } from '../../../api/_lib/forms.js'
@@ -70,9 +70,7 @@ export default function AdminDashboard() {
   }, [messages])
 
   const recent = messages.slice(0, 7)
-  const dateline = new Date().toLocaleDateString(undefined, {
-    weekday: 'long', day: 'numeric', month: 'long',
-  })
+  const dateline = adminDateline()
 
   return (
     <AdminShell

@@ -18,6 +18,11 @@ export function adminDisplayName(email) {
   return words.length ? words.join(' ') : email
 }
 
+/** The eyebrow above every admin page heading, so they all read alike. */
+export function adminDateline(now = new Date()) {
+  return now.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
 /** Single letter for the avatar disc. */
 export function adminInitial(email) {
   const name = adminDisplayName(email)

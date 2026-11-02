@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Bell, RefreshCw } from 'lucide-react'
 import { AdminShell } from '../../admin/AdminShell.jsx'
 import { useMessages, countByForm, unreadByForm, STATUS_LABELS } from '../../admin/useMessages.js'
+import { adminDateline } from '../../admin/identity.js'
 import { FORMS, inferFormId, formLabelForRow, parseSubmissionBody } from '../../../api/_lib/forms.js'
 
 const FILTERS = ['all', 'unread', 'read', 'replied', 'archived']
@@ -73,6 +75,14 @@ export default function AdminMessages() {
     })
   }, [sectionMessages, query, filter])
 
+  // Same summary vocabulary as the Overview, scoped to the open section.
+  const statusCounts = useMemo(() => {
+    const counts = { unread: 0, read: 0, replied: 0, archived: 0 }
+    for (const m of sectionMessages) if (m.status in counts) counts[m.status] += 1
+    return counts
+  }, [sectionMessages])
+  const unreadEverywhere = messages.filter((m) => m.status === 'unread').length
+
   const selected = sectionMessages.find((m) => m.id === selectedId) ?? null
   // The stored body is every answer flattened into one string. Split it so the
   // box below holds only what the visitor actually wrote, and the rest of the
@@ -103,11 +113,28 @@ export default function AdminMessages() {
   return (
     <AdminShell
       title={heading}
+      eyebrow={adminDateline()}
       heading={heading}
       actions={
-        <button type="button" className="admin-btn admin-btn--quiet" onClick={reload} disabled={state === 'loading'}>
-          Refresh
-        </button>
+        <>
+          <Link
+            to="/admin/messages?status=unread"
+            className="admin-iconbtn"
+            aria-label={`${unreadEverywhere} unread submissions`}
+          >
+            <Bell className="admin-iconbtn__icon" aria-hidden />
+            {unreadEverywhere > 0 ? <span className="admin-iconbtn__dot">{unreadEverywhere}</span> : null}
+          </Link>
+          <button
+            type="button"
+            className="admin-iconbtn"
+            onClick={reload}
+            disabled={state === 'loading'}
+            aria-label="Refresh"
+          >
+            <RefreshCw className="admin-iconbtn__icon" aria-hidden />
+          </button>
+        </>
       }
     >
       {/* Section navigation. Each form is its own URL, so a section can be
@@ -138,6 +165,25 @@ export default function AdminMessages() {
           </Link>
         ))}
       </nav>
+
+      {state === 'ready' ? (
+        <section className="admin-hero admin-hero--compact">
+          <div className="admin-hero__glow" aria-hidden />
+          <div className="admin-hero__body">
+            <p className="admin-hero__label">{formId ? heading : 'All submissions'}</p>
+            <p className="admin-figure admin-hero__value">{sectionMessages.length}</p>
+          </div>
+          <div className="admin-hero__side">
+            <p className="admin-hero__sub">
+              <span className="admin-figure">{statusCounts.unread}</span> unread
+              <span className="admin-hero__dot" aria-hidden />
+              <span className="admin-figure">{statusCounts.replied}</span> replied
+              <span className="admin-hero__dot" aria-hidden />
+              <span className="admin-figure">{statusCounts.archived}</span> archived
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       <div className="admin-toolbar">
         <label className="admin-search">

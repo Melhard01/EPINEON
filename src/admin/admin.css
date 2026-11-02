@@ -270,25 +270,6 @@
   margin-bottom: 1rem;
 }
 
-/* ------------------------------------------------------------------- stats */
-.admin-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.admin-stat {
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--ad-line);
-  border-radius: var(--ad-radius);
-  background: var(--ad-surface);
-}
-.admin-stat--accent { border-color: rgba(201, 162, 39, 0.35); }
-.admin-stat__value { margin: 0; font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
-.admin-stat--accent .admin-stat__value { color: var(--ad-gold); }
-.admin-stat__label { margin: 0.2rem 0 0; font-size: 0.85rem; color: var(--ad-muted); }
-
 /* ----------------------------------------------------------------- toolbar */
 .admin-toolbar {
   display: flex;
@@ -619,6 +600,11 @@
   .admin-card--sticky { position: sticky; top: 1.25rem; }
 }
 
+/* Vertical rhythm for pages that stack sections rather than use .admin-grid.
+   The gap replaces the adjacent-card margin, so spacing stays uniform. */
+.admin-stack { display: grid; gap: 1.25rem; align-content: start; }
+.admin-stack > .admin-card + .admin-card { margin-top: 0; }
+
 .admin-duo { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.25rem; align-items: start; }
 @media (min-width: 900px) { .admin-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
@@ -719,6 +705,22 @@
   font-size: 0.72rem;
   color: var(--ad-muted);
 }
+
+/* A non-interactive sibling of .admin-metric, for a figure with nowhere to go.
+   No sparkline or chips follow the value here, so the two-line allowance for a
+   wrapping form name would just leave the card bottom-heavy. */
+.admin-metric--static { cursor: default; }
+.admin-metric--static:hover { border-color: var(--ad-line); transform: none; }
+.admin-metric--static .admin-metric__name { min-height: 0; }
+.admin-metric--static .admin-metric__value { margin-bottom: 0; }
+
+/* Messages stacks its sections with their own margins rather than a grid gap,
+   so a hero following the form tabs supplies its own. */
+.admin-sections + .admin-hero { margin-bottom: 1.25rem; }
+
+/* Shorter hero for pages where the figure summarises rather than headlines. */
+.admin-hero--compact { padding: clamp(1rem, 2.2vw, 1.4rem) clamp(1.25rem, 3vw, 2rem); }
+.admin-hero--compact .admin-hero__value { font-size: clamp(1.9rem, 3.6vw, 2.4rem); }
 
 .admin-spark { display: block; width: 100%; height: 1.75rem; }
 

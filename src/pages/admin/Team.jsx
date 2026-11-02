@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
+import { RefreshCw } from 'lucide-react'
 import { AdminShell } from '../../admin/AdminShell.jsx'
 import { adminFetch } from '../../admin/supabaseClient.js'
 import { useAdminAuth } from '../../admin/useAdminAuth.js'
+import { adminDateline } from '../../admin/identity.js'
 
 /**
  * Team access. Every mutation goes through /api/admin/team, which re-verifies
@@ -99,8 +101,63 @@ export default function AdminTeam() {
     }
   }
 
+  // Same vocabulary as the Overview: a headline figure, then the breakdown.
+  const revoked = members.filter((m) => m.status === 'revoked').length
+  const pending = members.filter((m) => m.status !== 'revoked' && !m.last_seen_at).length
+  const active = members.filter((m) => m.status !== 'revoked' && m.last_seen_at).length
+
   return (
-    <AdminShell title="Team access" heading="Team access">
+    <AdminShell
+      title="Team access"
+      eyebrow={adminDateline()}
+      heading="Team access"
+      actions={
+        <button
+          type="button"
+          className="admin-iconbtn"
+          onClick={load}
+          disabled={state === 'loading'}
+          aria-label="Refresh"
+        >
+          <RefreshCw className="admin-iconbtn__icon" aria-hidden />
+        </button>
+      }
+    >
+     <div className="admin-stack">
+      {state === 'ready' ? (
+        <>
+          <section className="admin-hero admin-hero--compact">
+            <div className="admin-hero__glow" aria-hidden />
+            <div className="admin-hero__body">
+              <p className="admin-hero__label">Administrators with access</p>
+              <p className="admin-figure admin-hero__value">{active + pending}</p>
+            </div>
+            <div className="admin-hero__side">
+              <p className="admin-hero__sub">
+                <span className="admin-figure">{pending}</span> yet to accept
+                <span className="admin-hero__dot" aria-hidden />
+                <span className="admin-figure">{revoked}</span> revoked
+              </p>
+            </div>
+          </section>
+
+          <div className="admin-metrics">
+            {[
+              { label: 'Active', value: active },
+              { label: 'Pending', value: pending },
+              { label: 'Revoked', value: revoked },
+            ].map((metric) => (
+              <div key={metric.label} className="admin-metric admin-metric--static">
+                <div className="admin-metric__head">
+                  <p className="admin-metric__name">{metric.label}</p>
+                </div>
+                <p className="admin-figure admin-metric__value">{metric.value}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : null}
+
       <section className="admin-card">
         <h2 className="admin-h2">Invite a team member</h2>
         <p className="admin-hint">
@@ -156,9 +213,6 @@ export default function AdminTeam() {
       <section className="admin-card">
         <div className="admin-card__head">
           <h2 className="admin-h2">Authorised administrators</h2>
-          <button type="button" className="admin-btn admin-btn--quiet" onClick={load} disabled={state === 'loading'}>
-            Refresh
-          </button>
         </div>
 
         {state === 'loading' ? <p className="admin-empty" role="status">Loading team…</p> : null}
@@ -241,6 +295,7 @@ export default function AdminTeam() {
           </div>
         ) : null}
       </section>
+     </div>
     </AdminShell>
   )
 }
