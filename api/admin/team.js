@@ -28,7 +28,7 @@ import {
 } from '../_lib/invitations.js'
 import {
   ok, badRequest, forbidden, unauthorized, tooMany, serverError, setupError,
-  methodNotAllowed, readJsonBody, json, errorRef, logError, isSchemaError,
+  methodNotAllowed, readJsonBody, json, errorRef, logError, isSchemaError, isCredentialError,
 } from '../_lib/http.js'
 
 const ALLOWED = ['GET', 'POST', 'PATCH']
@@ -43,6 +43,15 @@ const ALLOWED = ['GET', 'POST', 'PATCH']
  */
 function fail(res, scope, error, ref) {
   logError(scope, error, ref)
+  if (isCredentialError(error)) {
+    return setupError(
+      res,
+      'The project rejected the server\u2019s credentials. Check that '
+        + 'SUPABASE_SERVICE_ROLE_KEY belongs to the same project as SUPABASE_URL, '
+        + 'and that it has not been rotated.',
+      ref,
+    )
+  }
   if (isSchemaError(error)) {
     return setupError(
       res,
@@ -88,7 +97,9 @@ async function handleTeam(req, res, ref) {
   if (!auth.ok) {
     if (auth.status === 401) return unauthorized(res)
     if (auth.status === 403) return forbidden(res)
-    return serverError(res, ref)
+    // requireAdmin's own lookup failed — the first place a bad service-role
+    // key surfaces, since the browser's anon-key queries carry on working.
+    return fail(res, 'team:auth', auth.error, ref)
   }
 
   const supabase = getSupabaseAdmin()
@@ -143,7 +154,7 @@ async function handleTeam(req, res, ref) {
 
     const { data: existing, error: existingError } = await supabase
       .from('admin_users')
-      .select('id, status, last_seen_at')
+      .select('id, status, last_seen_at, revoked_at')
       .eq('email', email)
       .maybeSingle()
     // This error used to be discarded. A failed lookup left `existing`
@@ -160,28 +171,40 @@ async function handleTeam(req, res, ref) {
     // Re-inviting a revoked member reactivates them; re-inviting an active one
     // who never signed in just re-issues their link. The button is safe to
     // press twice either way.
+    // The allowlist row has to exist before the invitation is minted, but the
+    // mint can still fail. Without undoing the row, a failed invitation leaves
+    // the address allowlisted as 'active' — standing admin rights for someone
+    // who never received a link. Each retry added another one.
     let outcome = 'invited'
+    let undo = null
     if (existing) {
       outcome = existing.status === 'active' ? 'reinvited' : 'reactivated'
+      const before = { status: existing.status, revoked_at: existing.revoked_at ?? null }
       const { error } = await supabase
         .from('admin_users')
         .update({ status: 'active', revoked_at: null, invited_by: auth.user.id, invited_at: new Date().toISOString() })
         .eq('id', existing.id)
       if (error) return fail(res, 'team:reactivate', error, ref)
+      undo = () => supabase.from('admin_users').update(before).eq('id', existing.id)
     } else {
       // user_id stays null until they redeem the invitation; requireAdmin()
       // and /api/admin/signup bind it then.
-      const { error } = await supabase.from('admin_users').insert({
-        email,
-        user_id: null,
-        status: 'active',
-        invited_by: auth.user.id,
-      })
+      const { data: created, error } = await supabase
+        .from('admin_users')
+        .insert({ email, user_id: null, status: 'active', invited_by: auth.user.id })
+        .select('id')
+        .single()
       if (error) return fail(res, 'team:insert', error, ref)
+      undo = () => supabase.from('admin_users').delete().eq('id', created.id)
     }
 
     const minted = await mintInvitation(supabase, { email, invitedBy: auth.user.id, req })
-    if (minted.error) return fail(res, 'team:mint-invitation', minted.error, ref)
+    if (minted.error) {
+      const { error: undoError } = await undo()
+      // Worth knowing about: it means a grant was left behind after all.
+      if (undoError) logError('team:rollback-failed', undoError, ref)
+      return fail(res, 'team:mint-invitation', minted.error, ref)
+    }
 
     return ok(res, { [outcome]: true, signupUrl: minted.url })
   }

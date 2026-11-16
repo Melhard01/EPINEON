@@ -1,4 +1,5 @@
 import { getSupabaseAdmin, getSupabaseAnon } from './supabaseAdmin.js'
+import { logError } from './http.js'
 
 /**
  * Resolve the caller from their bearer token and confirm they are an approved
@@ -9,7 +10,8 @@ import { getSupabaseAdmin, getSupabaseAnon } from './supabaseAdmin.js'
  * no authenticated user can write to themselves (the table has no insert or
  * update policy — only the service role can change it).
  *
- * @returns {{ok: true, user: object, admin: object} | {ok: false, status: number}}
+ * @returns {{ok: true, user: object, admin: object}
+ *          | {ok: false, status: number, error?: object}}
  */
 export async function requireAdmin(req) {
   const header = req.headers.authorization || ''
@@ -22,7 +24,7 @@ export async function requireAdmin(req) {
     if (error || !data?.user) return { ok: false, status: 401 }
     user = data.user
   } catch (err) {
-    console.error('[auth] token verification failed:', err.message)
+    logError('auth:verify-token', err)
     return { ok: false, status: 401 }
   }
 
@@ -51,8 +53,10 @@ export async function requireAdmin(req) {
   }
 
   if (error) {
-    console.error('[auth] allowlist lookup failed:', error.message)
-    return { ok: false, status: 500 }
+    // Returned to the caller as well as logged: this is the first place a
+    // rejected service-role key shows up, and "500" alone says nothing.
+    logError('auth:allowlist-lookup', error)
+    return { ok: false, status: 500, error }
   }
 
   const admin = rows?.[0]

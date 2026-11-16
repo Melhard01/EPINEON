@@ -238,3 +238,31 @@ test('team: an unexpected throw still answers with JSON rather than crashing', a
   assert.equal(res.payload.ok, false)
   assert.ok(res.payload.ref)
 })
+
+test('team: a failed invitation leaves no allowlist row behind', async () => {
+  fake.state.admins = [{ id: 'row-1', email: 'admin@epineon.ai', status: 'active', user_id: 'uuid-admin' }]
+  fake.state.missingTables = ['admin_invitations']
+  fake.state.inserted.length = 0
+  try {
+    const res = mockRes()
+    await teamHandler(
+      mockReq({
+        method: 'POST',
+        headers: { authorization: `Bearer ${ADMIN_TOKEN}` },
+        body: { email: 'never.invited@epineon.ai' },
+      }),
+      res,
+    )
+    assert.equal(res.statusCode, 500)
+    // The row is written before the invitation is minted; when minting fails
+    // it must be undone, or the address keeps standing admin rights it was
+    // never actually granted.
+    const deletes = fake.state.calls.filter(
+      (c) => c.method === 'DELETE' && c.path === '/rest/v1/admin_users',
+    )
+    assert.ok(deletes.length >= 1, 'the allowlist row should have been rolled back')
+  } finally {
+    fake.state.missingTables = []
+    fake.state.admins = []
+  }
+})

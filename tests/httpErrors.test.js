@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { isSchemaError, errorRef, logError } from '../api/_lib/http.js'
+import { isSchemaError, isCredentialError, errorRef, logError } from '../api/_lib/http.js'
 
 /** Deciding whether a failure means "the migrations are not applied". */
 
@@ -67,4 +67,32 @@ test('logError survives a non-object throw', () => {
     console.error = original
   }
   assert.equal(lines.length, 2)
+})
+
+/** Telling a rejected credential apart from a missing table. */
+
+test('isCredentialError recognises a rejected service-role key', () => {
+  for (const error of [
+    { message: 'Invalid API key', hint: 'Double check your Supabase anon or service_role API key.' },
+    { code: 'PGRST301', message: 'JWT expired' },
+    { code: '42501', message: 'permission denied for table admin_users' },
+    { status: 401, message: 'Unauthorized' },
+  ]) {
+    assert.equal(isCredentialError(error), true, `missed: ${JSON.stringify(error)}`)
+  }
+})
+
+test('isCredentialError and isSchemaError do not claim the same failures', () => {
+  const missingTable = { code: '42P01', message: 'relation "public.admin_invitations" does not exist' }
+  assert.equal(isSchemaError(missingTable), true)
+  assert.equal(isCredentialError(missingTable), false)
+
+  const badKey = { message: 'Invalid API key' }
+  assert.equal(isCredentialError(badKey), true)
+  assert.equal(isSchemaError(badKey), false)
+
+  for (const ordinary of [{ code: '23505', message: 'duplicate key value' }, { message: 'fetch failed' }, null]) {
+    assert.equal(isCredentialError(ordinary), false)
+    assert.equal(isSchemaError(ordinary), false)
+  }
 })

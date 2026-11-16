@@ -75,6 +75,22 @@ export function logError(scope, error, ref) {
  */
 const SCHEMA_CODES = new Set(['42P01', '42703', 'PGRST204', 'PGRST205'])
 
+/**
+ * Did the project reject our credentials?
+ *
+ * The giveaway is that the browser's own queries keep working — those use the
+ * anon key and the visitor's JWT — while every server-side call fails. That
+ * means SUPABASE_SERVICE_ROLE_KEY is wrong, rotated, truncated, or belongs to
+ * a different project than SUPABASE_URL.
+ */
+export function isCredentialError(error) {
+  if (!error) return false
+  if (['PGRST301', 'PGRST302', '42501'].includes(error.code)) return true
+  if (error.status === 401 || error.status === 403) return true
+  const text = `${error.message ?? ''} ${error.hint ?? ''}`
+  return /api key|jwt|invalid authentication|not authori[sz]ed|permission denied/i.test(text)
+}
+
 export function isSchemaError(error) {
   if (!error) return false
   if (SCHEMA_CODES.has(error.code)) return true
