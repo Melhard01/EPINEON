@@ -19,10 +19,10 @@ export default function NotFound() {
                 <Link to="/">Go to homepage →</Link>
               </Button>
               <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-6">
-                <Link to="/products" className="text-sm font-medium text-[#c9a227] hover:text-[#e8c95a]">
+                <Link to="/products" className="inline-flex min-h-11 items-center text-sm font-medium text-[#c9a227] hover:text-[#e8c95a]">
                   Browse our products →
                 </Link>
-                <Link to="/contact#sales" className="text-sm font-medium text-[#c9a227] hover:text-[#e8c95a]">
+                <Link to="/contact#sales" className="inline-flex min-h-11 items-center text-sm font-medium text-[#c9a227] hover:text-[#e8c95a]">
                   Talk to us →
                 </Link>
               </div>

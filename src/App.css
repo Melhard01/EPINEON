@@ -8034,3 +8034,41 @@
   height: 1px;
   overflow: hidden;
 }
+
+/* ---------------------------------------------------------------------------
+ * Touch-target floors (responsiveness audit, 12 November 2026)
+ *
+ * Interactive controls that measured under 44px tall on phones and tablets. Each rule is
+ * capped at 1023.98px so the desktop design is untouched.
+ *
+ * Deliberately NOT included:
+ *  - inline prose links inside paragraphs (legal pages). WCAG 2.5.8 exempts links in a
+ *    sentence, and padding them would break the line box they sit in.
+ *  - .ss-dot, which already carries a 24px hit area via ::before (see its own comment).
+ * ------------------------------------------------------------------------- */
+
+@media (max-width: 1023.98px) {
+  /* "Explore …" link at the foot of ecosystem/industry cards — measured 38px */
+  .ecosystem-card-cta {
+    min-height: 2.75rem;
+  }
+
+  /* Legal-document table-of-contents links — measured 36px at 768px */
+  .legal-doc-toc-link {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}
+
+/* Contact form tabs measured 36px tall on phones (0.55rem padding + a 1.2 line-height on
+   0.85rem type). They are standalone controls, not links in a sentence, so they get the
+   full 44px target below the desktop breakpoint. */
+@media (max-width: 1023.98px) {
+  .landing-page-dark .contact-page--refined .contact-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+}

@@ -825,3 +825,20 @@
   .admin-metric { transition: none; }
   .admin-metric:hover { transform: none; }
 }
+
+/* ------------------------------------------------- touch targets (audit 2026-11-12)
+ * Measured under 44px on phones and tablets. Capped at 1023.98px so the desktop
+ * console is unchanged. `.admin-inline-link` is deliberately excluded: it sits inside
+ * sentences ("Already have an account? Sign in"), where WCAG 2.5.8 exempts links in a
+ * line of text and padding would break the line box. */
+@media (max-width: 1023.98px) {
+  .admin-brand {
+    min-height: 2.75rem;
+  }
+
+  .admin-btn--link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+  }
+}

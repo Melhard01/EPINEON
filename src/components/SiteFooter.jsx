@@ -40,8 +40,10 @@ function FooterSolutionLinks({ listClassName, linkClassName }) {
 }
 
 export function SiteFooter() {
+  // py-3 + 20px line-height = 44px, the touch-target minimum. These links only render
+  // below md, so there is no desktop impact.
   const linkMuted =
-    'footer-mobile-link transition-colors hover:text-white block py-1.5'
+    'footer-mobile-link transition-colors hover:text-white block py-3'
 
   return (
     <footer className="site-footer relative z-30 w-full py-12 lg:py-16 overflow-hidden">
@@ -177,16 +179,16 @@ export function SiteFooter() {
             <h4 className="font-semibold text-slate-900 mb-3 lg:mb-4 text-sm sm:text-base lg:text-lg">Products</h4>
             <FooterSolutionLinks
               listClassName="space-y-1 lg:space-y-2 text-slate-700 text-xs sm:text-sm lg:text-base"
-              linkClassName="hover:text-slate-900 transition-colors block py-1"
+              linkClassName="hover:text-slate-900 transition-colors block py-3 lg:py-1"
             />
           </div>
           <div className="min-w-0 flex-1 md:min-w-[min(100%,12rem)]">
             <h4 className="font-semibold text-slate-900 mb-3 lg:mb-4 text-sm sm:text-base lg:text-lg">Resources</h4>
             <ul className="space-y-1 lg:space-y-2 text-slate-700 text-xs sm:text-sm lg:text-base">
-              <li><Link to="/trust" className="hover:text-slate-900 transition-colors block py-1" onClick={scrollPageToTop}>Trust Center</Link></li>
-              <li><Link to="/privacy" className="hover:text-slate-900 transition-colors block py-1" onClick={scrollPageToTop}>Privacy Policy</Link></li>
-              <li><Link to="/terms" className="hover:text-slate-900 transition-colors block py-1" onClick={scrollPageToTop}>Terms & Conditions</Link></li>
-              <li><Link to="/cookie-policy" className="hover:text-slate-900 transition-colors block py-1" onClick={scrollPageToTop}>Cookie Policy</Link></li>
+              <li><Link to="/trust" className="hover:text-slate-900 transition-colors block py-3 lg:py-1" onClick={scrollPageToTop}>Trust Center</Link></li>
+              <li><Link to="/privacy" className="hover:text-slate-900 transition-colors block py-3 lg:py-1" onClick={scrollPageToTop}>Privacy Policy</Link></li>
+              <li><Link to="/terms" className="hover:text-slate-900 transition-colors block py-3 lg:py-1" onClick={scrollPageToTop}>Terms & Conditions</Link></li>
+              <li><Link to="/cookie-policy" className="hover:text-slate-900 transition-colors block py-3 lg:py-1" onClick={scrollPageToTop}>Cookie Policy</Link></li>
             </ul>
           </div>
         </div>

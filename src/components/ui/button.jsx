@@ -22,7 +22,11 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        // h-9 is a FIXED height, so caller `py-*` never affects it. min-h-11 lifts every
+        // button to the 44px touch minimum below lg; lg:min-h-9 restores the original 36px
+        // on desktop so the existing design is untouched. Callers can still override, because
+        // cn() puts their className last and tailwind-merge keeps the last of a conflict.
+        default: "h-9 min-h-11 px-4 py-2 has-[>svg]:px-3 lg:min-h-9",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9",

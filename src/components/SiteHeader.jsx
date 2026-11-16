@@ -196,7 +196,7 @@ export function SiteHeader() {
 
             <button
               type="button"
-              className="site-header-menu-btn relative z-[60] ml-auto inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-white shadow-none hover:bg-white/10 sm:h-11 sm:w-11 lg:hidden"
+              className="site-header-menu-btn relative z-[60] ml-auto inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-white shadow-none hover:bg-white/10 lg:hidden"
               aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileNavOpen}
               onClick={() => setMobileNavOpen((o) => !o)}

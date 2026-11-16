@@ -1,17 +1,15 @@
 import React from 'react'
 import { Button } from '../ui/button'
 import { LandingSection } from './LandingSection'
+import { HeroBackgroundVideo } from './HeroBackgroundVideo'
 
 export function HeroSection({ onWatchStory }) {
   return (
     <div className="site-content min-w-0">
-      <div className="flex flex-col items-center justify-start pt-16 sm:pt-20 lg:pt-24">
+      <div className="flex flex-col items-center justify-start pt-8 sm:pt-14 lg:pt-24">
         <div className="w-full min-w-0 max-w-3xl scroll-animate text-center sm:max-w-4xl">
           <div className="space-y-8 lg:space-y-10">
             <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <p className="epineon-eyebrow-pill scroll-animate text-reveal text-center">
-                PRECISION LIFE SCIENCE, POWERED BY AI
-              </p>
               <h1 className="hero-display-serif text-reveal text-center leading-snug text-balance text-4xl sm:text-5xl md:text-[2.875rem] lg:text-6xl xl:text-7xl">
                 <span className="hero-display-line1 mb-2 block text-4xl sm:mb-3 sm:text-5xl md:text-[2.875rem] lg:text-6xl xl:text-7xl">
                   Human-centred AI for high-stakes work,
@@ -26,17 +24,21 @@ export function HeroSection({ onWatchStory }) {
               and foresight are non-negotiable.
             </p>
           </div>
-          <div className="mx-auto mt-8 flex scroll-animate scroll-animate-delay-4 w-full max-w-[16.5rem] flex-col items-center justify-center gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-3">
+          {/* The pair fits on one line from ~400px, so it turns horizontal there rather than
+              waiting for sm (640px) — that left a dead zone where two short buttons sat stacked
+              in a 264px column on a 600px-wide screen. flex-wrap is the safety net: if the two
+              ever do not fit, they wrap instead of overflowing. */}
+          <div className="mx-auto mt-8 flex scroll-animate scroll-animate-delay-4 w-full max-w-[16.5rem] flex-col items-center justify-center gap-2.5 min-[390px]:max-w-none min-[390px]:flex-row min-[390px]:flex-wrap sm:gap-3">
             <Button
               asChild
-              className="epineon-btn-primary hero-cta-learn-more shadow-none w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 sm:w-auto sm:whitespace-nowrap sm:px-6 md:text-base md:px-7 md:py-3 lg:text-lg lg:px-8 lg:py-3.5"
+              className="epineon-btn-primary hero-cta-learn-more shadow-none w-full min-h-11 min-w-0 rounded-full whitespace-normal text-center text-sm px-5 min-[390px]:w-auto min-[390px]:whitespace-nowrap sm:px-6 md:min-h-12 md:text-base md:px-7 lg:text-lg lg:px-8"
             >
               <a href="#ecosystems">Explore Ecosystems</a>
             </Button>
             <Button
               asChild
               variant="outline"
-              className="epineon-btn-secondary hero-cta-outline shadow-none !bg-white !text w-full min-w-0 rounded-full whitespace-normal text-center text-sm px-5 py-2.5 sm:w-auto sm:whitespace-nowrap sm:px-6 md:text-base md:px-7 md:py-3 lg:text-lg lg:px-8 lg:py-3.5"
+              className="epineon-btn-secondary hero-cta-outline shadow-none !bg-white !text w-full min-h-11 min-w-0 rounded-full whitespace-normal text-center text-sm px-5 min-[390px]:w-auto min-[390px]:whitespace-nowrap sm:px-6 md:min-h-12 md:text-base md:px-7 lg:text-lg lg:px-8"
             >
               <a href="#industries">
                 <span className="hero-cta-story-text">Find your path</span>
@@ -61,9 +63,10 @@ export function HeroSection({ onWatchStory }) {
 
 export function HeroSectionBlock({ onWatchStory }) {
   return (
-    <LandingSection id="home" withMeshBackground={false} className="landing-hero-section landing-hero-section--top-glow pb-10 pt-28 lg:pb-14">
+    <LandingSection id="home" withMeshBackground={false} className="landing-hero-section landing-hero-section--top-glow pb-24 pt-20 sm:pt-24 lg:pb-28 lg:pt-28">
       <div className="landing-hero-section__bg" aria-hidden>
         <div className="landing-hero-section__grid" />
+        <HeroBackgroundVideo />
         <div className="landing-hero-section__glow" />
       </div>
       <div className="relative z-10">
