@@ -314,6 +314,62 @@
   box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
 }
 
+/* --------------------------------------------------- input with a trailing control
+ * Used by the password reveal toggle on the sign-in form. The button is positioned
+ * over the input rather than beside it, so the field keeps its full width and the
+ * layout is unchanged when no affix is present. */
+.admin-input-group {
+  position: relative;
+  display: block;
+}
+
+/* Room for the button, so a long password never runs underneath it */
+.admin-input--with-affix {
+  padding-right: 3.1rem;
+}
+
+.admin-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Matches .admin-input's own min-height, so the hit area fills the field edge to
+     edge and clears the 44px touch minimum. */
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: var(--ad-muted);
+  cursor: pointer;
+  transition: color 0.18s ease;
+}
+
+.admin-password-toggle:hover:not(:disabled) {
+  color: var(--ad-text);
+}
+
+.admin-password-toggle:focus-visible {
+  outline: 2px solid var(--ad-gold);
+  outline-offset: -2px;
+  color: var(--ad-text);
+}
+
+.admin-password-toggle:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-password-toggle {
+    transition: none;
+  }
+}
+
 /* ----------------------------------------------------------------- buttons */
 .admin-btn {
   display: inline-flex;

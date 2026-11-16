@@ -1424,3 +1424,119 @@ drift guards — all still pass, confirming the form contract is untouched.
 
 See §9 and §10 of [docs/RESPONSIVE_DESIGN_AUDIT.md](RESPONSIVE_DESIGN_AUDIT.md) for the full
 numbers.
+
+---
+
+## 2026-11-16 — Show/hide password on the administrator sign-in
+
+### What was built
+
+The password field on `/admin/login` now has an eye button inside its right edge. Pressing it
+switches the field between hidden dots and readable text; pressing it again hides it. It starts
+hidden every time the page loads.
+
+### Why a password reveal at all
+
+Typing a long password blind, on a form that deliberately refuses to say whether the email or the
+password was wrong (see `onSubmit` — one message for both, so the form cannot be used to discover
+which addresses have accounts), means a typo and a genuinely wrong password look identical. The
+reveal lets the operator check what they typed before submitting.
+
+It is off by default and never remembers its state, because a revealed password is readable by
+anyone near the screen. The visitor turns it on deliberately, for a moment.
+
+### The markup change that matters
+
+The other fields on this form are *implicit* labels — the `<label>` wraps both the caption and
+the input:
+
+```jsx
+<label className="admin-field">
+  <span className="admin-label">Work email</span>
+  <input className="admin-input" … />
+</label>
+```
+
+The password field could not stay that way. **HTML does not allow a `<label>` to contain
+interactive content other than its own control**, and a button is interactive content. So the
+password field alone was converted to an explicit label:
+
+```jsx
+<div className="admin-field">
+  <label className="admin-label" htmlFor="admin-password">Password</label>
+  <div className="admin-input-group">
+    <input id="admin-password" className="admin-input admin-input--with-affix" … />
+    <button type="button" className="admin-password-toggle" …>…</button>
+  </div>
+</div>
+```
+
+That is the only structural change; the email field above it is untouched.
+
+### The details that are easy to get wrong
+
+| Decision | Why |
+|---|---|
+| `type="button"` | Without it a `<button>` inside a `<form>` defaults to `type="submit"`. The eye would submit the sign-in form |
+| `aria-label` flips between "Show password" and "Hide password" | The button has no text, only an icon. The label carries the state, so a screen reader announces what pressing it will do |
+| `aria-pressed={showPassword}` | Marks it as a toggle rather than a one-shot action, so assistive technology reports it as on or off |
+| `aria-controls="admin-password"` | Names the field it governs |
+| Icon is `aria-hidden` | It is decorative; the button's own label is the accessible name |
+| Button is 2.75rem square | Matches `.admin-input`'s `min-height`, so it fills the field edge to edge and clears the 44px touch minimum established by the November responsiveness audit |
+| `.admin-input--with-affix` adds `padding-right: 3.1rem` | Without it a long password runs underneath the button |
+| `disabled={busy}` | Matches the input, so the form freezes as one piece while signing in |
+
+The button is positioned absolutely over the input rather than placed beside it, so the field
+keeps its full width and nothing moves when the affix is absent.
+
+### Libraries
+
+`lucide-react`'s `Eye` and `EyeOff`, already a dependency and already used elsewhere in the admin
+console (`AdminShell`, `Dashboard`, `Messages`, `Team`). No new dependency.
+
+### Backend, API, database, security
+
+**No backend change.** The field still posts the same `password` value to
+`supabase.auth.signInWithPassword`; only its rendered `type` attribute changes. Nothing new is
+stored, logged or transmitted, and the toggle state lives in component state that resets on every
+page load.
+
+The one security property worth stating: switching `type="password"` to `type="text"` makes the
+value visible on screen **and** removes the browser's own masking, so a password manager or
+screen recorder sees plain text. That is inherent to any reveal control. It is mitigated by
+defaulting to hidden and never persisting the state.
+
+### What was verified
+
+Measured in headless Chrome against the production build, at 375px and 1440px:
+
+| Check | Result |
+|---|---|
+| Toggling | `type` goes `password` → `text` → `password` |
+| Label and state | `aria-label` flips "Show password" ↔ "Hide password"; `aria-pressed` flips `false` ↔ `true` |
+| Typed value survives | typed `hunter2!` with real key events, still `hunter2!` after revealing and hiding |
+| Keyboard | Tab from the password field lands on the toggle; Space activates it |
+| **Enter never reveals** | with focus in the password field, Enter leaves `type="password"` |
+| Button geometry | 44×44, inside the 44px input's bounds, at both widths |
+| Not nested in a label | confirmed: no `.admin-password-toggle` inside any `<label>` |
+| `<label for>` present | yes, pointing at `admin-password` |
+| Horizontal overflow | 0 at both widths |
+| Build / tests / lint | build passes, 142/142 tests, lint unchanged |
+
+**Not verified:** that Enter submits the form. Synthetic `Enter` through the DevTools Protocol
+does not trigger implicit form submission in this harness — and it does not on the *email* field
+either, which this change never touched, so the behaviour is unchanged rather than broken. It
+needs a real browser to confirm.
+
+### Not done
+
+`/admin/signup` has two password fields (`password` and `confirmPassword`) with no reveal. They
+were left alone because the request named the sign-in page. The same pattern would drop straight
+in: `.admin-input-group`, `.admin-input--with-affix` and `.admin-password-toggle` are generic.
+
+### Files touched
+
+| File | Change |
+|---|---|
+| `src/pages/admin/Login.jsx` | `showPassword` state, explicit label, the toggle button |
+| `src/admin/admin.css` | `.admin-input-group`, `.admin-input--with-affix`, `.admin-password-toggle` and its hover/focus/disabled/reduced-motion states |

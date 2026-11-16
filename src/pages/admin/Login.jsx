@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { getSupabase, isSupabaseConfigured } from '../../admin/supabaseClient.js'
 import { useAdminAuth } from '../../admin/useAdminAuth.js'
 import { AdminShell } from '../../admin/AdminShell.jsx'
@@ -13,6 +14,7 @@ export default function AdminLogin() {
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
   const [notice, setNotice] = useState(null)
@@ -95,19 +97,43 @@ export default function AdminLogin() {
           />
         </label>
 
-        <label className="admin-field">
-          <span className="admin-label">Password</span>
-          <input
-            className="admin-input"
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={busy}
-          />
-        </label>
+        {/*
+          An explicit <label htmlFor> rather than a wrapping one, unlike the email
+          field above: a <label> may not contain interactive content other than its
+          own control, and the reveal button is interactive content.
+        */}
+        <div className="admin-field">
+          <label className="admin-label" htmlFor="admin-password">Password</label>
+          <div className="admin-input-group">
+            <input
+              id="admin-password"
+              className="admin-input admin-input--with-affix"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={busy}
+            />
+            <button
+              type="button"
+              className="admin-password-toggle"
+              onClick={() => setShowPassword((shown) => !shown)}
+              disabled={busy}
+              // The label carries the state, so a screen reader announces the change
+              // on press. aria-pressed marks it as a toggle rather than an action.
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              aria-pressed={showPassword}
+              aria-controls="admin-password"
+              // type=button keeps Enter in the password field submitting the form
+              // rather than flipping the password into plain sight.
+              tabIndex={0}
+            >
+              {showPassword ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
+            </button>
+          </div>
+        </div>
 
         <button type="submit" className="admin-btn admin-btn--primary" disabled={busy || !isSupabaseConfigured}>
           {busy ? 'Signing in…' : 'Sign in'}
