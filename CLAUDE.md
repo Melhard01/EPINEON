@@ -15,19 +15,30 @@ npm run dev          # Vite dev server
 npm run build        # 3 steps: client build → SSR build → prerender (see below)
 npm run preview      # serve the built dist/ (no clean-URL rewriting — see Prerendering)
 npm run lint         # eslint over the repo (dist/ ignored); 16 pre-existing problems
+npm test             # node --test tests/ — 142 tests, no framework
+
+node --test tests/forms.test.js                      # one file
+node --test --test-name-pattern="never says" tests/  # one test by name
 ```
 
 `npm run build` runs `vite build` (client → `dist/`), then `vite build --ssr src/entry-server.jsx`
 (→ `.ssr-build/`, gitignored), then [scripts/prerender.mjs](scripts/prerender.mjs), which writes
 one static `.html` per route plus `dist/sitemap.xml` and deletes `.ssr-build/`.
 
-There is no test framework, no TypeScript, and no formatter config — the codebase is plain
-JSX + ESLint only. Don't add test commands to docs unless a suite is actually introduced.
+There is no TypeScript and no formatter config. Tests are Node's built-in runner over plain
+`.test.js` files — no Jest, no Vitest. `tests/fakeSupabase.mjs` is a stand-in for the Supabase
+REST and Auth APIs (PostgREST filters, `?select=` projection, filtered PATCH, and a
+`missingTables` option that answers as an unapplied migration would), so the real handlers run
+unmodified without a live project.
 
-The dev server proxies `/submit` and `/api/submit` to `http://127.0.0.1:3003` (see
-[vite.config.js](vite.config.js)); the backend that serves them is **not** in this repo.
-Set `VITE_API_BASE_URL` (origin only, no path) in `.env.local` to point the contact form at a
-remote API instead — see [.env.example](.env.example).
+**`dist/` is committed to git.** Every `npm run build` rewrites all 34 pages, so any commit that
+runs a build touches them all — and a build made with throwaway env values will commit those
+values. Check `dist/` before staging.
+
+The dev server still proxies `/submit` and `/api/submit` to `http://127.0.0.1:3003` (see
+[vite.config.js](vite.config.js)), but that is **vestigial** — the contact form now posts to
+`/api/contact` in this repo and is not proxied. `VITE_API_BASE_URL` (origin only, no path) still
+redirects the form to another origin during development — see [.env.example](.env.example).
 
 ## Architecture
 
@@ -171,10 +182,125 @@ elements; CSS in `App.css` does the rest. Consequences worth knowing:
 
 [src/pages/Contact.jsx](src/pages/Contact.jsx) drives every path (demo request + inquiry tabs)
 from field arrays defined at the top of the file, then flattens all non-name/email fields into a
-single `message` string before POSTing `{firstName, lastName, email, message}` to
-`${VITE_API_BASE_URL}/api/submit` (or same-origin `/api/submit`). Adding a field means adding it
-to the tab's `fields` array only — the backend contract stays fixed.
+single `message` string (`[Demo request]\nCompany: …`) before POSTing to `/api/contact`:
+
+```js
+{ name, email, subject, message, company, formId,
+  companyWebsite /* honeypot */, formStartedAt, sourcePath }
+```
+
+Adding a field means adding it to the tab's `fields` array — but if you add or rename a **tab**,
+or rename a field **label**, you must also update the registry in
+[api/_lib/forms.js](api/_lib/forms.js). `npm test` fails if the two disagree: the drift guards
+read the tabs and labels straight out of `Contact.jsx`. That coupling exists because the server
+splits the flattened body back apart using those labels.
+
+The active tab comes from `?tab=`/`?sub=` first, then the legacy `#hash` that links across the
+site still use — see [src/lib/contactTabs.js](src/lib/contactTabs.js).
 
 Cookie consent is homegrown: [lib/cookieUtils.js](src/lib/cookieUtils.js) stores preferences
 under the `epineon-cookie-consent` localStorage key, with `canUseAnalytics/Marketing/Functional`
 helpers to gate any script you add.
+
+## Admin dashboard, API and database
+
+A private operations console at `/admin` for reading contact submissions and managing who can
+see them. Three subsystems the rest of this file does not touch:
+
+- [api/](api/) — Vercel serverless functions, Node ESM, no framework. Three endpoints:
+  `/api/contact` (public intake), `/api/admin/team`, `/api/admin/signup`.
+- [supabase/migrations/](supabase/migrations/) — four tables (`contact_messages`, `admin_users`,
+  `admin_invitations`, `rate_limits`), `is_admin()`, `bump_rate_limit()`, RLS on everything.
+- [src/admin/](src/admin/) — the dashboard: its own shell, hooks and `admin.css`. It shares the
+  repo with the marketing site but inherits none of its layout, and `admin.css` is scoped under
+  `.admin-root` so the two cannot leak into each other.
+
+### The invariant worth protecting
+
+**Authorisation lives in Postgres, not in the application.** `is_admin()` plus RLS decides what
+any authenticated user can touch; `requireAdmin()` re-checks it server-side on every
+`/api/admin/*` call. [RequireAdmin.jsx](src/admin/RequireAdmin.jsx) is a convenience for the
+operator, *not* the boundary — deleting it changes what the page looks like, not what data it
+can reach.
+
+Consequences when changing anything here:
+
+- The admin UI reads and writes Supabase **directly** from the browser with the user's JWT. Only
+  go through an endpoint for something the user is not allowed to do themselves (insert a
+  submission, write the allowlist, create an auth user). Don't add a read API; RLS already
+  enforces what it would.
+- `contact_messages` has **no insert policy** and `admin_users`/`admin_invitations` have no
+  insert or update policy for `authenticated`. Those absences are the design — they are what
+  stop a signed-in user granting themselves access. Don't "fix" them by adding policies.
+- **Anything prefixed `VITE_` is inlined into the public browser bundle.**
+  `SUPABASE_SERVICE_ROLE_KEY` is deliberately un-prefixed and
+  [api/_lib/supabaseAdmin.js](api/_lib/supabaseAdmin.js) must never be imported from `src/`.
+- Supabase writes from the browser must call `.select()`. PostgREST returns neither an error nor
+  a row count when RLS filters the target out, so a blocked write otherwise looks successful —
+  see `setStatus` in [useMessages.js](src/admin/useMessages.js).
+
+### api/_lib
+
+Split deliberately into **pure rules** (`validation`, `invitations`, `forms`) and **I/O**
+(`auth`, `supabaseAdmin`, `rateLimit`). That split is why most of the 142 tests run without a
+database. [http.js](api/_lib/http.js) also classifies failures: `isSchemaError` (an unapplied
+migration) and `isCredentialError` (a rejected service-role key) produce different, named
+messages for admin callers, each with a `ref` matching a log line.
+
+### Migrations
+
+Three files, applied in filename order; each is idempotent. The build does **not** apply them.
+`useMessages` selects `form_id`, `form_name` and `company`, so a project missing migration 3
+fails every dashboard query rather than degrading — and a project missing migration 2 lets the
+team page load while every invitation fails. Verify with:
+
+```sql
+select table_name from information_schema.tables where table_schema = 'public' order by 1;
+```
+
+### Admin routing gotcha
+
+Admin routes are prerendered as `noindex` shells like any other route, because there is no SPA
+fallback. The per-form sections are **one dynamic route** (`/admin/messages/:formId`, declared in
+[AppRoutes.jsx](src/AppRoutes.jsx)) with their concrete paths enumerated in `PRERENDER_PATHS`. A
+literal route per form leaves `useParams()` empty and every section renders as "All".
+# Development Documentation Rules
+
+I am a beginner programmer and I want to understand everything we build together.
+
+Whenever you implement, modify, or add a feature, you must update the project's technical documentation.
+
+For every new feature or significant code change, document:
+
+1. **What was built:** Explain the feature and its purpose.
+2. **Architecture:** Explain how the feature fits into the existing project.
+3. **Libraries and technologies:** Explain which libraries, frameworks and tools were used and why.
+4. **Algorithms and logic:** Explain the logic, algorithms, functions and important decisions behind the implementation.
+5. **Data flow:** Explain how data moves between the frontend, API, backend and database.
+6. **Backend:** Explain the API endpoints, server-side operations, database queries and how data is stored, retrieved or updated.
+7. **Security:** Explain authentication, authorization, validation and security measures involved.
+8. **Code references:** Mention the important files, functions and code locations.
+
+### Documentation requirements
+
+- Maintain a file named `docs/DEVELOPMENT_GUIDE.md`.
+- Update it whenever a significant feature is implemented or modified.
+- Keep previous documentation and update it rather than replacing everything.
+- Use simple English suitable for a beginner.
+- Include diagrams and practical code examples when useful.
+- Explain WHY decisions were made, not just WHAT was implemented.
+- Clearly distinguish existing functionality from newly implemented functionality.
+- Never claim something works unless you have verified it.
+
+### Important working rule
+
+After completing each development task:
+
+1. Summarize what you changed.
+2. Explain how it works technically.
+3. Update `docs/DEVELOPMENT_GUIDE.md`.
+4. Tell me which documentation sections were updated.
+
+Do not modify application code just to create documentation.
+
+My goal is not only to build applications using AI but also to understand how to develop them independently.
